@@ -1,25 +1,35 @@
-import logo from './logo.svg';
-import './App.css';
+import { BrowserRouter, Routes, Route } from "react-router-dom"
+import PagPrincipal from "./Componentes/PagPrincipal"
+import Login from "./Componentes/Login"
+import Citas from "./Componentes/Citas"
+import Propietarios from "./Componentes/Propietarios"
+import Ayuda from "./Componentes/Ayuda"
+import Header from "./Componentes/Header"
+import Servicios from "./Componentes/Servicios"
+import Footer from "./Componentes/Footer"
+import Mascotas from "./Componentes/Mascotas"
+import PoliticasP from "./Componentes/PoliticasP"
+import Administrador from "./Componentes/Administrador"
+
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    <BrowserRouter>
+      <Header />
+      <Routes>
+        <Route path="/" element={<PagPrincipal />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/citas" element={<Citas />} />
+        <Route path="/servicios" element={<Servicios />} />
+        <Route path="/propietarios" element={<Propietarios />} />
+        <Route path="/ayuda" element={<Ayuda />} />
+        <Route path="/mascotas" element={<Mascotas />} />
+        <Route path="/PoliticasP" element={<PoliticasP />} />
+        <Route path="/Administrador" element={<Administrador />} />
+      </Routes>
+      <Footer />
+    </BrowserRouter>
+  )
 }
 
-export default App;
+export default App

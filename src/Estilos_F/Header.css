@@ -1,0 +1,169 @@
+/* ===== GLOBAL STYLES ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Montserrat", "Segoe UI", sans-serif;
+  color: #333333;
+  line-height: 1.6;
+  background-color: #ffffff;
+}
+
+/* ===== HEADER ===== */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background-color: white;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  height: 80px;
+}
+
+.logo-container {
+  width: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo {
+  width: 100%;
+  height: auto;
+  max-height: 50px;
+  object-fit: contain;
+}
+
+.nav-menu {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.menu-list {
+  display: flex;
+  gap: 2rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+.nav-link {
+  color: #000000;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  padding: 0.5rem 0;
+  text-decoration: none !important;
+  display: inline-block;
+}
+
+.nav-link:hover {
+  color: #528ca7;
+  transform: translateY(-2px);
+}
+
+/* ===== HEADER BUTTONS ===== */
+.header-buttons {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-left: auto;
+}
+
+.login-btn,
+.options-btn {
+  background-color: #6cc5ee;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.8rem;
+  border-radius: 30px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  font-size: 0.95rem;
+  min-width: 120px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none !important; /* Elimina subrayado en botones-link */
+}
+
+.login-btn:hover,
+.options-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.login-btn:hover {
+  background-color: #528ca7;
+}
+
+.options-btn:hover {
+  background-color: #528ca7;
+}
+
+/* ===== DROPDOWN ===== */
+.options-wrapper {
+  position: relative;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 5px);
+  right: 0;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 12px;
+  width: 200px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  z-index: 100;
+  display: none;
+}
+
+.options-wrapper:hover .dropdown-menu {
+  display: block;
+}
+
+.dropdown-link {
+  color: #2D3142;
+  display: block;
+  padding: 8px 12px;
+  transition: all 0.2s;
+  text-decoration: none !important;
+}
+
+.dropdown-link:hover {
+  color: #2C6EAB;
+  background: #F8F8F8;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .header {
+    padding: 0.5rem 1rem;
+    height: auto;
+  }
+  
+  .menu-list {
+    gap: 1rem;
+    font-size: 0.9rem;
+  }
+  
+  .login-btn, 
+  .options-btn {
+    padding: 0.5rem 1.2rem;
+    min-width: 100px;
+    font-size: 0.9rem;
+    height: 38px;
+  }
+}

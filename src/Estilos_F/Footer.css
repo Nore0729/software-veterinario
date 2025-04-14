@@ -1,0 +1,96 @@
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 10vh;
+    margin: 0;
+  }
+  
+  .app-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 80vh; 
+  }
+  
+  main {
+    flex-grow: 1;
+  }
+  
+  .footer {
+    margin-top: auto;
+    width: 100%;
+    background-color: #44a6f1;
+    color: white;
+    text-align: center;
+    padding: 5px 0; 
+  }
+  
+  .footer-container {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    padding: 5px; 
+  }
+  
+  .footer-column {
+    flex: 1;
+    min-width: 100px; 
+    margin: 5px;
+  }
+  
+  .footer-column h3 {
+    border-bottom: 2px solid white;
+    padding-bottom: 3px;
+    font-size: 1rem; 
+  }
+  
+  .footer-column ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .footer-column ul li {
+    margin: 3px 0;
+    font-size: 0.9rem; 
+  }
+  
+  .footer-column ul li a {
+    color: white;
+    text-decoration: none;
+  }
+  
+  .payment-methods {
+    text-align: center;
+    margin-top: 10px; 
+  }
+  
+  .payment-icons  {
+    width: 90px; 
+    margin: 3px;
+  }
+  
+  
+  @media (min-width: 600px) {
+    #cuerpo2 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+  
+    .texto-bienvenida h2,
+    #cuerpo1 h1 {
+        font-size: 2rem; 
+    }
+  
+    .veterinario1 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+  
+    .footer-container {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+  
+    .footer-column {
+        flex: 1 0 40%; 
+        min-width: 0;
+    }
+  }
+  
