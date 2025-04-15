@@ -55,7 +55,7 @@ export const Login = () => {
         </form>
 
         <div className="login-links"> {/* Agregado className */}
-          <a href="#">¿Olvidaste tu contraseña?</a>
+          <Link to="/Contraseña1">¿Olvidaste tu contraseña?</Link>
           <Link to="/Propietarios">Registrar</Link> {/* Eliminado className innecesario */}
         </div>
       </div>

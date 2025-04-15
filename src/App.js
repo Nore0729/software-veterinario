@@ -10,6 +10,10 @@ import Footer from "./Componentes/Footer"
 import Mascotas from "./Componentes/Mascotas"
 import PoliticasP from "./Componentes/PoliticasP"
 import Administrador from "./Componentes/Administrador"
+import Contraseña1 from "./Componentes/Contraseña1"
+import Contraseña2 from "./Componentes/Contraseña2"
+
+
 
 
 function App() {
@@ -26,6 +30,8 @@ function App() {
         <Route path="/mascotas" element={<Mascotas />} />
         <Route path="/PoliticasP" element={<PoliticasP />} />
         <Route path="/Administrador" element={<Administrador />} />
+        <Route path="/Contraseña1" element={<Contraseña1/>}/>
+        <Route path="/Contraseña2" element={<Contraseña2/>}/>
       </Routes>
       <Footer />
     </BrowserRouter>
