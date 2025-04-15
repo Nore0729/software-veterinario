@@ -1,4 +1,4 @@
-/* ===== GLOBAL STYLES ===== */
+
 * {
   margin: 0;
   padding: 0;
@@ -12,7 +12,7 @@ body {
   background-color: #ffffff;
 }
 
-/* ===== HEADER ===== */
+
 .header {
   display: flex;
   justify-content: space-between;
@@ -24,6 +24,7 @@ body {
   top: 0;
   z-index: 1000;
   height: 80px;
+  flex-wrap: wrap;
 }
 
 .logo-container {
@@ -70,7 +71,7 @@ body {
   transform: translateY(-2px);
 }
 
-/* ===== HEADER BUTTONS ===== */
+
 .header-buttons {
   display: flex;
   gap: 1rem;
@@ -94,7 +95,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  text-decoration: none !important; /* Elimina subrayado en botones-link */
+  text-decoration: none !important; 
 }
 
 .login-btn:hover,
@@ -111,7 +112,7 @@ body {
   background-color: #528ca7;
 }
 
-/* ===== DROPDOWN ===== */
+
 .options-wrapper {
   position: relative;
 }
@@ -125,7 +126,7 @@ body {
   border-radius: 8px;
   padding: 12px;
   width: 200px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   z-index: 100;
   display: none;
 }
@@ -135,7 +136,7 @@ body {
 }
 
 .dropdown-link {
-  color: #2D3142;
+  color: #2d3142;
   display: block;
   padding: 8px 12px;
   transition: all 0.2s;
@@ -143,27 +144,172 @@ body {
 }
 
 .dropdown-link:hover {
-  color: #2C6EAB;
-  background: #F8F8F8;
+  color: #2c6eab;
+  background: #f8f8f8;
 }
 
 /* ===== RESPONSIVE ===== */
-@media (max-width: 768px) {
+@media (max-width: 1200px) {
   .header {
-    padding: 0.5rem 1rem;
-    height: auto;
+    padding: 0.8rem 1.5rem;
   }
-  
+
   .menu-list {
-    gap: 1rem;
-    font-size: 0.9rem;
+    gap: 1.5rem;
   }
-  
-  .login-btn, 
+
+  .login-btn,
+  .options-btn {
+    padding: 0.6rem 1.5rem;
+    min-width: 110px;
+  }
+}
+
+@media (max-width: 992px) {
+  .header {
+    padding: 0.7rem 1.2rem;
+  }
+
+  .menu-list {
+    gap: 1.2rem;
+  }
+
+  .login-btn,
   .options-btn {
     padding: 0.5rem 1.2rem;
     min-width: 100px;
     font-size: 0.9rem;
-    height: 38px;
+  }
+}
+
+@media (max-width: 768px) {
+  .header {
+    padding: 0.5rem 1rem;
+    height: auto;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+
+  .logo-container {
+    width: 120px;
+    order: 1;
+  }
+
+  .header-buttons {
+    order: 2;
+    margin-left: 0;
+  }
+
+  .nav-menu {
+    order: 3;
+    flex-basis: 100%;
+    margin-top: 1rem;
+    overflow-x: auto;
+    justify-content: flex-start;
+    padding-bottom: 0.5rem;
+  }
+
+  .menu-list {
+    gap: 1rem;
+    width: max-content;
+    padding-right: 1rem;
+  }
+
+  .login-btn,
+  .options-btn {
+    padding: 0.5rem 1rem;
+    min-width: 90px;
+    font-size: 0.85rem;
+    height: 36px;
+  }
+}
+
+@media (max-width: 576px) {
+  .header {
+    padding: 0.5rem;
+  }
+
+  .logo-container {
+    width: 100px;
+  }
+
+  .header-buttons {
+    gap: 0.5rem;
+  }
+
+  .login-btn,
+  .options-btn {
+    padding: 0.4rem 0.8rem;
+    min-width: 80px;
+    font-size: 0.8rem;
+    height: 32px;
+  }
+
+  .nav-menu {
+    margin-top: 0.8rem;
+  }
+
+  .menu-list {
+    gap: 0.8rem;
+  }
+
+  .nav-link {
+    font-size: 0.9rem;
+    padding: 0.4rem 0;
+  }
+
+  .dropdown-menu {
+    width: 180px;
+    padding: 8px;
+  }
+
+  .dropdown-link {
+    padding: 6px 10px;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .header {
+    padding: 0.4rem;
+  }
+
+  .logo-container {
+    width: 90px;
+  }
+
+  .login-btn,
+  .options-btn {
+    padding: 0.3rem 0.6rem;
+    min-width: 70px;
+    font-size: 0.75rem;
+    height: 30px;
+  }
+
+  .menu-list {
+    gap: 0.6rem;
+  }
+
+  .nav-link {
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .header-buttons {
+    flex-direction: column;
+    gap: 0.3rem;
+    align-items: flex-end;
+  }
+
+  .login-btn,
+  .options-btn {
+    min-width: 65px;
+    font-size: 0.7rem;
+    height: 28px;
+  }
+
+  .nav-link {
+    font-size: 0.8rem;
   }
 }

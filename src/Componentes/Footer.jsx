@@ -13,7 +13,7 @@ const Footer = () => {
                     <h3>Síguenos</h3>
                     <ul>
                         <li>
-                            <a href="#">
+                            <a href="https://wa.link/gfl7jn">
                               <BsWhatsapp />
                                Whatsapp
                             </a>
@@ -38,7 +38,7 @@ const Footer = () => {
                         <li><a href="#">Sobre nosotros</a></li>
                         <li><a href="/servicios">Servicios</a></li>
                         <li><a href="#">Contacto</a></li>
-                        <li><a href="#">Política de privacidad</a></li>
+                        <li><a href="/PoliticasP">Política de privacidad</a></li>
                     </ul>
                 </div>
                 <div className="footer-column">
