@@ -16,7 +16,7 @@ function Servicios() {
         <div className="tarjeta-servicio">
           <div className="imagen-contenedor">
             <img
-              src={require("../imagenes/Bienestar.jpg") || "/placeholder.svg"}
+              src="https://raw.githubusercontent.com/Nore0729/Img-soft-veterinario/refs/heads/main/Bienestar.jpg"
               alt="Servicio de Bienestar"
               className="imagen-servicio"
             />
@@ -42,7 +42,7 @@ function Servicios() {
         <div className="tarjeta-servicio">
           <div className="imagen-contenedor">
             <img
-              src={require("../imagenes/operar.jpg") || "/placeholder.svg"}
+              src="https://raw.githubusercontent.com/Nore0729/Img-soft-veterinario/refs/heads/main/operar.jpg"
               alt="Servicio de Urgencias"
               className="imagen-servicio"
             />
@@ -60,11 +60,11 @@ function Servicios() {
           </div>
         </div>
 
-        {/* Servicio 3: Cirugías */}
+    
         <div className="tarjeta-servicio">
           <div className="imagen-contenedor">
             <img
-              src={require("../imagenes/ortopedia.jpg") || "/placeholder.svg"}
+              src="https://raw.githubusercontent.com/Nore0729/Img-soft-veterinario/refs/heads/main/ortopedia.jpg"
               alt="Servicio de Cirugías"
               className="imagen-servicio"
             />
@@ -82,11 +82,10 @@ function Servicios() {
           </div>
         </div>
 
-        {/* Servicio 5: Especialidades */}
         <div className="tarjeta-servicio">
           <div className="imagen-contenedor">
             <img
-              src={require("../imagenes/hospital.jpg") || "/placeholder.svg"}
+              src="https://raw.githubusercontent.com/Nore0729/Img-soft-veterinario/refs/heads/main/hospital.jpg"
               alt="Servicio de Especialidades"
               className="imagen-servicio"
             />

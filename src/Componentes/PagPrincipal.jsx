@@ -658,15 +658,6 @@ const PagPrincipal = () => {
                   Enviar mensaje
                 </button>
               </form>
-
-              <div className="quick-actions">
-                <a href="https://wa.link/gfl7jn" className="quick-action whatsapp-btn">
-                   WhatsApp
-                </a>
-                <a href="tel:+123456789" className="quick-action call-btn">
-                   Llamar
-                </a>
-              </div>
             </div>
           </div>
         </div>

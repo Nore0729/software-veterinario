@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import logo from "../imagenes/GuzPet.png";
 import "../Estilos_F/Header.css";
 
 const Header = () => {
@@ -10,7 +9,7 @@ const Header = () => {
     <header className="header">
       <div className="logo-container">
         <img 
-          src={logo || "https://via.placeholder.com/150x50?text=GuzPet"} 
+          src="https://raw.githubusercontent.com/Nore0729/Img-soft-veterinario/refs/heads/main/GuzPet.png" 
           alt="Logo GuzPet" 
           className="logo" 
         />
