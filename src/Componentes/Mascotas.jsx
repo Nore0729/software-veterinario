@@ -21,7 +21,7 @@ function Mascota() {
     reptil: ["Tortuga", "Iguana", "Serpiente"]
   };
 
-  // Calcula progreso en tiempo real
+
   useEffect(() => {
     const requiredFields = {
       1: ['nombre', 'especie', 'raza', 'foto'],
@@ -50,7 +50,7 @@ function Mascota() {
 
   const onSubmit = (data) => {
     console.log('Mascota registrada:', data);
-    // Aquí tu lógica de envío
+    
   };
 
   const nextStep = async () => {
@@ -73,7 +73,7 @@ function Mascota() {
       <header className="mascota-header">
         <h1>🐾 Registrar Nueva Mascota</h1>
         
-        {/* Barra de progreso principal */}
+     
         <div className="progress-tracker">
           <div 
             className="progress-bar" 
@@ -84,7 +84,7 @@ function Mascota() {
           </div>
         </div>
 
-        {/* Indicador de paso actual */}
+        
         <div className="step-indicator">
           <span className={step >= 1 ? 'active' : ''}>1. Identificación</span>
           <span className={step >= 2 ? 'active' : ''}>2. Características</span>
@@ -93,7 +93,7 @@ function Mascota() {
       </header>
 
       <form onSubmit={handleSubmit(onSubmit)} className="mascota-form">
-        {/* PASO 1 */}
+        
         {step === 1 && (
           <fieldset className="form-section">
             <legend>Información Básica</legend>

@@ -9,7 +9,7 @@ const port = 3001;
 app.use(bodyParser.json());
 app.use(cors());
 
-// Conexión a la base de datos
+
 const db = mysql.createConnection({
   host: 'localhost',
   user: 'root',
@@ -26,7 +26,7 @@ db.connect((err) => {
   console.log('Conexión a la base de datos exitosa');
 });
 
-// Ruta para registrar propietarios
+
 app.post('/api/registro-propietario', (req, res) => {
   const { tipoDocumento, documento, nombre, fechaNacimiento, telefono, email, direccion, password } = req.body;
 
