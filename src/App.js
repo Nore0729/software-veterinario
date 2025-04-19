@@ -12,7 +12,7 @@ import PoliticasP from "./Componentes/PoliticasP"
 import Administrador from "./Componentes/Administrador"
 import Contraseña1 from "./Componentes/Contraseña1"
 import Contraseña2 from "./Componentes/Contraseña2"
-
+import UserWelcome from "./Componentes/UserWelcome"
 
 
 
@@ -32,6 +32,7 @@ function App() {
         <Route path="/Administrador" element={<Administrador />} />
         <Route path="/Contraseña1" element={<Contraseña1/>}/>
         <Route path="/Contraseña2" element={<Contraseña2/>}/>
+        <Route path="/UserWelcome" element={<UserWelcome/>}/>
       </Routes>
       <Footer />
     </BrowserRouter>

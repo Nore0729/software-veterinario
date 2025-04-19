@@ -1,35 +1,43 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import '../Estilos_F/Login.css';
 
 export const Login = () => {
-  // Estados
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
-  // Manejo del submit
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!email || !password) {
       setError('Por favor completa ambos campos');
       return;
     }
-    
-    // Aquí iría tu lógica de autenticación
-    console.log('Datos de login:', { email, password });
-    setError('');
-    alert(`Bienvenido, ${email}!`);
+
+    try {
+      const response = await axios.post('http://localhost:3001/api/login', {
+        email,
+        password
+      });
+
+      console.log(response.data);
+      setError('');
+      navigate('/UserWelcome'); // Redirige si el login es exitoso
+    } catch (err) {
+      console.error('Error al iniciar sesión:', err);
+      setError(err.response?.data?.message || 'Error al iniciar sesión');
+    }
   };
 
   return (
     <div className="login-container">
-      <div> {/* Contenedor principal agregado */}
+      <div>
         <h2>🐾 Patitas Felices</h2>
-        
         <form onSubmit={handleSubmit}>
-          <div className="form-group"> {/* Agregado className */}
+          <div className="form-group">
             <label>Correo electrónico:</label>
             <input 
               type="email" 
@@ -39,7 +47,7 @@ export const Login = () => {
             />
           </div>
 
-          <div className="form-group"> {/* Agregado className */}
+          <div className="form-group">
             <label>Contraseña:</label>
             <input 
               type="password" 
@@ -49,14 +57,14 @@ export const Login = () => {
             />
           </div>
 
-          {error && <p className="error-message">{error}</p>} {/* Cambiado a className */}
+          {error && <p className="error-message">{error}</p>}
 
           <button type="submit">Iniciar Sesión</button>
         </form>
 
-        <div className="login-links"> {/* Agregado className */}
+        <div className="login-links">
           <Link to="/Contraseña1">¿Olvidaste tu contraseña?</Link>
-          <Link to="/Propietarios">Registrar</Link> {/* Eliminado className innecesario */}
+          <Link to="/Propietarios">Registrar</Link>
         </div>
       </div>
     </div>

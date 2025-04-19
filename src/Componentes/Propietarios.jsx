@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { Link } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { PawPrint, User, AtSign, Lock, ChevronRight, ChevronLeft } from 'lucide-react';
-import axios from 'axios'; // Importamos Axios
+import axios from 'axios'; 
 import '../Estilos_F/Propietarios.css';
 
 function RegistroPropietario() {
@@ -21,7 +21,6 @@ function RegistroPropietario() {
   const password = watch("password");
   const formValues = watch();
 
-  // Campos requeridos por paso
   const requiredFields = {
     1: ['tipoDocumento', 'documento', 'nombre', 'fechaNacimiento'],
     2: ['telefono', 'email', 'direccion'],
@@ -66,10 +65,8 @@ function RegistroPropietario() {
 
   const onSubmit = async (data) => {
     try {
-      // Hacemos una solicitud POST al backend con los datos del formulario
-      const response = await axios.post('http://localhost:3000/api/registro-propietario', data);
+      const response = await axios.post('http://localhost:3001/api/registro-propietario', data);
       
-      // Si la respuesta es exitosa, mostramos un mensaje de éxito
       Swal.fire({
         title: '<strong>Registro exitoso!</strong>',
         html: `<i>El propietario <strong>${data.nombre}</strong> fue registrado</i>`,
@@ -77,7 +74,6 @@ function RegistroPropietario() {
         timer: 3000
       });
     } catch (error) {
-      // Si ocurre un error, mostramos un mensaje de error
       Swal.fire({
         title: '<strong>Error!</strong>',
         html: `<i>No se pudo registrar al propietario. Intenta nuevamente.</i>`,

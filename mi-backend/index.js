@@ -1,27 +1,23 @@
-// Importamos las dependencias necesarias
 const express = require('express');
 const mysql = require('mysql2');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 
-// Creamos una instancia de Express
 const app = express();
-const port = 3000; // El puerto donde escuchará el servidor
+const port = 3001;
 
-// Usamos middleware para manejar el cuerpo de las solicitudes (formato JSON) y CORS
 app.use(bodyParser.json());
 app.use(cors());
 
-// Configuramos la conexión a la base de datos MySQL
+// Conexión a la base de datos
 const db = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: '',
-    database: 'veterinaria',
-    port: '3306' // Asegúrate de tener esta base de datos creada
+  host: 'localhost',
+  user: 'root',
+  password: '',
+  database: 'veterinaria',
+  port: '3306'
 });
 
-// Conectamos a la base de datos MySQL
 db.connect((err) => {
   if (err) {
     console.error('Error al conectar a la base de datos:', err);
@@ -30,15 +26,15 @@ db.connect((err) => {
   console.log('Conexión a la base de datos exitosa');
 });
 
-// Ruta que maneja el registro de propietarios
+// Ruta para registrar propietarios
 app.post('/api/registro-propietario', (req, res) => {
   const { tipoDocumento, documento, nombre, fechaNacimiento, telefono, email, direccion, password } = req.body;
 
-  // Consulta SQL para insertar los datos del propietario en la base de datos
-  const query = `INSERT INTO propietarios (tipoDocumento, documento, nombre, fechaNacimiento, telefono, email, direccion, password) 
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+  const query = `
+    INSERT INTO propietarios 
+    (tipoDocumento, documento, nombre, fechaNacimiento, telefono, email, direccion, password) 
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
 
-  // Ejecutamos la consulta con los valores recibidos del formulario
   db.query(query, [tipoDocumento, documento, nombre, fechaNacimiento, telefono, email, direccion, password], (err, results) => {
     if (err) {
       console.error('Error al insertar los datos:', err);
@@ -48,7 +44,26 @@ app.post('/api/registro-propietario', (req, res) => {
   });
 });
 
-// Iniciamos el servidor en el puerto 5000
+// Ruta para iniciar sesión
+app.post('/api/login', (req, res) => {
+  const { email, password } = req.body;
+
+  const query = 'SELECT * FROM propietarios WHERE email = ? AND password = ?';
+
+  db.query(query, [email, password], (err, results) => {
+    if (err) {
+      console.error('Error al consultar la base de datos:', err);
+      return res.status(500).json({ message: 'Error del servidor' });
+    }
+
+    if (results.length > 0) {
+      return res.status(200).json({ message: 'Login exitoso', user: results[0] });
+    } else {
+      return res.status(401).json({ message: 'Correo o contraseña incorrectos o no registrados' });
+    }
+  });
+});
+
 app.listen(port, () => {
   console.log(`Servidor corriendo en http://localhost:${port}`);
 });
