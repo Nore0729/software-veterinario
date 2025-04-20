@@ -1,4 +1,3 @@
-// Importamos las dependencias necesarias
 const express = require('express');
 const mysql = require('mysql2/promise'); // Usamos la versión promise-based
 const bodyParser = require('body-parser');
@@ -8,7 +7,6 @@ const path = require('path');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-// Creamos una instancia de Express
 const app = express();
 const port = 3000;
 

@@ -5,16 +5,16 @@ import Swal from 'sweetalert2';
 import '../Estilos_F/Login.css';
 
 export const Login = () => {
-  // Estados
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const navigate = useNavigate();
   const navigate = useNavigate();
 
   // Manejo del submit
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!email || !password) {
       setError('Por favor completa ambos campos');
       return;
@@ -53,9 +53,10 @@ export const Login = () => {
   return (
     <div className="login-container">
       <div>
+      <div>
         <h2>🐾 Patitas Felices</h2>
-        
         <form onSubmit={handleSubmit}>
+          <div className="form-group">
           <div className="form-group">
             <label>Correo electrónico:</label>
             <input 
@@ -68,6 +69,7 @@ export const Login = () => {
           </div>
 
           <div className="form-group">
+          <div className="form-group">
             <label>Contraseña:</label>
             <input 
               type="password" 
@@ -79,10 +81,12 @@ export const Login = () => {
           </div>
 
           {error && <p className="error-message">{error}</p>}
+          {error && <p className="error-message">{error}</p>}
 
           <button type="submit">Iniciar Sesión</button>
         </form>
 
+        <div className="login-links">
         <div className="login-links">
           <Link to="/Contraseña1">¿Olvidaste tu contraseña?</Link>
           <Link to="/Propietarios">Registrarse</Link>

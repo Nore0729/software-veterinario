@@ -458,7 +458,7 @@ const PagPrincipal = () => {
                   </div>
                   <div className="address-content">
                     <h4>Dirección</h4>
-                    <p> Cl. 13 #1093, Soacha, Cundinamarca</p>
+                    <p>Cl. 12 #9 -58, Soacha, Cundinamarca</p>
                   </div>
                 </div>
 
@@ -469,7 +469,7 @@ const PagPrincipal = () => {
                   <div className="address-content">
                     <h4>Teléfono</h4>
                     <p>
-                      <a href="tel:+123456789">+52 123 456 789</a>
+                      <a href="tel:+123456789">+57 3214972944</a>
                     </p>
                   </div>
                 </div>
@@ -482,7 +482,7 @@ const PagPrincipal = () => {
                     <h4>Email</h4>
                     <p>
                       <a href="mailto:contacto@guzpet.com">
-                        contacto@guzpet.com
+                        contacto@petlovers.com
                       </a>
                     </p>
                   </div>
@@ -496,11 +496,11 @@ const PagPrincipal = () => {
                 <ul className="hours-list">
                   <li className="hours-item">
                     <span className="day">Lunes - Viernes</span>
-                    <span className="time">9:00 AM - 7:00 PM</span>
+                    <span className="time">9:00 AM - 4:00 PM</span>
                   </li>
                   <li className="hours-item">
                     <span className="day">Sábado</span>
-                    <span className="time">10:00 AM - 4:00 PM</span>
+                    <span className="time">10:00 AM - 2:00 PM</span>
                   </li>
                   <li className="hours-item">
                     <span className="day">Domingo</span>
@@ -521,16 +521,13 @@ const PagPrincipal = () => {
             </div>
 
             <div className="map-container">
-              <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3976.785944323178!2d-74.22182648523948!3d4.632467996632035!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8e3f9c7ba6e3c7a5%3A0x3b4d1c5b0b5b5b5b!2sCIDE%20Soacha!5e0!3m2!1ses!2sco!4v1620000000000!5m2!1ses!2sco"
-                width="600"
-                height="450"
-                style={{ border: 0 }}
-                allowFullScreen=""
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                title="Ubicación Pet-Lovers"
-              ></iframe>
+            <iframe
+              title="Ubicación Pet Lovers Spa Therapy"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3977.007047573952!2d-74.2208567!3d4.5839607!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8e3f9f1dbb5a9d83%3A0x66d22c859134dc43!2sPet%20Lovers%20Spa%20Therapy!5e0!3m2!1ses!2sco!4v1620000000000!5m2!1ses!2sco"
+              allowFullScreen
+              loading="lazy"
+              className="map-iframe"
+            ></iframe>
             </div>
           </div>
         </div>

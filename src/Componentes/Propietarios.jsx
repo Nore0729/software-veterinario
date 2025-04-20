@@ -22,7 +22,6 @@ function RegistroPropietario() {
   const password = watch("password");
   const formValues = watch();
 
-  // Campos requeridos por paso
   const requiredFields = {
     1: ['tipoDocumento', 'documento', 'nombre', 'fechaNacimiento'],
     2: ['telefono', 'email', 'direccion'],

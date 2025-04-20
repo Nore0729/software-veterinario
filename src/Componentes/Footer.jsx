@@ -37,14 +37,13 @@ const Footer = () => {
                     <ul>
                         <li><a href="#">Sobre nosotros</a></li>
                         <li><a href="/servicios">Servicios</a></li>
-                        <li><a href="#">Contacto</a></li>
                         <li><a href="/PoliticasP">Política de privacidad</a></li>
                     </ul>
                 </div>
                 <div className="footer-column">
                     <h3>Contacto</h3>
                     <ul>
-                        <li>Email: Petlovers@gmail.com</li>
+                        <li>Email:contacto@petlovers.com</li>
                         <li>Teléfono: +57 3214972645</li>
                         <li>Dirección: Soacha Cundinamarca</li>
                     </ul>
