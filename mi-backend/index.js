@@ -44,7 +44,7 @@ app.post('/api/registro-propietario', (req, res) => {
   });
 });
 
-// Ruta para iniciar sesión
+
 app.post('/api/login', (req, res) => {
   const { email, password } = req.body;
 
