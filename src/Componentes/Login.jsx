@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import Swal from 'sweetalert2';
 import '../Estilos_F/Login.css';
 
 export const Login = () => {
@@ -11,24 +12,44 @@ export const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    
     if (!email || !password) {
       setError('Por favor completa ambos campos');
       return;
     }
 
     try {
-      const response = await axios.post('http://localhost:3001/api/login', {
+      const response = await axios.post('http://localhost:3000/api/login', {
         email,
         password
       });
 
-      console.log(response.data);
-      setError('');
-      navigate('/UserWelcome'); // Redirige si el login es exitoso
-    } catch (err) {
-      console.error('Error al iniciar sesión:', err);
-      setError(err.response?.data?.message || 'Error al iniciar sesión');
+      // Guardar todos los datos del usuario incluyendo tipoDocumento
+      const { id, nombre, token, tipoDocumento } = response.data.user;
+      localStorage.setItem('propietario', JSON.stringify({ 
+        id, 
+        nombre, 
+        email,
+        tipoDocumento 
+      }));
+      localStorage.setItem('token', token);
+
+      Swal.fire({
+        title: `¡Bienvenido, ${nombre}!`,
+        icon: 'success',
+        timer: 2000
+      }).then(() => {
+        navigate('/registrar-mascota');
+      });
+
+    } catch (error) {
+      const errorMsg = error.response?.data?.error || 'Error al iniciar sesión';
+      setError(errorMsg);
+      Swal.fire({
+        title: 'Error',
+        text: errorMsg,
+        icon: 'error'
+      });
     }
   };
 
@@ -36,6 +57,7 @@ export const Login = () => {
     <div className="login-container">
       <div>
         <h2>🐾 Patitas Felices</h2>
+        
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label>Correo electrónico:</label>
@@ -44,6 +66,7 @@ export const Login = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="ejemplo@vet.com"
+              required
             />
           </div>
 
@@ -54,6 +77,7 @@ export const Login = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
+              required
             />
           </div>
 
@@ -64,7 +88,7 @@ export const Login = () => {
 
         <div className="login-links">
           <Link to="/Contraseña1">¿Olvidaste tu contraseña?</Link>
-          <Link to="/Propietarios">Registrar</Link>
+          <Link to="/Propietarios">Registrarse</Link>
         </div>
       </div>
     </div>

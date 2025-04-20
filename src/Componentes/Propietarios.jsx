@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { PawPrint, User, AtSign, Lock, ChevronRight, ChevronLeft } from 'lucide-react';
-import axios from 'axios'; 
+import axios from 'axios';
 import '../Estilos_F/Propietarios.css';
 
 function RegistroPropietario() {
+  const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [progress, setProgress] = useState(0);
   
@@ -24,7 +25,7 @@ function RegistroPropietario() {
   const requiredFields = {
     1: ['tipoDocumento', 'documento', 'nombre', 'fechaNacimiento'],
     2: ['telefono', 'email', 'direccion'],
-    3: ['password', 'confirmPassword', 'terms']
+    3: ['password', 'confirmPassword']
   };
 
   // Calcula progreso automáticamente
@@ -65,23 +66,47 @@ function RegistroPropietario() {
 
   const onSubmit = async (data) => {
     try {
-      const response = await axios.post('http://localhost:3001/api/registro-propietario', data);
+      // Eliminar campos no necesarios para el backend
+      const { confirmPassword, terms, ...userData } = data;
       
-      Swal.fire({
-        title: '<strong>Registro exitoso!</strong>',
-        html: `<i>El propietario <strong>${data.nombre}</strong> fue registrado</i>`,
-        icon: 'success',
-        timer: 3000
-      });
+      // Validación adicional de contraseñas
+      if (data.password !== data.confirmPassword) {
+        Swal.fire('Error', 'Las contraseñas no coinciden', 'error');
+        return;
+      }
+
+      // Enviar datos al backend
+      const response = await axios.post('http://localhost:3000/api/registro-propietario', userData);
+
+      // Manejar respuesta exitosa
+      if (response.data.token) {
+        Swal.fire({
+          title: '<strong>Registro exitoso!</strong>',
+          html: `<i>Bienvenido <strong>${data.nombre}</strong></i>`,
+          icon: 'success'
+        }).then(() => {
+          navigate('/login'); // Redirigir al login después del registro
+        });
+      }
     } catch (error) {
+      // Manejo detallado de errores
+      let errorMessage = 'Error al registrar';
+      
+      if (error.response) {
+        errorMessage = error.response.data.error || errorMessage;
+        if (error.response.data.details) {
+          errorMessage += `: ${error.response.data.details}`;
+        }
+      }
+
       Swal.fire({
         title: '<strong>Error!</strong>',
-        html: `<i>No se pudo registrar al propietario. Intenta nuevamente.</i>`,
-        icon: 'error',
-        timer: 3000
+        html: `<i>${errorMessage}</i>`,
+        icon: 'error'
       });
     }
   };
+
   return (
     <div className="registro-container">
       {/* Barra de progreso */}
