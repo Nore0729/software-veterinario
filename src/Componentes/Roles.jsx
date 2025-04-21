@@ -157,7 +157,6 @@ function Roles() {
           <li><a href="/MasRegis">Mascotas</a></li>
           <li><a href="/Veterinarios">Veterinarios</a></li>
           <li><a href="/Roles">Roles</a></li>
-          <li><a href="/usuarios-y-roles">Usuarios y Roles</a></li>
         </ul>
       </nav>
 
@@ -212,15 +211,6 @@ function Roles() {
           </div>
 
           <div className="seccion-roles">
-            <div className="header-roles">
-              <h2>Lista de Roles</h2>
-              <button 
-                onClick={() => setMostrarFormularioRol(true)} 
-                className="btn-nuevo-rol"
-              >
-                <FontAwesomeIcon icon={faPlus} /> Nuevo Rol
-              </button>
-            </div>
 
             {mostrarFormularioRol && (
               <form onSubmit={handleGuardarRol} className="form-rol">
@@ -274,6 +264,9 @@ function Roles() {
             <table className="tabla-roles">
               <thead>
                 <tr>
+                  <th>Id usuario</th>
+                  <th>Nom Usuario</th>
+                  <th>correo</th>
                   <th>Rol</th>
                   <th>Descripción</th>
                   <th>Estado</th>
@@ -293,9 +286,6 @@ function Roles() {
                     <td className="acciones">
                       <button onClick={() => handleEditarRol(rol)} className="btn-editar">
                         <FontAwesomeIcon icon={faEdit} />
-                      </button>
-                      <button onClick={() => handleEliminarRol(rol.id)} className="btn-eliminar">
-                        <FontAwesomeIcon icon={faTrash} />
                       </button>
                       <button 
                         onClick={() => handleToggleEstado(rol.id)} 

@@ -35,10 +35,8 @@ function Administrador() {
           <li><a href="/MasRegis">Mascotas</a></li>
           <li><a href="/Veterinarios">Veterinarios</a></li>
           <li><a href="/Roles">Roles</a></li>
-          <li><a href="/usuarios-y-roles">Usuarios y Roles</a></li>
         </ul>
       </nav>
-
       <main className="admin-main">
         <Outlet /> 
       </main>
