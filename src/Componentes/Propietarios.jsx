@@ -65,7 +65,7 @@ function RegistroPropietario() {
 
   const onSubmit = async (data) => {
     try {
-      const response = await axios.post('http://localhost:3001/api/registro-propietario', data);
+      const response = await axios.post('http://localhost:3000/api/registro-propietario', data);
       
       Swal.fire({
         title: '<strong>Registro exitoso!</strong>',

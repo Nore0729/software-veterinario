@@ -3,9 +3,10 @@ const mysql = require('mysql2');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const bcrypt = require('bcrypt');
+// const nodemailer = require('nodemailer');
 
 const app = express();
-const port = 3001;
+const port = 3000;
 
 app.use(bodyParser.json());
 app.use(cors());
@@ -16,7 +17,7 @@ const db = mysql.createConnection({
   user: 'root',
   password: '',
   database: 'veterinaria',
-  port: '3306'
+  port: '3309'
 });
 
 // Conexión a la base de datos
@@ -31,6 +32,10 @@ db.connect((err) => {
 // Ruta para registrar propietarios
 app.post('/api/registro-propietario', async (req, res) => {
   const { tipoDocumento, documento, nombre, fechaNacimiento, telefono, email, direccion, password } = req.body;
+
+  if (!tipoDocumento || !documento || !nombre || !fechaNacimiento || !telefono || !email || !direccion || !password) {
+    return res.status(400).send('Todos los campos son obligatorios');
+  }
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -57,6 +62,10 @@ app.post('/api/registro-propietario', async (req, res) => {
 app.post('/api/login', (req, res) => {
   const { email, password } = req.body;
 
+  if (!email || !password) {
+    return res.status(400).json({ message: 'Email y contraseña son requeridos' });
+  }
+
   const query = 'SELECT * FROM propietarios WHERE email = ?';
 
   db.query(query, [email], async (err, results) => {
@@ -73,7 +82,8 @@ app.post('/api/login', (req, res) => {
         // Devolvemos el nombre del propietario
         return res.status(200).json({ 
           message: 'Login exitoso', 
-          userName: user.nombre 
+          name: user.nombre,
+          userEmail: user.email
         });
       } else {
         return res.status(401).json({ message: 'Correo o contraseña incorrectos' });
@@ -84,7 +94,47 @@ app.post('/api/login', (req, res) => {
   });
 });
 
+// Endpoint para restablecer la contraseña
+app.post('/api/reset-password', async (req, res) => {
+  const { email, newPassword } = req.body;
+  console.log(email,newPassword)
+
+  if (!email || !newPassword) {
+    return res.status(400).json({
+      success: false,
+      message: 'Email y nueva contraseña son requeridos',
+    });
+  }
+
+  try {
+    // Hashear la nueva contraseña
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Usar el procedimiento almacenado ActualizarContrasena
+    db.query("CALL ModifyPassword(?, ?)", [email, hashedPassword], (err, result) => {
+      if (err) {
+        console.error('Error al actualizar la contraseña:', err);
+        return res.status(500).json({
+          success: false,
+          message: 'Error en el servidor al actualizar la contraseña',
+        });
+      }
+      else res.status(200).json({
+        message:'tu contraseña fue cambiada correctamente'
+      })
+    });
+  } catch (error) {
+    console.error('Error al restablecer la contraseña:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Error en el servidor al restablecer la contraseña',
+      error: error.message,
+    });
+  }
+});
+
 app.listen(port, () => {
   console.log(`Servidor corriendo en http://localhost:${port}`);
 });
+
 

@@ -18,17 +18,21 @@ export const Login = () => {
     }
 
     try {
-      const response = await axios.post('http://localhost:3001/api/login', {
+      const response = await axios.post('http://localhost:3000/api/login', {
         email,
         password
       });
 
-      const userName = response.data.nombre;   // Aquí obtienes el nombre del usuario
-      localStorage.setItem('userName', userName);   // Guarda el nombre del propietario en localStorage
-      console.log('Nombre guardado en localStorage:', userName); // <------------------- LOG AÑADIDO
+      const { name, userEmail } = response.data;
+      console.log(name)
+      console.log(userEmail)
+      
+      // Guarda los datos en localStorage
+      localStorage.setItem('nombre', name);
+      localStorage.setItem('email', userEmail);
 
       setError('');
-      navigate('/UserWelcome');   // Redirige al componente UserWelcome
+      navigate('/UserWelcome'); // Redirige a UserWelcome
     } catch (err) {
       console.error('Error al iniciar sesión:', err);
       setError(err.response?.data?.message || 'Error al iniciar sesión');
@@ -66,7 +70,7 @@ export const Login = () => {
         </form>
 
         <div className="login-links">
-          <Link to="/Contraseña1">¿Olvidaste tu contraseña?</Link>
+          <Link to="/Recuperarcontraseña">¿Olvidaste tu contraseña?</Link>
           <Link to="/Propietarios">Registrar</Link>
         </div>
       </div>
@@ -75,6 +79,7 @@ export const Login = () => {
 };
 
 export default Login;
+
 
 
 

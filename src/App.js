@@ -9,8 +9,6 @@ import Servicios from "./Componentes/Servicios"
 import Footer from "./Componentes/Footer"
 import Mascotas from "./Componentes/Mascotas"
 import PoliticasP from "./Componentes/PoliticasP"
-import Contraseña1 from "./Componentes/Contraseña1"
-import Contraseña2 from "./Componentes/Contraseña2"
 import UserWelcome from "./Componentes/UserWelcome"
 import Ubicacion from "./Componentes/Ubicacion"
 import Admin from "./Componentes/Admin"
@@ -18,6 +16,8 @@ import Usuarios from "./Componentes/Usuarios"
 import Roles from "./Componentes/Roles"
 import MasRegis from "./Componentes/MasRegis"
 import Veterinarios from "./Componentes/Veterinarios"
+import RecuperarContraseña from "./Componentes/Recuperarcontraseña"
+
 
 function AppWrapper() {
   const location = useLocation()
@@ -36,11 +36,10 @@ function AppWrapper() {
         <Route path="/ayuda" element={<Ayuda />} />
         <Route path="/mascotas" element={<Mascotas />} />
         <Route path="/PoliticasP" element={<PoliticasP />} />
-        <Route path="/Contraseña1" element={<Contraseña1 />} />
-        <Route path="/Contraseña2" element={<Contraseña2 />} />
         <Route path="/Ubicacion" element={<Ubicacion />} />
         <Route path="/Usuarios" element={<Usuarios />} />
         <Route path="/Roles" element={<Roles />} />
+        <Route path="/Recuperarcontraseña" element={<RecuperarContraseña />} />
         <Route path="/MasRegis" element={<MasRegis />} />
         <Route path="/Veterinarios" element={<Veterinarios />} />
         <Route path="/Admin" element={<Admin />} />
