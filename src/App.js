@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom"
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom"
 import PagPrincipal from "./Componentes/PagPrincipal"
 import Login from "./Componentes/Login"
 import Citas from "./Componentes/Citas"
@@ -14,17 +14,19 @@ import Contraseña2 from "./Componentes/Contraseña2"
 import UserWelcome from "./Componentes/UserWelcome"
 import Ubicacion from "./Componentes/Ubicacion"
 import Admin from "./Componentes/Admin"
-import Usuarios from "./Componentes//Usuarios"
+import Usuarios from "./Componentes/Usuarios"
 import Roles from "./Componentes/Roles"
 import MasRegis from "./Componentes/MasRegis"
 import Veterinarios from "./Componentes/Veterinarios"
 
-
-
-function App() {
+function AppWrapper() {
+  const location = useLocation()
+  const noMostrarHeaderFooter = ["/Admin", "/UserWelcome"]
+  const mostrarHeaderFooter = !noMostrarHeaderFooter.includes(location.pathname)
   return (
-    <BrowserRouter>
-      <Header />
+    <>
+      {mostrarHeaderFooter && <Header />}
+      
       <Routes>
         <Route path="/" element={<PagPrincipal />} />
         <Route path="/login" element={<Login />} />
@@ -34,17 +36,24 @@ function App() {
         <Route path="/ayuda" element={<Ayuda />} />
         <Route path="/mascotas" element={<Mascotas />} />
         <Route path="/PoliticasP" element={<PoliticasP />} />
-        <Route path="/Contraseña1" element={<Contraseña1/>}/>
-        <Route path="/Contraseña2" element={<Contraseña2/>}/>
-        <Route path="/UserWelcome" element={<UserWelcome/>}/>
+        <Route path="/Contraseña1" element={<Contraseña1 />} />
+        <Route path="/Contraseña2" element={<Contraseña2 />} />
         <Route path="/Ubicacion" element={<Ubicacion />} />
-        <Route path="/Admin" element={<Admin />} />
         <Route path="/Usuarios" element={<Usuarios />} />
         <Route path="/Roles" element={<Roles />} />
         <Route path="/MasRegis" element={<MasRegis />} />
         <Route path="/Veterinarios" element={<Veterinarios />} />
+        <Route path="/Admin" element={<Admin />} />
+        <Route path="/UserWelcome" element={<UserWelcome />} />
       </Routes>
-      <Footer />
+      {mostrarHeaderFooter && <Footer />}
+    </>
+  )
+}
+function App() {
+  return (
+    <BrowserRouter>
+      <AppWrapper />
     </BrowserRouter>
   )
 }
