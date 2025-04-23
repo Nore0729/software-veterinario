@@ -17,7 +17,7 @@ const db = mysql.createConnection({
   user: 'root',
   password: '',
   database: 'veterinaria',
-  port: '3309'
+  port: '3306'
 });
 
 // Conexión a la base de datos
@@ -132,6 +132,22 @@ app.post('/api/reset-password', async (req, res) => {
     });
   }
 });
+
+app.get('/Propietarios/:email', (req, res) => {
+  const email = req.params.email;
+  const sql = 'SELECT * FROM propietarios WHERE email = ?';
+  db.query(sql, [email], (err, result) => {
+    if (err) {
+      console.error('Error al consultar propietario:', err);
+      res.status(500).json({ error: 'Error al consultar' });
+    } else if (result.length === 0) {
+      res.status(404).json({ error: 'No se encontró el propietario' });
+    } else {
+      res.json(result[0]);
+    }
+  });
+});
+
 
 app.listen(port, () => {
   console.log(`Servidor corriendo en http://localhost:${port}`);

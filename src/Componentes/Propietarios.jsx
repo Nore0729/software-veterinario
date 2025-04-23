@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { PawPrint, User, AtSign, Lock, ChevronRight, ChevronLeft } from 'lucide-react';
 import axios from 'axios'; 
@@ -9,7 +9,8 @@ import '../Estilos_F/Propietarios.css';
 function RegistroPropietario() {
   const [step, setStep] = useState(1);
   const [progress, setProgress] = useState(0);
-  
+  const navigate = useNavigate(); 
+
   const {
     register, 
     handleSubmit, 
@@ -71,8 +72,15 @@ function RegistroPropietario() {
         title: '<strong>Registro exitoso!</strong>',
         html: `<i>El propietario <strong>${data.nombre}</strong> fue registrado</i>`,
         icon: 'success',
-        timer: 3000
+        timer: 3000,
+        didClose: () => {
+          // Guardar nombre y correo en localStorage
+          localStorage.setItem('nombre', data.nombre);
+          localStorage.setItem('email', data.email);
+          navigate('/UserWelcome');
+        }
       });
+
     } catch (error) {
       Swal.fire({
         title: '<strong>Error!</strong>',

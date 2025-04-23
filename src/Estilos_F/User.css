@@ -3,7 +3,7 @@
     display: flex;
     min-height: 100vh;
     font-family: 'Arial', sans-serif;
-    background-color: #f5f7fa;
+    background-color: #e0e7f1;
     position: relative;
   }
   
@@ -11,9 +11,9 @@
   .sidebar {
     width: 60px;
     height: 100vh;
-    background: #002a5e;
+    background: #73acf3;
     color: white;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     overflow: hidden;
     position: fixed;
     z-index: 100;
@@ -113,7 +113,7 @@
   
   /* Submenú */
   .submenu {
-    background: #001a3a;
+    background: #73acf3;
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.3s ease;

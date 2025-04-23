@@ -6,7 +6,7 @@
   justify-content: center;
   min-height: 100vh;
   font-family: 'Arial', sans-serif;
-  background-color: #F8F8F8; /* Color light */
+  background-color: #F8F8F8;
   padding: 2rem;
 }
 
@@ -23,7 +23,7 @@
 /* ===== TÍTULO ===== */
 .login-container h2 {
   text-align: center;
-  color: #2C6EAB; /* Color primary */
+  color: #2C6EAB;
   margin-bottom: 2rem;
   font-size: 2rem;
 }
@@ -44,7 +44,7 @@
 /* ===== ETIQUETAS ===== */
 .login-container label {
   font-weight: 600;
-  color: #2D3142; /* Color dark */
+  color: #2D3142;
   font-size: 1rem;
 }
 
@@ -57,29 +57,47 @@
   transition: all 0.3s ease;
 }
 
-.login-container input:focus {
-  outline: none;
-  border-color: #2C6EAB; /* Color primary */
-  box-shadow: 0 0 0 3px rgba(44, 110, 171, 0.2); /* Color primary con transparencia */
+/* ===== CONTAINER DE CONTRASEÑA (CON OJO) ===== */
+.password-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
-.login-container input::placeholder {
-  color: #aaa;
+.password-input-container input {
+  padding-right: 405px; /* Deja espacio para el ojo */
+  width: 100%;
+}
+
+.password-toggle-icon {
+  position: absolute;
+  right: 12px; 
+  top:15px;
+  cursor: pointer;
+  color: #2C6EAB;
+  font-size: 1.2rem;
+  transition: transform 0.2s ease;
+}
+
+/* Estilo hover para el ojo */
+.password-toggle-icon:hover {
+  transform: scale(1.1);
 }
 
 /* ===== MENSAJE DE ERROR ===== */
-.login-container p[style*="color: red"] {
+.error-message {
   background-color: rgba(255, 0, 0, 0.05);
   padding: 0.8rem;
   border-radius: 8px;
   font-size: 0.9rem;
-  margin: -0.5rem 0;
+  color: red;
   text-align: center;
 }
 
 /* ===== BOTÓN ===== */
 .login-container button {
-  background-color: #2C6EAB; /* Color primary */
+  background-color: #2C6EAB;
   color: white;
   border: none;
   padding: 14px;
@@ -93,7 +111,7 @@
 }
 
 .login-container button:hover {
-  background-color: #245a8f; /* Color primary más oscuro */
+  background-color: #245a8f;
   transform: translateY(-2px);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
@@ -108,14 +126,14 @@
 }
 
 .login-links a {
-  color: #3D8361; /* Color secondary */
+  color: #3D8361;
   text-decoration: none;
   font-size: 0.9rem;
   transition: color 0.3s ease;
 }
 
 .login-links a:hover {
-  color: #326c50; /* Color secondary más oscuro */
+  color: #326c50;
   text-decoration: underline;
 }
 
@@ -124,7 +142,7 @@
   .login-container > div {
     padding: 1.5rem;
   }
-  
+
   .login-links {
     flex-direction: column;
     gap: 0.8rem;
