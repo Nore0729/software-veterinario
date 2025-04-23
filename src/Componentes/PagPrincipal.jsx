@@ -131,7 +131,7 @@ const PagPrincipal = () => {
 
           <div className="hero-image">
             <img 
-              src="https://raw.githubusercontent.com/Nore0729/Img-soft-veterinario/refs/heads/main/inicio.JPG" 
+              src="https://raw.githubusercontent.com/Nore0729/Img-soft-veterinario/refs/heads/main/inicio.png" 
               alt="Veterinario con mascota" 
               className="main-image" 
             />

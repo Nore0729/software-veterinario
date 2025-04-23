@@ -1,9 +1,22 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import "../Estilos_F/Header.css";
 
 const Header = () => {
-  const [isOptionsOpen, setIsOptionsOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(window.innerWidth > 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsDesktop(window.innerWidth > 768);
+      if (window.innerWidth > 768) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   return (
     <header className="header">
@@ -15,41 +28,57 @@ const Header = () => {
         />
       </div>
 
-      <nav className="nav-menu">
-        <ul className="menu-list">
-          <li>
-            <Link to="/" className="nav-link">Inicio</Link>
-          </li>
-          <li>
-            <Link to="/servicios" className="nav-link">Servicios</Link>
-          </li>
-          <li>
-            <Link to="/ubicacion" className="nav-link">Ubicación</Link>
-          </li>
-          <li>
-            <Link to="/mascotas" className="nav-link">Mascotas</Link>
-          </li>
-        </ul>
-      </nav>
+      {/* Menú Hamburguesa solo en móvil */}
+      {!isDesktop && (
+        <button 
+          className={`hamburger-btn ${isMobileMenuOpen ? 'open' : ''}`}
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          aria-label="Menú"
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      )}
 
-      <div className="header-buttons">
-        <div className="options-wrapper">
-          <button 
-            className="options-btn"
-            onClick={() => setIsOptionsOpen(!isOptionsOpen)}
+      {/* Contenido del Header - visible en desktop o cuando el menú móvil está abierto */}
+      <div className={`header-content ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
+        <nav className="nav-menu">
+          <ul className="menu-list">
+            <li>
+              <Link to="/" className="nav-link" onClick={() => !isDesktop && setIsMobileMenuOpen(false)}>Inicio</Link>
+            </li>
+            <li>
+              <Link to="/servicios" className="nav-link" onClick={() => !isDesktop && setIsMobileMenuOpen(false)}>Servicios</Link>
+            </li>
+            <li>
+              <Link to="/ubicacion" className="nav-link" onClick={() => !isDesktop && setIsMobileMenuOpen(false)}>Ubicación</Link>
+            </li>
+            <li>
+              <Link to="/mascotas" className="nav-link" onClick={() => !isDesktop && setIsMobileMenuOpen(false)}>Mascotas</Link>
+            </li>
+            <li>
+              <Link to="/contacto" className="nav-link" onClick={() => !isDesktop && setIsMobileMenuOpen(false)}>Contacto</Link>
+            </li>
+          </ul>
+        </nav>
+
+        <div className="header-buttons">
+          <Link 
+            to="/propietarios" 
+            className="register-btn"
+            onClick={() => !isDesktop && setIsMobileMenuOpen(false)}
           >
-            Opciones
-          </button>
-          {isOptionsOpen && (
-            <div className="dropdown-menu">
-              <Link to="/propietarios" className="dropdown-link">Registrar</Link>
-              <Link to="/contacto" className="dropdown-link">Contacto</Link>
-            </div>
-          )}
+            Regístrate
+          </Link>
+          <Link 
+            to="/login" 
+            className="login-btn"
+            onClick={() => !isDesktop && setIsMobileMenuOpen(false)}
+          >
+            Iniciar Sesión
+          </Link>
         </div>
-        <Link to="/login" className="login-btn">
-          Iniciar Sesión
-        </Link>
       </div>
     </header>
   );

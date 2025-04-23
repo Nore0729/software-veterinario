@@ -17,11 +17,15 @@ import Roles from "./Componentes/Roles"
 import MasRegis from "./Componentes/MasRegis"
 import Veterinarios from "./Componentes/Veterinarios"
 import RecuperarContraseña from "./Componentes/Recuperarcontraseña"
+import VeterinarioPer from "./Componentes/VeterinarioPer"
+import Consultas from "./Componentes/Consultas"
+import Pacientes from "./Componentes/Pacientes"
+import HistorialMedico from "./Componentes/HistorialMedico"
 
 
 function AppWrapper() {
   const location = useLocation()
-  const noMostrarHeaderFooter = ["/Admin", "/UserWelcome"]
+  const noMostrarHeaderFooter = ["/Admin", "/UserWelcome", "/Usuarios", "/MasRegis", "/Veterinarios", "/Roles"]
   const mostrarHeaderFooter = !noMostrarHeaderFooter.includes(location.pathname)
   return (
     <>
@@ -44,6 +48,10 @@ function AppWrapper() {
         <Route path="/Veterinarios" element={<Veterinarios />} />
         <Route path="/Admin" element={<Admin />} />
         <Route path="/UserWelcome" element={<UserWelcome />} />
+        <Route path="/VeterinarioPer" element={<VeterinarioPer />} />
+        <Route path="/Consultas" element={<Consultas />} />
+        <Route path="/Pacientes" element={<Pacientes />} />
+        <Route path="/HistorialMedico" element={<HistorialMedico />} />
       </Routes>
       {mostrarHeaderFooter && <Footer />}
     </>
