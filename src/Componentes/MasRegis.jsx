@@ -1,5 +1,3 @@
-"use client"
-
 import { useState } from "react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import {
@@ -13,8 +11,10 @@ import {
 } from "@fortawesome/free-solid-svg-icons"
 import "../Estilos_F/MasRegis.css"
 import "../Estilos_F/Administrador.css"
+import { Users, PawPrint, Stethoscope, ShieldCheck, LogOut } from 'lucide-react';
 
 function Mascotas() {
+
   const [mascotas, setMascotas] = useState([
     {
       id: 1,
@@ -288,22 +288,40 @@ function Mascotas() {
         </div>
       </header>
 
-      <nav className="admin-sidebar">
+       <nav className="admin-sidebar">
         <div className="sidebar-header">
           <h1>Menú</h1>
         </div>
         <ul>
-          <li>
-            <a href="/Usuarios">Usuarios</a>
+          <li className="active">
+            <a href="/Usuarios">
+              <Users className="nav-icon" size={18} />
+              <span>Usuarios</span>
+            </a>
           </li>
           <li>
-            <a href="/MasRegis">Mascotas</a>
+            <a href="/MasRegis">
+              <PawPrint className="nav-icon" size={18} />
+              <span>Mascotas</span>
+            </a>
           </li>
           <li>
-            <a href="/Veterinarios">Veterinarios</a>
+            <a href="/Veterinarios">
+              <Stethoscope className="nav-icon" size={18} />
+              <span>Veterinarios</span>
+            </a>
           </li>
           <li>
-            <a href="/Roles">Roles</a>
+            <a href="/Roles">
+              <ShieldCheck className="nav-icon" size={18} />
+              <span>Roles</span>
+            </a>
+          </li>
+          <li>
+            <a href="/">
+              <LogOut className="nav-icon" size={18} />
+              <span>Cerrar Sesión</span>
+            </a>
           </li>
         </ul>
       </nav>

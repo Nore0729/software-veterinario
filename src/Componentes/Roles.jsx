@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faEdit, faTrash, faToggleOn, faToggleOff, faCheck, faTimes } from "@fortawesome/free-solid-svg-icons";
 import "../Estilos_F/Roles.css";
 import "../Estilos_F/Administrador.css";
+import { Users, PawPrint, Stethoscope, ShieldCheck, LogOut } from 'lucide-react';
 
 function Roles() {
   const [usuarios, setUsuarios] = useState([
@@ -147,16 +148,41 @@ function Roles() {
           </div>
         </div>
       </header>
-
       <nav className="admin-sidebar">
         <div className="sidebar-header">
           <h1>Menú</h1>
         </div>
         <ul>
-          <li><a href="/Usuarios">Usuarios</a></li>
-          <li><a href="/MasRegis">Mascotas</a></li>
-          <li><a href="/Veterinarios">Veterinarios</a></li>
-          <li><a href="/Roles">Roles</a></li>
+          <li className="active">
+            <a href="/Usuarios">
+              <Users className="nav-icon" size={18} />
+              <span>Usuarios</span>
+            </a>
+          </li>
+          <li>
+            <a href="/MasRegis">
+              <PawPrint className="nav-icon" size={18} />
+              <span>Mascotas</span>
+            </a>
+          </li>
+          <li>
+            <a href="/Veterinarios">
+              <Stethoscope className="nav-icon" size={18} />
+              <span>Veterinarios</span>
+            </a>
+          </li>
+          <li>
+            <a href="/Roles">
+              <ShieldCheck className="nav-icon" size={18} />
+              <span>Roles</span>
+            </a>
+          </li>
+          <li>
+            <a href="/">
+              <LogOut className="nav-icon" size={18} />
+              <span>Cerrar Sesión</span>
+            </a>
+          </li>
         </ul>
       </nav>
 
@@ -261,44 +287,49 @@ function Roles() {
               </form>
             )}
 
-            <table className="tabla-roles">
-              <thead>
-                <tr>
-                  <th>Id usuario</th>
-                  <th>Nom Usuario</th>
-                  <th>correo</th>
-                  <th>Rol</th>
-                  <th>Descripción</th>
-                  <th>Estado</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                {roles.map(rol => (
-                  <tr key={rol.id}>
-                    <td>{rol.nombre}</td>
-                    <td>{rol.descripcion}</td>
-                    <td>
-                      <span className={`estado ${rol.estado ? 'activo' : 'inactivo'}`}>
-                        {rol.estado ? 'Activo' : 'Inactivo'}
-                      </span>
-                    </td>
-                    <td className="acciones">
-                      <button onClick={() => handleEditarRol(rol)} className="btn-editar">
-                        <FontAwesomeIcon icon={faEdit} />
-                      </button>
-                      <button 
-                        onClick={() => handleToggleEstado(rol.id)} 
-                        className={`btn-toggle ${rol.estado ? 'activo' : 'inactivo'}`}
-                      >
-                        <FontAwesomeIcon icon={rol.estado ? faToggleOn : faToggleOff} />
-                        {rol.estado ? ' Desactivar' : ' Activar'}
-                      </button>
-                    </td>
+              <table className="tabla-roles">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Descripción</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {roles.map(rol => (
+                    <tr key={rol.id}>
+                      <td>{rol.id}</td>
+                      <td>{rol.nombre}</td>
+                      <td>{rol.descripcion}</td>
+                      <td>
+                        <span className={`estado ${rol.estado ? 'activo' : 'inactivo'}`}>
+                          {rol.estado ? 'Activo' : 'Inactivo'}
+                        </span>
+                      </td>
+                      <td className="acciones">
+                        <button onClick={() => handleEditarRol(rol)} className="btn-editar">
+                          <FontAwesomeIcon icon={faEdit} />
+                        </button>
+                        <button 
+                          onClick={() => handleToggleEstado(rol.id)} 
+                          className={`btn-toggle ${rol.estado ? 'activo' : 'inactivo'}`}
+                        >
+                          <FontAwesomeIcon icon={rol.estado ? faToggleOn : faToggleOff} />
+                          {rol.estado ? ' Desactivar' : ' Activar'}
+                        </button>
+                        <button 
+                          onClick={() => handleEliminarRol(rol.id)}
+                          className="btn-eliminar"
+                        >
+                          <FontAwesomeIcon icon={faTrash} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
           </div>
         </div>
       </main>

@@ -1,7 +1,15 @@
 import "../Estilos_F/Administrador.css"
-import { Outlet } from "react-router-dom"; // Asegúrate de tenerlo importado
+import { useState } from "react";
+import { Outlet } from "react-router-dom";
+import { Users, PawPrint, Stethoscope, ShieldCheck, LogOut, Menu } from 'lucide-react';
 
 function Administrador() {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
+
   const defaultContent = (
     <div className="admin-header-actions">
       <h1 className="admin-heading">Bienvenido al Panel de Administración</h1>
@@ -13,6 +21,9 @@ function Administrador() {
       <header className="admin-header">
         <div className="admin-header-content">
           <div className="admin-logo-container">
+            <button className="menu-toggle" onClick={toggleSidebar}>
+              <Menu size={20} />
+            </button>
             <div className="admin-title">Pet Lovers</div>
           </div>
           <div className="admin-user-section">
@@ -31,15 +42,43 @@ function Administrador() {
           <h1>Menú</h1>
         </div>
         <ul>
-          <li><a href="/Usuarios">Usuarios</a></li>
-          <li><a href="/MasRegis">Mascotas</a></li>
-          <li><a href="/Veterinarios">Veterinarios</a></li>
-          <li><a href="/Roles">Roles</a></li>
+          <li className="active">
+            <a href="/Usuarios">
+              <Users className="nav-icon" size={18} />
+              <span>Usuarios</span>
+            </a>
+          </li>
+          <li>
+            <a href="/MasRegis">
+              <PawPrint className="nav-icon" size={18} />
+              <span>Mascotas</span>
+            </a>
+          </li>
+          <li>
+            <a href="/Veterinarios">
+              <Stethoscope className="nav-icon" size={18} />
+              <span>Veterinarios</span>
+            </a>
+          </li>
+          <li>
+            <a href="/Roles">
+              <ShieldCheck className="nav-icon" size={18} />
+              <span>Roles</span>
+            </a>
+          </li>
+          <li>
+            <a href="/">
+              <LogOut className="nav-icon" size={18} />
+              <span>Cerrar Sesión</span>
+            </a>
+          </li>
         </ul>
       </nav>
       <main className="admin-main">
         <Outlet /> 
       </main>
+      
+      {sidebarOpen && <div className="sidebar-backdrop" onClick={toggleSidebar}></div>}
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faEdit, faTrash, faSearch, faCheck, faTimes } from "@fortawesome/free-solid-svg-icons";
 import "../Estilos_F/Veterinarios.css";
 import "../Estilos_F/Administrador.css";
+import { Users, PawPrint, Stethoscope, ShieldCheck, LogOut } from 'lucide-react';
 
 function Veterinarios() {
   const [veterinarios, setVeterinarios] = useState([]);
@@ -176,10 +177,36 @@ function Veterinarios() {
           <h1>Menú</h1>
         </div>
         <ul>
-          <li><a href="/Usuarios">Usuarios</a></li>
-          <li><a href="/MasRegis">Mascotas</a></li>
-          <li><a href="/Veterinarios">Veterinarios</a></li>
-          <li><a href="/Roles">Roles</a></li>
+          <li className="active">
+            <a href="/Usuarios">
+              <Users className="nav-icon" size={18} />
+              <span>Usuarios</span>
+            </a>
+          </li>
+          <li>
+            <a href="/MasRegis">
+              <PawPrint className="nav-icon" size={18} />
+              <span>Mascotas</span>
+            </a>
+          </li>
+          <li>
+            <a href="/Veterinarios">
+              <Stethoscope className="nav-icon" size={18} />
+              <span>Veterinarios</span>
+            </a>
+          </li>
+          <li>
+            <a href="/Roles">
+              <ShieldCheck className="nav-icon" size={18} />
+              <span>Roles</span>
+            </a>
+          </li>
+          <li>
+            <a href="/">
+              <LogOut className="nav-icon" size={18} />
+              <span>Cerrar Sesión</span>
+            </a>
+          </li>
         </ul>
       </nav>
 
