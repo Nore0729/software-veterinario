@@ -1,8 +1,11 @@
 import "../Estilos_F/Usuarios.css";
+import "../Estilos_F/Administrador.css";
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faEdit, faTrash, faSearch, faSave, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
 import "../Estilos_F/Administrador.css";
+import { Users, PawPrint, Stethoscope, ShieldCheck, LogOut } from 'lucide-react';
 
 const Usuarios = () => {
   const [usuarios, setUsuarios] = useState([]);
@@ -19,7 +22,7 @@ const Usuarios = () => {
   });
 
   useEffect(() => {
-    // Datos iniciales de ejemplo
+   
     setUsuarios([
       {
         id: 1,
@@ -96,7 +99,7 @@ const Usuarios = () => {
 
     if (nombre && apellido && tipoDoc && numDoc && email && telefono) {
       if (editandoId) {
-        // Actualizar usuario existente
+        
         setUsuarios(usuarios.map(usuario => 
           usuario.id === editandoId ? { 
             ...usuario,
@@ -104,7 +107,7 @@ const Usuarios = () => {
           } : usuario
         ));
       } else {
-        // Crear nuevo usuario
+        
         const nuevo = {
           id: usuarios.length > 0 ? Math.max(...usuarios.map(u => u.id)) + 1 : 1,
           nombre,
@@ -118,7 +121,7 @@ const Usuarios = () => {
         setUsuarios([...usuarios, nuevo]);
       }
       
-      // Resetear formulario
+      
       setNuevoUsuario({
         nombre: "",
         apellido: "",
@@ -168,11 +171,36 @@ const Usuarios = () => {
           <h1>Menú</h1>
         </div>
         <ul>
-          <li><a href="/Usuarios">Usuarios</a></li>
-          <li><a href="/MasRegis">Mascotas</a></li>
-          <li><a href="/Veterinarios">Veterinarios</a></li>
-          <li><a href="/Roles">Roles</a></li>
-          <li><a href="/usuarios-y-roles">Usuarios y Roles</a></li>
+          <li className="active">
+            <a href="/Usuarios">
+              <Users className="nav-icon" size={18} />
+              <span>Usuarios</span>
+            </a>
+          </li>
+          <li>
+            <a href="/MasRegis">
+              <PawPrint className="nav-icon" size={18} />
+              <span>Mascotas</span>
+            </a>
+          </li>
+          <li>
+            <a href="/Veterinarios">
+              <Stethoscope className="nav-icon" size={18} />
+              <span>Veterinarios</span>
+            </a>
+          </li>
+          <li>
+            <a href="/Roles">
+              <ShieldCheck className="nav-icon" size={18} />
+              <span>Roles</span>
+            </a>
+          </li>
+          <li>
+            <a href="/">
+              <LogOut className="nav-icon" size={18} />
+              <span>Cerrar Sesión</span>
+            </a>
+          </li>
         </ul>
       </nav>
 
