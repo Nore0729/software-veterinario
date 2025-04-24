@@ -31,7 +31,7 @@ const UserWelcome = ({ userName }) => {
     {
       title: "Inicio",
       icon: <FaHome />,
-      path: "/inicio"
+      path: "/UserWelcome"
     },
     {
       title: "Mis Citas",
@@ -57,7 +57,11 @@ const UserWelcome = ({ userName }) => {
     {
       title: "Configuración",
       icon: <FaCog />,
-      path: "/configuracion"
+      subItems: [
+        { label: "Mi Cuenta", path: "/Datospro" },
+        { label: "Ayuda", path: "/Ayudapro" },
+        { label:"Actualizar Datos", patch: "/Actualizarpro"}
+      ]
     }
   ];
 

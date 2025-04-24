@@ -12,7 +12,7 @@ const PoliticasP = () => {
             <div className="politicas-card">
                 <p className="politicas-text">
                     El propósito del presente documento es establecer el alcance, modalidad, tiempo de respuesta, 
-                    priorización y el nivel de servicio de soporte y de gestión de requerimientos que Pet Care 
+                    priorización y el nivel de servicio de soporte y de gestión de requerimientos que Pet Lovers
                     se compromete a brindar a sus clientes.
                 </p>
             </div>
