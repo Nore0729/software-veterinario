@@ -8,13 +8,13 @@ import {
   faTimes,
   faFileMedical,
   faTimes as faClose,
+  faPlus
 } from "@fortawesome/free-solid-svg-icons"
 import "../Estilos_F/MasRegis.css"
 import "../Estilos_F/Administrador.css"
 import { Users, PawPrint, Stethoscope, ShieldCheck, LogOut } from 'lucide-react';
 
 function Mascotas() {
-
   const [mascotas, setMascotas] = useState([
     {
       id: 1,
@@ -107,6 +107,7 @@ function Mascotas() {
 
   const [mostrarFormulario, setMostrarFormulario] = useState(false)
   const [editandoId, setEditandoId] = useState(null)
+  const [modoNuevo, setModoNuevo] = useState(false)
   const [mascotaEditada, setMascotaEditada] = useState({
     nombre: "",
     especie: "",
@@ -123,13 +124,24 @@ function Mascotas() {
   const [busqueda, setBusqueda] = useState("")
   const [notificacion, setNotificacion] = useState({ mostrar: false, mensaje: "", tipo: "" })
 
-  // Nuevos estados para el historial médico
+  // Estados para el historial médico
   const [mostrarHistorial, setMostrarHistorial] = useState(false)
   const [historialActual, setHistorialActual] = useState(null)
   const [mascotaSeleccionada, setMascotaSeleccionada] = useState(null)
   const [idBusquedaHistorial, setIdBusquedaHistorial] = useState("")
   const [mostrarBusquedaHistorial, setMostrarBusquedaHistorial] = useState(false)
   const [errorHistorial, setErrorHistorial] = useState("")
+
+  // Especies y razas predefinidas
+  const especies = ["Perro", "Gato", "Ave", "Roedor", "Reptil", "Otro"]
+  const razasPorEspecie = {
+    "Perro": ["Labrador", "Pastor Alemán", "Bulldog", "Chihuahua", "Poodle"],
+    "Gato": ["Persa", "Siamés", "Bengalí", "Esfinge", "Común"],
+    "Ave": ["Canario", "Periquito", "Loro", "Cacatúa"],
+    "Roedor": ["Hámster", "Cobaya", "Ratón", "Jerbo"],
+    "Reptil": ["Tortuga", "Iguana", "Serpiente", "Camaleón"],
+    "Otro": []
+  }
 
   const mascotasFiltradas = mascotas.filter((mascota) => {
     const termino = busqueda.toLowerCase()
@@ -153,7 +165,27 @@ function Mascotas() {
     setBusqueda(e.target.value)
   }
 
+  const handleNuevaMascota = () => {
+    setModoNuevo(true)
+    setEditandoId(null)
+    setMascotaEditada({
+      nombre: "",
+      especie: "",
+      raza: "",
+      idDueno: "",
+      foto: "",
+      genero: "",
+      color: "",
+      fechaNacimiento: "",
+      peso: "",
+      estadoReproductivo: "",
+      caracteristicasFisicas: "",
+    })
+    setMostrarFormulario(true)
+  }
+
   const handleEditar = (mascota) => {
+    setModoNuevo(false)
     setEditandoId(mascota.id)
     setMascotaEditada({ ...mascota })
     setMostrarFormulario(true)
@@ -161,7 +193,12 @@ function Mascotas() {
 
   const handleEditChange = (e) => {
     const { name, value } = e.target
-    setMascotaEditada({ ...mascotaEditada, [name]: value })
+    setMascotaEditada(prev => ({
+      ...prev,
+      [name]: value,
+      // Si cambia la especie, resetear la raza
+      ...(name === "especie" && { raza: "" })
+    }))
   }
 
   const handleImageChange = (e) => {
@@ -169,7 +206,7 @@ function Mascotas() {
     if (file) {
       const reader = new FileReader()
       reader.onloadend = () => {
-        setMascotaEditada({ ...mascotaEditada, foto: reader.result })
+        setMascotaEditada(prev => ({ ...prev, foto: reader.result }))
       }
       reader.readAsDataURL(file)
     }
@@ -191,21 +228,50 @@ function Mascotas() {
       caracteristicasFisicas: "",
     })
     setEditandoId(null)
+    setModoNuevo(false)
+  }
+
+  const validarMascota = () => {
+    const { nombre, especie, idDueno, genero } = mascotaEditada
+    const errores = []
+
+    if (!nombre.trim()) errores.push("El nombre es obligatorio")
+    if (!especie) errores.push("Debe seleccionar una especie")
+    if (!idDueno.trim()) errores.push("El ID del dueño es obligatorio")
+    if (!genero) errores.push("Debe seleccionar un género")
+
+    return errores
   }
 
   const handleGuardar = (e) => {
     e.preventDefault()
-
-    if (!mascotaEditada.nombre || !mascotaEditada.especie || !mascotaEditada.idDueno) {
-      mostrarNotificacion("Nombre, especie e ID del dueño son obligatorios", "error")
+    
+    const errores = validarMascota()
+    if (errores.length > 0) {
+      mostrarNotificacion(errores.join(", "), "error")
       return
     }
 
-    setMascotas(
-      mascotas.map((mascota) => (mascota.id === editandoId ? { ...mascotaEditada, id: editandoId } : mascota)),
-    )
+    if (modoNuevo) {
+      // Registrar nueva mascota
+      const nuevaMascota = {
+        ...mascotaEditada,
+        id: Math.max(...mascotas.map(m => m.id), 0) + 1,
+        fechaRegistro: new Date().toISOString().split('T')[0]
+      }
+      
+      setMascotas([...mascotas, nuevaMascota])
+      mostrarNotificacion("Mascota registrada correctamente", "exito")
+    } else {
+      // Editar mascota existente
+      setMascotas(
+        mascotas.map((mascota) => 
+          mascota.id === editandoId ? { ...mascotaEditada, id: editandoId } : mascota
+        ),
+      )
+      mostrarNotificacion("Mascota actualizada correctamente", "exito")
+    }
 
-    mostrarNotificacion("Mascota actualizada correctamente", "exito")
     handleCancelar()
   }
 
@@ -217,7 +283,7 @@ function Mascotas() {
     }
   }
 
-
+  // Funciones para el historial médico (se mantienen igual)
   const handleMostrarBusquedaHistorial = () => {
     setMostrarBusquedaHistorial(true)
     setIdBusquedaHistorial("")
@@ -288,18 +354,18 @@ function Mascotas() {
         </div>
       </header>
 
-       <nav className="admin-sidebar">
+      <nav className="admin-sidebar">
         <div className="sidebar-header">
           <h1>Menú</h1>
         </div>
         <ul>
-          <li className="active">
+          <li>
             <a href="/Usuarios">
               <Users className="nav-icon" size={18} />
               <span>Usuarios</span>
             </a>
           </li>
-          <li>
+          <li className="active">
             <a href="/MasRegis">
               <PawPrint className="nav-icon" size={18} />
               <span>Mascotas</span>
@@ -337,41 +403,72 @@ function Mascotas() {
             </div>
           )}
 
-          <div className="busqueda-container">
-            <input type="text" placeholder="Buscar mascota ..." value={busqueda} onChange={handleBusquedaChange} />
-            <FontAwesomeIcon icon={faSearch} className="icono-busqueda" />
+          <div className="acciones-superiores">
+            <button className="btn-agregar" onClick={handleNuevaMascota}>
+              <FontAwesomeIcon icon={faPlus} /> Nueva Mascota
+            </button>
+            <div className="busqueda-container">
+              <input 
+                type="text" 
+                placeholder="Buscar mascota ..." 
+                value={busqueda} 
+                onChange={handleBusquedaChange} 
+              />
+              <FontAwesomeIcon icon={faSearch} className="icono-busqueda" />
+            </div>
           </div>
 
           {mostrarFormulario && (
             <form className="formulario-mascota" onSubmit={handleGuardar}>
-              <h2>Editar Mascota</h2>
+              <h2>{modoNuevo ? "Registrar Nueva Mascota" : "Editar Mascota"}</h2>
 
               <div className="form-row">
                 <div className="form-group">
-                  <label>Nombre:</label>
-                  <input type="text" name="nombre" value={mascotaEditada.nombre} onChange={handleEditChange} required />
+                  <label>Nombre *</label>
+                  <input 
+                    type="text" 
+                    name="nombre" 
+                    value={mascotaEditada.nombre} 
+                    onChange={handleEditChange} 
+                    required 
+                  />
                 </div>
 
                 <div className="form-group">
-                  <label>Especie:</label>
-                  <input
-                    type="text"
+                  <label>Especie *</label>
+                  <select
                     name="especie"
                     value={mascotaEditada.especie}
                     onChange={handleEditChange}
                     required
-                  />
+                  >
+                    <option value="">Seleccionar...</option>
+                    {especies.map(especie => (
+                      <option key={especie} value={especie}>{especie}</option>
+                    ))}
+                  </select>
                 </div>
               </div>
 
               <div className="form-row">
                 <div className="form-group">
-                  <label>Raza:</label>
-                  <input type="text" name="raza" value={mascotaEditada.raza} onChange={handleEditChange} />
+                  <label>Raza</label>
+                  <select
+                    name="raza"
+                    value={mascotaEditada.raza}
+                    onChange={handleEditChange}
+                    disabled={!mascotaEditada.especie}
+                  >
+                    <option value="">Seleccionar...</option>
+                    {mascotaEditada.especie && razasPorEspecie[mascotaEditada.especie]?.map(raza => (
+                      <option key={raza} value={raza}>{raza}</option>
+                    ))}
+                    <option value="Otra">Otra</option>
+                  </select>
                 </div>
 
                 <div className="form-group">
-                  <label>ID del Dueño:</label>
+                  <label>ID del Dueño *</label>
                   <input
                     type="text"
                     name="idDueno"
@@ -384,8 +481,13 @@ function Mascotas() {
 
               <div className="form-row">
                 <div className="form-group">
-                  <label>Género:</label>
-                  <select name="genero" value={mascotaEditada.genero} onChange={handleEditChange} required>
+                  <label>Género *</label>
+                  <select 
+                    name="genero" 
+                    value={mascotaEditada.genero} 
+                    onChange={handleEditChange} 
+                    required
+                  >
                     <option value="">Seleccionar...</option>
                     <option value="macho">Macho</option>
                     <option value="hembra">Hembra</option>
@@ -393,24 +495,30 @@ function Mascotas() {
                 </div>
 
                 <div className="form-group">
-                  <label>Color:</label>
-                  <input type="text" name="color" value={mascotaEditada.color} onChange={handleEditChange} />
+                  <label>Color</label>
+                  <input 
+                    type="text" 
+                    name="color" 
+                    value={mascotaEditada.color} 
+                    onChange={handleEditChange} 
+                  />
                 </div>
               </div>
 
               <div className="form-row">
                 <div className="form-group">
-                  <label>Fecha de Nacimiento:</label>
+                  <label>Fecha de Nacimiento</label>
                   <input
                     type="date"
                     name="fechaNacimiento"
                     value={mascotaEditada.fechaNacimiento}
                     onChange={handleEditChange}
+                    max={new Date().toISOString().split('T')[0]}
                   />
                 </div>
 
                 <div className="form-group">
-                  <label>Peso (kg):</label>
+                  <label>Peso (kg)</label>
                   <input
                     type="number"
                     step="0.1"
@@ -424,7 +532,7 @@ function Mascotas() {
 
               <div className="form-row">
                 <div className="form-group">
-                  <label>Estado Reproductivo:</label>
+                  <label>Estado Reproductivo</label>
                   <select
                     name="estadoReproductivo"
                     value={mascotaEditada.estadoReproductivo}
@@ -433,12 +541,33 @@ function Mascotas() {
                     <option value="">Seleccionar...</option>
                     <option value="intacto">Intacto</option>
                     <option value="esterilizado">Esterilizado</option>
+                    <option value="castrado">Castrado</option>
                   </select>
+                </div>
+
+                <div className="form-group">
+                  <label>Foto</label>
+                  <input 
+                    type="file" 
+                    accept="image/*" 
+                    onChange={handleImageChange} 
+                  />
                 </div>
               </div>
 
+              {mascotaEditada.foto && (
+                <div className="form-group">
+                  <label>Previsualización</label>
+                  <img
+                    src={mascotaEditada.foto}
+                    alt="Previsualización"
+                    className="preview-image"
+                  />
+                </div>
+              )}
+
               <div className="form-group">
-                <label>Características Físicas:</label>
+                <label>Características Físicas</label>
                 <textarea
                   name="caracteristicasFisicas"
                   value={mascotaEditada.caracteristicasFisicas}
@@ -447,23 +576,15 @@ function Mascotas() {
                 />
               </div>
 
-              <div className="form-group">
-                <label>Foto:</label>
-                <input type="file" accept="image/*" onChange={handleImageChange} />
-                {mascotaEditada.foto && (
-                  <img
-                    src={mascotaEditada.foto || "/placeholder.svg"}
-                    alt="Previsualización"
-                    className="preview-image"
-                  />
-                )}
-              </div>
-
               <div className="form-buttons">
                 <button type="submit" className="btn-guardar">
-                  Guardar Cambios
+                  {modoNuevo ? "Registrar Mascota" : "Guardar Cambios"}
                 </button>
-                <button type="button" className="btn-cancelar" onClick={handleCancelar}>
+                <button 
+                  type="button" 
+                  className="btn-cancelar" 
+                  onClick={handleCancelar}
+                >
                   Cancelar
                 </button>
               </div>
@@ -479,12 +600,7 @@ function Mascotas() {
                   <th>Especie</th>
                   <th>Raza</th>
                   <th>Género</th>
-                  <th>Color</th>
-                  <th>Fecha Nac.</th>
-                  <th>Peso (kg)</th>
-                  <th>Estado Reprod.</th>
                   <th>ID Dueño</th>
-                  <th>Características</th>
                   <th>Acciones</th>
                 </tr>
               </thead>
@@ -502,17 +618,20 @@ function Mascotas() {
                     <td>{mascota.especie}</td>
                     <td>{mascota.raza || "-"}</td>
                     <td>{mascota.genero === "macho" ? "Macho" : "Hembra"}</td>
-                    <td>{mascota.color || "-"}</td>
-                    <td>{formatFecha(mascota.fechaNacimiento)}</td>
-                    <td>{mascota.peso || "-"}</td>
-                    <td>{mascota.estadoReproductivo === "intacto" ? "Intacto" : "Esterilizado"}</td>
                     <td>{mascota.idDueno}</td>
-                    <td className="caracteristicas-cell">{mascota.caracteristicasFisicas || "-"}</td>
                     <td className="acciones-cell">
-                      <button onClick={() => handleEditar(mascota)} className="btn-editar" title="Editar">
+                      <button 
+                        onClick={() => handleEditar(mascota)} 
+                        className="btn-editar" 
+                        title="Editar"
+                      >
                         <FontAwesomeIcon icon={faEdit} />
                       </button>
-                      <button onClick={() => handleEliminar(mascota.id)} className="btn-eliminar" title="Eliminar">
+                      <button 
+                        onClick={() => handleEliminar(mascota.id)} 
+                        className="btn-eliminar" 
+                        title="Eliminar"
+                      >
                         <FontAwesomeIcon icon={faTrash} />
                       </button>
                       <button
@@ -655,4 +774,4 @@ function Mascotas() {
   )
 }
 
-export default Mascotas
+export default Mascotas; 
