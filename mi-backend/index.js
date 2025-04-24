@@ -133,24 +133,92 @@ app.post('/api/reset-password', async (req, res) => {
   }
 });
 
-app.get('/Propietarios/:email', (req, res) => {
-  const email = req.params.email;
-  const sql = 'SELECT * FROM propietarios WHERE email = ?';
-  db.query(sql, [email], (err, result) => {
-    if (err) {
-      console.error('Error al consultar propietario:', err);
-      res.status(500).json({ error: 'Error al consultar' });
-    } else if (result.length === 0) {
-      res.status(404).json({ error: 'No se encontró el propietario' });
-    } else {
-      res.json(result[0]);
-    }
-  });
-});
+// app.get('/Propietarios/:email', (req, res) => {
+//   const email = req.params.email;
+//   const sql = 'SELECT * FROM propietarios WHERE email = ?';
+//   db.query(sql, [email], (err, result) => {
+//     if (err) {
+//       console.error('Error al consultar propietario:', err);
+//       res.status(500).json({ error: 'Error al consultar' });
+//     } else if (result.length === 0) {
+//       res.status(404).json({ error: 'No se encontró el propietario' });
+//     } else {
+//       res.json(result[0]);
+//     }
+//   });
+// });
 
+// Ruta para registrar mascota con documento del propietario
+app.post('/api/registro-mascota', async (req, res) => {
+  const {
+    documento,
+    nombre,
+    especie,
+    raza,
+    genero,
+    color,
+    fechaNacimiento,
+    peso,
+    tamano,
+    estadoReproductivo,
+    vacunado,
+    observaciones
+  } = req.body;
+
+  // Validar que todos los campos requeridos estén presentes
+  if (
+    !documento ||
+    !nombre ||
+    !especie ||
+    !raza ||
+    !genero ||
+    !fechaNacimiento ||
+    !tamano ||
+    !estadoReproductivo
+  ) {
+    return res.status(400).send('Todos los campos son obligatorios');
+  }
+
+  try {
+    // Preparar la consulta para insertar los datos en la base de datos
+    const query = `
+      INSERT INTO mascotas 
+      (documento, nombre, especie, raza, genero, color, fechaNacimiento, peso, tamano, estadoReproductivo, vacunado, observaciones) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+
+    // Ejecutar la consulta con los valores recibidos
+    db.query(
+      query,
+      [
+        documento,
+        nombre,
+        especie,
+        raza,
+        genero,
+        color || null, // Color es opcional, se permite que sea nulo
+        fechaNacimiento,
+        peso || null, // Peso es opcional, se permite que sea nulo
+        tamano,
+        estadoReproductivo,
+        vacunado || false, // Vacunado es opcional y por defecto es false
+        observaciones || null // Observaciones es opcional, se permite que sea nulo
+      ],
+      (err, results) => {
+        if (err) {
+          console.error('Error al insertar los datos:', err);
+          return res.status(500).send('Hubo un problema al registrar la mascota');
+        }
+        res.status(201).send('Mascota registrada exitosamente');
+      }
+    );
+
+  } catch (error) {
+    console.error('Error en el proceso de registro de la mascota:', error);
+    return res.status(500).send('Error del servidor');
+  }
+});
 
 app.listen(port, () => {
   console.log(`Servidor corriendo en http://localhost:${port}`);
 });
-
 

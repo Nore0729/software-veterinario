@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import '../Estilos_F/Datospro.css';
 import axios from 'axios';
+import Layout from '../Componentes/menuusu';  // Asegúrate de que la ruta sea la correcta
+import '../Estilos_F/Datospro.css';
 
 const Datospro = () => {
   const [datos, setDatos] = useState(null);
@@ -23,35 +24,38 @@ const Datospro = () => {
   }
 
   return (
-    <div className="datospro-container">
-      <h2>Mi cuenta</h2>
-      <form className="datospro-form">
-        <label>Tipo de Documento:</label>
-        <input type="text" value={datos.tipoDocumento} readOnly />
+    <Layout userName={datos.nombre}>
+      <div className="datospro-container">
+        <h2>Mi cuenta</h2>
+        <form className="datospro-form">
+          <label>Tipo de Documento:</label>
+          <input type="text" value={datos.tipoDocumento} readOnly />
 
-        <label>Documento:</label>
-        <input type="text" value={datos.documento} readOnly />
+          <label>Documento:</label>
+          <input type="text" value={datos.documento} readOnly />
 
-        <label>Nombre:</label>
-        <input type="text" value={datos.nombre} readOnly />
+          <label>Nombre:</label>
+          <input type="text" value={datos.nombre} readOnly />
 
-        <label>Fecha de Nacimiento:</label>
-        <input type="date" value={datos.fechaNacimiento?.split('T')[0]} readOnly />
+          <label>Fecha de Nacimiento:</label>
+          <input type="date" value={datos.fechaNacimiento?.split('T')[0]} readOnly />
 
-        <label>Teléfono:</label>
-        <input type="text" value={datos.telefono} readOnly />
+          <label>Teléfono:</label>
+          <input type="text" value={datos.telefono} readOnly />
 
-        <label>Email:</label>
-        <input type="email" value={datos.email} readOnly />
+          <label>Email:</label>
+          <input type="email" value={datos.email} readOnly />
 
-        <label>Dirección:</label>
-        <input type="text" value={datos.direccion} readOnly />
+          <label>Dirección:</label>
+          <input type="text" value={datos.direccion} readOnly />
 
-        <label>Fecha de Registro:</label>
-        <input type="text" value={new Date(datos.fechaRegistro).toLocaleString()} readOnly />
-      </form>
-    </div>
+          <label>Fecha de Registro:</label>
+          <input type="text" value={new Date(datos.fechaRegistro).toLocaleString()} readOnly />
+        </form>
+      </div>
+    </Layout>
   );
 };
 
 export default Datospro;
+

@@ -1,0 +1,52 @@
+.datospro-container {
+    width: 60%;
+    margin: 30px auto;
+    padding: 15px;
+    border-radius: 8px;
+    background-color: #f0f8ff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    font-size: 14px; /* Fuente más pequeña */
+  }
+  
+  .datospro-container h2 {
+    text-align: center;
+    color: #003366;
+    font-size: 20px; /* Título más pequeño */
+    margin-bottom: 15px;
+  }
+  
+  .datospro-form {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px; /* Menor espacio entre campos */
+  }
+  
+  .datospro-form label {
+    font-size: 14px;
+    color: #0055a5;
+  }
+  
+  .datospro-form input {
+    padding: 8px;
+    border: 1px solid #007bff; /* Borde más delgado */
+    border-radius: 4px;
+    font-size: 14px;
+    color: #333;
+    background-color: #e6f7ff;
+  }
+  
+  .datospro-form input[readonly] {
+    background-color: #f0f8ff;
+    cursor: not-allowed;
+  }
+  
+  .datospro-form input:focus {
+    outline: none;
+    border-color: #0055a5;
+    background-color: #cce5ff;
+  }
+  
+  .datospro-form input::placeholder {
+    color: #999;
+  }
+  
