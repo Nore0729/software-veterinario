@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import emailjs from '@emailjs/browser';
@@ -20,6 +20,17 @@ function RecuperarContraseña() {
   const [email, setEmail] = useState('');
   const [verificationCode, setVerificationCode] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [canResendCode, setCanResendCode] = useState(true);
+  const [resendTimer, setResendTimer] = useState(0);
+
+  useEffect(() => {
+    if (resendTimer > 0) {
+      const timer = setTimeout(() => setResendTimer(resendTimer - 1), 1000);
+      return () => clearTimeout(timer);
+    } else {
+      setCanResendCode(true);
+    }
+  }, [resendTimer]);
 
   const generateVerificationCode = () => {
     const length = 6;
@@ -28,7 +39,6 @@ function RecuperarContraseña() {
     for (let i = 0; i < length; i++) {
       code += characters.charAt(Math.floor(Math.random() * characters.length));
     }
-    console.log(code)
     return code;
   };
 
@@ -36,24 +46,24 @@ function RecuperarContraseña() {
     const code = generateVerificationCode();
     setVerificationCode(code);
     setEmail(data.email);
-    console.log(data.email)
-    console.log(email)
-    const Params=
-    {
-      email: email,
-      passcode: code,
-    }
+    setCanResendCode(false);
+    setResendTimer(60);
 
     emailjs
       .send(
         'service_8xog7f1',
         'template_54r481o',
-        Params,
+        { email: data.email, passcode: code },
         'tiIgYIyXTybTyjObZ'
       )
       .then(
         () => {
-          Swal.fire('Éxito', 'Código enviado al correo', 'success');
+          Swal.fire({
+            title: 'Código enviado',
+            text: 'Hemos enviado un código de verificación a tu correo electrónico',
+            icon: 'success',
+            confirmButtonColor: '#2196f3'
+          });
           setStep(2);
           reset();
         },
@@ -61,168 +71,233 @@ function RecuperarContraseña() {
       );
   };
 
+  const handleResendCode = () => {
+    if (!canResendCode) return;
+    
+    const code = generateVerificationCode();
+    setVerificationCode(code);
+    setCanResendCode(false);
+    setResendTimer(60);
+
+    emailjs.send(
+      'service_8xog7f1',
+      'template_54r481o',
+      { email, passcode: code },
+      'tiIgYIyXTybTyjObZ'
+    ).then(
+      () => Swal.fire('Éxito', 'Nuevo código enviado al correo', 'success'),
+      () => Swal.fire('Error', 'No se pudo enviar el correo', 'error')
+    );
+  };
+
   const handleVerifyCode = (data) => {
-    console.log(data)
     if (data.code === verificationCode) {
-      Swal.fire('Éxito', 'Código verificado', 'success');
+      Swal.fire({
+        title: 'Código verificado',
+        text: 'Ahora puedes establecer tu nueva contraseña',
+        icon: 'success',
+        confirmButtonColor: '#2196f3'
+      });
       setStep(3);
       reset();
     } else {
-      Swal.fire('Error', 'Código incorrecto', 'error');
+      Swal.fire('Error', 'El código ingresado no es correcto', 'error');
     }
   };
 
   const handleResetPassword = async (data) => {
-    const { password } = data;
     try {
       const response = await fetch('http://localhost:3001/api/reset-password', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, newPassword: password }),
+        body: JSON.stringify({ email, newPassword: data.password }),
       });
 
       const result = await response.json();
 
       if (response.ok) {
-        Swal.fire('Éxito', 'Contraseña restablecida correctamente', 'success').then(() => {
+        Swal.fire({
+          title: '¡Contraseña actualizada!',
+          text: 'Tu contraseña ha sido restablecida correctamente',
+          icon: 'success',
+          confirmButtonColor: '#4caf50'
+        }).then(() => {
           navigate('/login');
         });
-        reset();
       } else {
         Swal.fire('Error', result.message || 'Error al restablecer la contraseña', 'error');
       }
     } catch (error) {
-      console.error('Error al enviar la solicitud de restablecimiento:', error);
-      Swal.fire('Error', 'Error de conexión con el servidor', 'error');
+      console.error('Error:', error);
+      Swal.fire('Error', 'Ocurrió un problema al conectar con el servidor', 'error');
     }
   };
 
-  const getStepTitle = () => {
-    switch (step) {
-      case 1:
-        return 'Recuperar Contraseña';
-      case 2:
-        return 'Verificar Código';
-      case 3:
-        return 'Nueva Contraseña';
-      default:
-        return '';
-    }
-  };
-
-  const getStepSubtitle = () => {
-    switch (step) {
-      case 1:
-        return 'Escriba el correo vinculado con su cuenta para el restablecimiento de su contraseña';
-      case 2:
-        return 'Ingrese el código enviado a su correo';
-      case 3:
-        return 'Establezca su nueva contraseña';
-      default:
-        return '';
-    }
+  const getStepLabels = () => {
+    return [
+      { number: 1, label: 'Ingresa tu email' },
+      { number: 2, label: 'Verifica el código' },
+      { number: 3, label: 'Nueva contraseña' }
+    ];
   };
 
   return (
     <main className="login-main">
       <div className="der-side">
         <div className="login-form">
-          <h1 className="form-title">{getStepTitle()}</h1>
-
-          <div className="steps-indicator-container">
-            <div className={`step-circle ${step === 1 ? 'active' : ''}`}>1</div>
-            <div className={`step-circle ${step === 2 ? 'active' : ''}`}>2</div>
-            <div className={`step-circle ${step === 3 ? 'active' : ''}`}>3</div>
+          <h1 className="form-title">Recuperar Contraseña</h1>
+          
+          <div className="steps-container">
+            <div className="steps-indicator">
+              <div className="step-connector"></div>
+              {getStepLabels().map((stepItem) => (
+                <div key={stepItem.number} className="step-circle-wrapper">
+                  <div 
+                    className={`step-circle ${
+                      step > stepItem.number ? 'completed' : 
+                      step === stepItem.number ? 'active' : ''
+                    }`}
+                  >
+                    {stepItem.number}
+                  </div>
+                  <div className="step-label">{stepItem.label}</div>
+                </div>
+              ))}
+            </div>
           </div>
 
-          <p className="form-subtitle">{getStepSubtitle()}</p>
-
           {step === 1 && (
-            <form onSubmit={handleSubmit(handleSendCode)}>
-              <label>
-                <strong>Email</strong>
-                <input
-                  type="email"
-                  {...register('email', { required: 'El email es obligatorio' })}
-                  className={errors.email ? 'input-error' : ''}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-                {errors.email && <p className="error-message">{errors.email.message}</p>}
-              </label>
-              <button type="submit" className="login-submit-btn">Enviar Código</button>
-            </form>
+            <>
+              <p className="form-subtitle">
+                Ingresa el correo electrónico asociado a tu cuenta para recibir un código de verificación
+              </p>
+              <form onSubmit={handleSubmit(handleSendCode)}>
+                <label>
+                  Correo electrónico
+                  <input
+                    type="email"
+                    {...register('email', { 
+                      required: 'El correo electrónico es requerido',
+                      pattern: {
+                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                        message: 'Ingresa un correo electrónico válido'
+                      }
+                    })}
+                    className={errors.email ? 'input-error' : ''}
+                  />
+                  {errors.email && <span className="error-message">{errors.email.message}</span>}
+                </label>
+                <button type="submit" className="btn-primary">
+                  Enviar código
+                </button>
+              </form>
+            </>
           )}
 
           {step === 2 && (
-            <form onSubmit={handleSubmit(handleVerifyCode)}>
-              <label>
-                <strong>Código de Verificación</strong>
-                <input
-                  type="text"
-                  {...register('code', { required: 'El código es obligatorio' })}
-                  className={errors.code ? 'input-error' : ''}
-                />
-                {errors.code && <p className="error-message">{errors.code.message}</p>}
-              </label>
-              <button type="submit" className="login-submit-btn">Verificar Código</button>
-            </form>
+            <>
+              <p className="form-subtitle">
+                Hemos enviado un código de verificación a tu correo electrónico
+              </p>
+              <form onSubmit={handleSubmit(handleVerifyCode)}>
+                <label>
+                  Código de verificación
+                  <input
+                    type="text"
+                    {...register('code', { 
+                      required: 'El código es requerido',
+                      minLength: {
+                        value: 6,
+                        message: 'El código debe tener 6 caracteres'
+                      }
+                    })}
+                    className={errors.code ? 'input-error' : ''}
+                  />
+                  {errors.code && <span className="error-message">{errors.code.message}</span>}
+                </label>
+                <button type="submit" className="btn-primary">
+                  Verificar código
+                </button>
+              </form>
+              <div className="resend-container">
+                {resendTimer > 0 ? (
+                  <span className="resend-text disabled">
+                    Puedes solicitar un nuevo código en {resendTimer} segundos
+                  </span>
+                ) : (
+                  <span className="resend-text" onClick={handleResendCode}>
+                    ¿No recibiste el código? Haz clic aquí para reenviar
+                  </span>
+                )}
+              </div>
+            </>
           )}
 
           {step === 3 && (
-            <form onSubmit={handleSubmit(handleResetPassword)}>
-              <label>
-                <strong>Nueva Contraseña</strong>
-                <div className="password-input-container">
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    {...register('password', {
-                      required: 'La contraseña es obligatoria',
-                      pattern: {
-                        value: /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])(?!.*\s).{8,}$/,
-                        message:
-                          'La contraseña debe contener al menos una letra mayúscula, una minúscula, un número, un carácter especial y tener al menos 8 caracteres.',
-                      },
-                    })}
-                    className={errors.password ? 'input-error' : ''}
-                  />
-                  <span
-                    className="password-toggle-icon"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? <BiShow size={20} /> : <BiHide size={20} />}
-                  </span>
-                </div>
-                {errors.password && <p className="error-message">{errors.password.message}</p>}
-              </label>
+            <>
+              <p className="form-subtitle">
+                Crea una nueva contraseña segura para tu cuenta
+              </p>
+              <form onSubmit={handleSubmit(handleResetPassword)}>
+                <label>
+                  Nueva contraseña
+                  <div className="password-input-container">
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      {...register('password', {
+                        required: 'La contraseña es requerida',
+                        minLength: {
+                          value: 8,
+                          message: 'La contraseña debe tener al menos 8 caracteres'
+                        },
+                        pattern: {
+                          value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+                          message: 'Debe incluir mayúsculas, minúsculas, números y caracteres especiales'
+                        }
+                      })}
+                      className={errors.password ? 'input-error' : ''}
+                    />
+                    <span
+                      className="password-toggle-icon"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? <BiShow size={20} /> : <BiHide size={20} />}
+                    </span>
+                  </div>
+                  {errors.password && <span className="error-message">{errors.password.message}</span>}
+                </label>
 
-              <label>
-                <strong>Confirmar Contraseña</strong>
-                <div className="password-input-container">
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    {...register('confirmPassword', {
-                      required: 'La confirmación de contraseña es obligatoria',
-                      validate: (value) =>
-                        value === watch('password') || 'Las contraseñas no coinciden',
-                    })}
-                    className={errors.confirmPassword ? 'input-error' : ''}
-                  />
-                  <span
-                    className="password-toggle-icon"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? <BiShow size={20} /> : <BiHide size={20} />}
-                  </span>
-                </div>
-                {errors.confirmPassword && (
-                  <p className="error-message">{errors.confirmPassword.message}</p>
-                )}
-              </label>
+                <label>
+                  Confirmar contraseña
+                  <div className="password-input-container">
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      {...register('confirmPassword', {
+                        required: 'Confirma tu contraseña',
+                        validate: value =>
+                          value === watch('password') || 'Las contraseñas no coinciden'
+                      })}
+                      className={errors.confirmPassword ? 'input-error' : ''}
+                    />
+                    <span
+                      className="password-toggle-icon"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? <BiShow size={20} /> : <BiHide size={20} />}
+                    </span>
+                  </div>
+                  {errors.confirmPassword && (
+                    <span className="error-message">{errors.confirmPassword.message}</span>
+                  )}
+                </label>
 
-              <button type="submit" className="login-submit-btn">Restablecer Contraseña</button>
-            </form>
+                <button type="submit" className="btn-primary btn-success">
+                  Restablecer contraseña
+                </button>
+              </form>
+            </>
           )}
         </div>
       </div>

@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../Estilos_F/Login.css';
-import { FaEye, FaEyeSlash } from 'react-icons/fa'; // Importando los íconos
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 export const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [showPassword, setShowPassword] = useState(false); // Estado para mostrar/ocultar la contraseña
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -22,19 +22,16 @@ export const Login = () => {
     try {
       const response = await axios.post('http://localhost:3000/api/login', {
         email,
-        password
+        password,
       });
 
       const { name, userEmail } = response.data;
-      console.log(name)
-      console.log(userEmail)
-      
-      // Guarda los datos en localStorage
+
       localStorage.setItem('nombre', name);
       localStorage.setItem('email', userEmail);
 
       setError('');
-      navigate('/UserWelcome'); // Redirige a UserWelcome
+      navigate('/UserWelcome');
     } catch (err) {
       console.error('Error al iniciar sesión:', err);
       setError(err.response?.data?.message || 'Error al iniciar sesión');
@@ -43,7 +40,15 @@ export const Login = () => {
 
   return (
     <div className="login-container">
-      <div>
+      <div className="login-box login-image-side">
+        <img
+          src="https://raw.githubusercontent.com/Nore0729/Img-soft-veterinario/refs/heads/main/inicio.png"
+          alt="Mascotas felices"
+          className="login-image"
+        />
+      </div>
+
+      <div className="login-box login-form-side">
         <h2>🐾 Patitas Felices</h2>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
@@ -89,7 +94,3 @@ export const Login = () => {
 };
 
 export default Login;
-
-
-
-

@@ -1,10 +1,9 @@
 import "../Estilos_F/Usuarios.css";
 import "../Estilos_F/Administrador.css";
-
+import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faEdit, faTrash, faSearch, faSave, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
-import "../Estilos_F/Administrador.css";
 import { Users, PawPrint, Stethoscope, ShieldCheck, LogOut } from 'lucide-react';
 
 const Usuarios = () => {
@@ -12,45 +11,46 @@ const Usuarios = () => {
   const [busqueda, setBusqueda] = useState("");
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const [editandoId, setEditandoId] = useState(null);
+  const [notificacion, setNotificacion] = useState({ mostrar: false, mensaje: "", tipo: "" });
   const [nuevoUsuario, setNuevoUsuario] = useState({
     nombre: "",
     apellido: "",
     tipoDoc: "DNI",
     numDoc: "",
     email: "",
-    telefono: ""
+    telefono: "",
+    password: ""
   });
 
   useEffect(() => {
-   
-    setUsuarios([
-      {
-        id: 1,
-        nombre: "Juan",
-        apellido: "Pérez",
-        tipoDoc: "DNI",
-        numDoc: "12345678",
-        email: "juan@example.com",
-        telefono: "1122334455",
-        fechaRegistro: "2023-05-15"
-      },
-      {
-        id: 2,
-        nombre: "Laura",
-        apellido: "Gómez",
-        tipoDoc: "Cédula",
-        numDoc: "87654321",
-        email: "laura@example.com",
-        telefono: "5544332211",
-        fechaRegistro: "2023-04-10"
-      }
-    ]);
+    fetch('/api/usuarios')
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Error al obtener los usuarios');
+        }
+        return response.json();
+      })
+      .then((data) => {
+        setUsuarios(data);
+      })
+      .catch((error) => {
+        mostrarNotificacion('Error al obtener los usuarios.', 'error');
+        console.error('Error al obtener los usuarios:', error);
+      });
   }, []);
 
   const handleEliminar = (id) => {
     const confirmacion = window.confirm("¿Estás seguro de que quieres eliminar este usuario?");
     if (confirmacion) {
-      setUsuarios(usuarios.filter((usuario) => usuario.id !== id));
+      axios.delete(`/api/eliminar-usuario/${id}`)
+        .then(() => {
+          setUsuarios(usuarios.filter((usuario) => usuario.id !== id));
+          mostrarNotificacion('Usuario eliminado correctamente.', 'exito');
+        })
+        .catch((error) => {
+          mostrarNotificacion('Error al eliminar el usuario.', 'error');
+          console.error('Error al eliminar el usuario:', error);
+        });
     }
   };
 
@@ -62,7 +62,8 @@ const Usuarios = () => {
       tipoDoc: usuario.tipoDoc,
       numDoc: usuario.numDoc,
       email: usuario.email,
-      telefono: usuario.telefono
+      telefono: usuario.telefono,
+      password: ""
     });
     setMostrarFormulario(true);
   };
@@ -75,7 +76,8 @@ const Usuarios = () => {
       tipoDoc: "DNI",
       numDoc: "",
       email: "",
-      telefono: ""
+      telefono: "",
+      password: ""
     });
     setMostrarFormulario(true);
   };
@@ -88,52 +90,61 @@ const Usuarios = () => {
       tipoDoc: "DNI",
       numDoc: "",
       email: "",
-      telefono: ""
+      telefono: "",
+      password: ""
     });
     setEditandoId(null);
   };
 
+  const mostrarNotificacion = (mensaje, tipo) => {
+    setNotificacion({ mostrar: true, mensaje, tipo });
+    setTimeout(() => {
+      setNotificacion({ mostrar: false, mensaje: "", tipo: "" });
+    }, 5000);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    const { nombre, apellido, tipoDoc, numDoc, email, telefono } = nuevoUsuario;
+    const { nombre, apellido, tipoDoc, numDoc, email, telefono, password } = nuevoUsuario;
 
-    if (nombre && apellido && tipoDoc && numDoc && email && telefono) {
+    if (nombre && apellido && tipoDoc && numDoc && email && telefono && (editandoId || password)) {
       if (editandoId) {
-        
-        setUsuarios(usuarios.map(usuario => 
-          usuario.id === editandoId ? { 
-            ...usuario,
-            ...nuevoUsuario
-          } : usuario
-        ));
+        const datosActualizados = { ...nuevoUsuario };
+        if (!password) delete datosActualizados.password;
+
+        axios.put(`/api/actualizar-usuario/${editandoId}`, datosActualizados)
+          .then(() => {
+            setUsuarios(usuarios.map(usuario =>
+              usuario.id === editandoId ? { ...usuario, ...datosActualizados } : usuario
+            ));
+            mostrarNotificacion('Usuario actualizado correctamente.', 'exito');
+            handleCancelar();
+          })
+          .catch((error) => {
+            mostrarNotificacion('Error al actualizar el usuario.', 'error');
+            console.error('Error al actualizar el usuario:', error);
+          });
       } else {
-        
-        const nuevo = {
-          id: usuarios.length > 0 ? Math.max(...usuarios.map(u => u.id)) + 1 : 1,
-          nombre,
-          apellido,
-          tipoDoc,
-          numDoc,
-          email,
-          telefono,
-          fechaRegistro: new Date().toISOString().split("T")[0]
-        };
-        setUsuarios([...usuarios, nuevo]);
+        axios.post('/api/registro-usuario', nuevoUsuario)
+          .then((response) => {
+            setUsuarios([
+              ...usuarios,
+              {
+                id: response.data?.id || (usuarios.length > 0 ? Math.max(...usuarios.map(u => u.id)) + 1 : 1),
+                ...nuevoUsuario,
+                fechaRegistro: new Date().toISOString().split("T")[0]
+              }
+            ]);
+            mostrarNotificacion('Usuario registrado exitosamente.', 'exito');
+            handleCancelar();
+          })
+          .catch((error) => {
+            mostrarNotificacion('Error al registrar el usuario.', 'error');
+            console.error('Error al registrar el usuario:', error);
+          });
       }
-      
-      
-      setNuevoUsuario({
-        nombre: "",
-        apellido: "",
-        tipoDoc: "DNI",
-        numDoc: "",
-        email: "",
-        telefono: ""
-      });
-      setMostrarFormulario(false);
-      setEditandoId(null);
     } else {
-      alert("Todos los campos son obligatorios.");
+      mostrarNotificacion("Todos los campos son obligatorios.", 'error');
     }
   };
 
@@ -208,164 +219,166 @@ const Usuarios = () => {
         <div className="usuarios-container">
           <h1>Registro de Usuarios</h1>
 
+          {notificacion.mostrar && (
+            <div className={`notificacion ${notificacion.tipo}`}>
+              {notificacion.mensaje}
+            </div>
+          )}
+
           <div className="acciones-superiores">
             <button className="btn-agregar" onClick={handleAgregar}>
               <FontAwesomeIcon icon={faPlus} /> Nuevo Usuario
             </button>
-            <button className="btn-reiniciar" onClick={() => setBusqueda("")}>
-              Limpiar Búsqueda
-            </button>
+            <button className="btn-reiniciar" onClick={() => setBusqueda("")}>Limpiar Búsqueda</button>
           </div>
 
           {mostrarFormulario && (
             <form className="formulario-nuevo" onSubmit={handleSubmit}>
-              <h3>{editandoId ? "Editar Usuario" : "Agregar Usuario"}</h3>
-              
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Nombre</label>
-                  <input
-                    type="text"
-                    placeholder="Nombre"
-                    value={nuevoUsuario.nombre}
-                    onChange={(e) => setNuevoUsuario({ ...nuevoUsuario, nombre: e.target.value })}
-                    required
-                  />
-                </div>
-                
-                <div className="form-group">
-                  <label>Apellido</label>
-                  <input
-                    type="text"
-                    placeholder="Apellido"
-                    value={nuevoUsuario.apellido}
-                    onChange={(e) => setNuevoUsuario({ ...nuevoUsuario, apellido: e.target.value })}
-                    required
-                  />
-                </div>
+            <h3>{editandoId ? "Editar Usuario" : "Agregar Usuario"}</h3>
+            <div className="form-row">
+              <div className="form-group">
+                <label>Nombre</label>
+                <input
+                  type="text"
+                  placeholder="Nombre"
+                  value={nuevoUsuario.nombre}
+                  onChange={(e) =>
+                    setNuevoUsuario({ ...nuevoUsuario, nombre: e.target.value })
+                  }
+                  pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$"
+                  title="El nombre solo debe contener letras"
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label>Apellido</label>
+                <input
+                  type="text"
+                  placeholder="Apellido"
+                  value={nuevoUsuario.apellido}
+                  onChange={(e) =>
+                    setNuevoUsuario({ ...nuevoUsuario, apellido: e.target.value })
+                  }
+                  pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$"
+                  title="El apellido solo debe contener letras"
+                  required
+                />
+              </div>
+            </div>
+          
+            <div className="form-row">
+              <div className="form-group">
+                <label>Tipo de Documento</label>
+                <select
+                  value={nuevoUsuario.tipoDoc}
+                  onChange={(e) =>
+                    setNuevoUsuario({ ...nuevoUsuario, tipoDoc: e.target.value })
+                  }
+                  required
+                >
+                  <option value="DNI">DNI</option>
+                  <option value="Cédula">Cédula</option>
+                  <option value="Pasaporte">Pasaporte</option>
+                </select>
+              </div>
+              <div className="form-group">
+                <label>Número de Documento</label>
+                <input
+                  type="text"
+                  placeholder="Número de documento"
+                  value={nuevoUsuario.numDoc}
+                  onChange={(e) =>
+                    setNuevoUsuario({ ...nuevoUsuario, numDoc: e.target.value })
+                  }
+                  pattern="^\d{5,12}$"
+                  title="El número de documento debe contener solo números y entre 5 y 12 dígitos"
+                  required
+                />
+              </div>
+            </div>
+          
+            <div className="form-row"/>
+              <div className="form-group">
+                <label>Correo Electrónico</label>
+                <input
+                  type="email"
+                  placeholder="Correo electrónico"
+                  value={nuevoUsuario.email}
+                  onChange={(e) =>
+                    setNuevoUsuario({ ...nuevoUsuario, email: e.target.value })
+                  }
+                  pattern="^[^@\s]+@[^@\s]+\.[^@\s]+$"
+                  title="Ingrese un correo electrónico válido"
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label>Teléfono</label>
+                <input
+                  type="tel"
+                  placeholder="Número de teléfono"
+                  value={nuevoUsuario.telefono}
+                  onChange={(e) =>
+                    setNuevoUsuario({ ...nuevoUsuario, telefono: e.target.value })
+                  }
+                  pattern="^\d{10}$"
+                  title="El número de teléfono debe tener exactamente 10 dígitos"
+                  required
+                />
               </div>
               
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Tipo de Documento</label>
-                  <select
-                    value={nuevoUsuario.tipoDoc}
-                    onChange={(e) => setNuevoUsuario({ ...nuevoUsuario, tipoDoc: e.target.value })}
-                    required
-                  >
-                    <option value="DNI">DNI</option>
-                    <option value="Cédula">Cédula</option>
-                    <option value="Pasaporte">Pasaporte</option>
-                    <option value="Otro">Otro</option>
-                  </select>
-                </div>
-                
-                <div className="form-group">
-                  <label>Número de Documento</label>
-                  <input
-                    type="text"
-                    placeholder="Número de documento"
-                    value={nuevoUsuario.numDoc}
-                    onChange={(e) => setNuevoUsuario({ ...nuevoUsuario, numDoc: e.target.value })}
-                    required
-                  />
-                </div>
-              </div>
-              
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Correo Electrónico</label>
-                  <input
-                    type="email"
-                    placeholder="Correo electrónico"
-                    value={nuevoUsuario.email}
-                    onChange={(e) => setNuevoUsuario({ ...nuevoUsuario, email: e.target.value })}
-                    required
-                  />
-                </div>
-                
-                <div className="form-group">
-                  <label>Teléfono</label>
-                  <input
-                    type="tel"
-                    placeholder="Número de teléfono"
-                    value={nuevoUsuario.telefono}
-                    onChange={(e) => setNuevoUsuario({ ...nuevoUsuario, telefono: e.target.value })}
-                    required
-                  />
-                </div>
-              </div>
-              
-              <div className="form-buttons">
-                <button type="submit" className="btn-guardar">
-                  <FontAwesomeIcon icon={editandoId ? faSave : faPlus} /> 
-                  {editandoId ? " Guardar Cambios" : " Registrar Usuario"}
-                </button>
-                <button type="button" className="btn-cancelar" onClick={handleCancelar}>
-                  <FontAwesomeIcon icon={faTimes} /> Cancelar
-                </button>
-              </div>
-            </form>
+          
+            <div className="form-buttons">
+              <button type="submit" className="btn-guardar">
+                <FontAwesomeIcon icon={editandoId ? faSave : faPlus} />{" "}
+                {editandoId ? " Guardar Cambios" : " Registrar Usuario"}
+              </button>
+              <button type="button" className="btn-cancelar" onClick={handleCancelar}>
+                <FontAwesomeIcon icon={faTimes} /> Cancelar
+              </button>
+            </div>
+          </form>
+          
           )}
 
           <div className="busqueda-container">
-            <input
-              type="text"
-              placeholder="Buscar Usuario..."
-              value={busqueda}
-              onChange={(e) => setBusqueda(e.target.value)}
-            />
-            <FontAwesomeIcon icon={faSearch} className="icono-busqueda" />
+            <input type="text" placeholder="Buscar Usuario..." value={busqueda} onChange={(e) => setBusqueda(e.target.value)} />
+            <FontAwesomeIcon icon={faSearch} />
           </div>
 
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>Apellido</th>
-                <th>Tipo Doc.</th>
-                <th>Número Doc.</th>
-                <th>Correo</th>
-                <th>Teléfono</th>
-                <th>Fecha Registro</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {usuariosFiltrados.map((usuario) => (
-                <tr key={usuario.id}>
-                  <td>{usuario.id}</td>
-                  <td>{usuario.nombre}</td>
-                  <td>{usuario.apellido}</td>
-                  <td>{usuario.tipoDoc}</td>
-                  <td>{usuario.numDoc}</td>
-                  <td>{usuario.email}</td>
-                  <td>{usuario.telefono}</td>
-                  <td>{usuario.fechaRegistro}</td>
-                  <td>
-                    <button 
-                      className="btn-editar" 
-                      onClick={() => handleEditar(usuario)}
-                    >
-                      <FontAwesomeIcon icon={faEdit} />
-                    </button>
-                    <button 
-                      className="btn-eliminar" 
-                      onClick={() => handleEliminar(usuario.id)}
-                    >
-                      <FontAwesomeIcon icon={faTrash} />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-              {usuariosFiltrados.length === 0 && (
+          <div className="tabla-usuarios">
+            <table>
+              <thead>
                 <tr>
-                  <td colSpan="9">No se encontraron usuarios.</td>
+                  <th>Nombre</th>
+                  <th>Apellido</th>
+                  <th>Documento</th>
+                  <th>Email</th>
+                  <th>Teléfono</th>
+                  <th>Acciones</th>
                 </tr>
-              )}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {usuariosFiltrados.map((usuario) => (
+                  <tr key={usuario.id}>
+                    <td>{usuario.nombre}</td>
+                    <td>{usuario.apellido}</td>
+                    <td>{usuario.numDoc}</td>
+                    <td>{usuario.email}</td>
+                    <td>{usuario.telefono}</td>
+                    <td>
+                      <button className="btn-editar" onClick={() => handleEditar(usuario)}>
+                        <FontAwesomeIcon icon={faEdit} />
+                      </button>
+                      <button className="btn-eliminar" onClick={() => handleEliminar(usuario.id)}>
+                        <FontAwesomeIcon icon={faTrash} />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </main>
     </div>
@@ -373,6 +386,7 @@ const Usuarios = () => {
 };
 
 export default Usuarios;
+
 
 
 

@@ -15,7 +15,7 @@ app.use(cors());
 const db = mysql.createConnection({
   host: 'localhost',
   user: 'root',
-  password: '',
+  password: '12345678',
   database: 'veterinaria',
   port: '3306'
 });
@@ -218,7 +218,51 @@ app.post('/api/registro-mascota', async (req, res) => {
   }
 });
 
+// RUTA PARA REGISTRAR USUARIOS
+app.post('/api/registro-usuario', async (req, res) => {
+  const { tipoDoc, numDoc, nombre, apellido, email, telefono, password } = req.body;
+
+  if (!tipoDoc || !numDoc || !nombre || !apellido || !email || !telefono || !password) {
+    return res.status(400).send('Todos los campos son obligatorios');
+  }
+
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const query = `
+      INSERT INTO usuarios 
+      (tipoDoc, numDoc, nombre, apellido, email, telefono, password) 
+      VALUES (?, ?, ?, ?, ?, ?, ?)`;
+
+    db.query(query, [tipoDoc, numDoc, nombre, apellido, email, telefono, hashedPassword], (err, results) => {
+      if (err) {
+        console.error('Error al insertar los datos del usuario:', err);
+        return res.status(500).send('Hubo un problema al registrar al usuario');
+      }
+      res.status(201).send({ mensaje: 'Usuario registrado exitosamente', id: results.insertId });
+    });
+
+  } catch (error) {
+    console.error('Error al encriptar la contraseña:', error);
+    return res.status(500).send('Error del servidor');
+  }
+});
+
+// RUTA PARA OBTENER TODOS LOS USUARIOS (nombre corregido)
+app.get('/api/usuarios', (req, res) => {
+  const query = 'SELECT id, tipoDoc, numDoc, nombre, apellido, email, telefono FROM usuarios';
+
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error('Error al obtener los usuarios:', err);
+      return res.status(500).send('Error al obtener los usuarios');
+    }
+    res.json(results);
+  });
+});
+
 app.listen(port, () => {
   console.log(`Servidor corriendo en http://localhost:${port}`);
 });
+
 
