@@ -19,6 +19,10 @@ import Admin from "./Componentes/Admin"
 import UserWelcome from "./Componentes/UserWelcome"
 import DatosPro from "./Componentes/Datospro"
 import Ayudapro from "./Componentes/ayudapro"
+import HistorialMedico from "./Componentes/HistorialMedico"
+import Pacientes from "./Componentes/Pacientes"
+import Consultas from "./Componentes/Consultas"
+import VeterinarioPer from "./Componentes/VeterinarioPer"
 
 function App() {
   return (
@@ -40,6 +44,9 @@ function App() {
           <Route path="/Recuperarcontraseña" element={<RecuperarContraseña />} />
           <Route path="/MasRegis" element={<MasRegis />} />
           <Route path="/Veterinarios" element={<Veterinarios />} />
+          <Route path="/Pacientes" element={<Pacientes />} />
+          <Route path="/Consultas" element={<Consultas />} />
+          <Route path="/ HistorialMedico" element={< HistorialMedico />} />
         </Route>
 
         {/* Rutas internas sin header/footer */}
@@ -48,6 +55,7 @@ function App() {
           <Route path="/UserWelcome" element={<UserWelcome />} />
           <Route path="/Datospro" element={<DatosPro />} />
           <Route path="/ayudapro" element={<Ayudapro />} />
+          <Route path="/VeterinarioPer" element={<VeterinarioPer />} />
         </Route>
       </Routes>
     </BrowserRouter>
