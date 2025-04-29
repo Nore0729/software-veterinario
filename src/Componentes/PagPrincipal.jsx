@@ -167,9 +167,6 @@ const PagPrincipal = () => {
                 />
               </div>
               <div className="service-content">
-                <div className="service-icon">
-                 
-                </div>
                 <h3 className="service-title">Consulta General</h3>
                 <p className="service-description">
                   Evaluación completa de la salud de tu mascota con profesionales
@@ -191,9 +188,6 @@ const PagPrincipal = () => {
                 />
               </div>
               <div className="service-content">
-                <div className="service-icon">
-                  
-                </div>
                 <h3 className="service-title">Vacunación</h3>
                 <p className="service-description">
                   Protege a tu mascota contra enfermedades con nuestro programa
@@ -215,9 +209,6 @@ const PagPrincipal = () => {
                 />
               </div>
               <div className="service-content">
-                <div className="service-icon">
-                  
-                </div>
                 <h3 className="service-title">Cirugía</h3>
                 <p className="service-description">
                   Procedimientos quirúrgicos realizados con la máxima precisión y
@@ -248,7 +239,7 @@ const PagPrincipal = () => {
                 alt="Equipo Pet-lovers"
               />
               <div className="experience-badge">
-                <span>15+</span>
+                <span>10+</span>
                 <span>años</span>
               </div>
             </div>
@@ -256,7 +247,7 @@ const PagPrincipal = () => {
             <div className="about-content">
               <h2 className="about-title">Sobre Pet-Lovers</h2>
               <p className="about-description">
-                Desde 2008, GuzPet ha sido sinónimo de excelencia en medicina
+                Desde 2010, Pet-Lovers ha sido sinónimo de excelencia en medicina
                 veterinaria. Nuestro equipo de profesionales altamente
                 calificados está comprometido con brindar el mejor cuidado
                 posible a cada mascota que nos visita.
@@ -303,8 +294,8 @@ const PagPrincipal = () => {
             <div className="benefits-grid">
               {/* Beneficio 1 */}
               <div className="benefit-card">
-                <div className="benefit-icon">
-                  
+                <div className="iconos">
+                  <img src="https://raw.githubusercontent.com/Nore0729/Img-soft-veterinario/refs/heads/main/equipo.png" alt="grupo" />
                 </div>
                 <h3 className="benefit-title">Equipo Profesional</h3>
                 <p className="benefit-description">
@@ -314,19 +305,8 @@ const PagPrincipal = () => {
               </div>
 
               <div className="benefit-card">
-                <div className="benefit-icon">
-                  
-                </div>
-                <h3 className="benefit-title">Instalaciones Modernas</h3>
-                <p className="benefit-description">
-                  Equipamiento de última generación para diagnósticos precisos y
-                  tratamientos efectivos.
-                </p>
-              </div>
-
-              <div className="benefit-card">
-                <div className="benefit-icon">
-                  
+                <div className="iconos">
+                  <img src="https://raw.githubusercontent.com/Nore0729/Img-soft-veterinario/refs/heads/main/atencion.png" alt="grupo" />
                 </div>
                 <h3 className="benefit-title">Atención Personalizada</h3>
                 <p className="benefit-description">
@@ -336,8 +316,8 @@ const PagPrincipal = () => {
               </div>
 
               <div className="benefit-card">
-                <div className="benefit-icon">
-                  
+                <div className="iconos">
+                  <img src="https://raw.githubusercontent.com/Nore0729/Img-soft-veterinario/refs/heads/main/horario.png" alt="grupo" />
                 </div>
                 <h3 className="benefit-title">Horarios Flexibles</h3>
                 <p className="benefit-description">
@@ -434,12 +414,61 @@ const PagPrincipal = () => {
                   </div>
                 </div>
               </div>
+
+              <div className="testimonial-card">
+                <div className="testimonial-content">
+                  <p className="testimonial-text">
+                    "Llevamos a nuestro conejo Tambor a Pet-Lovers desde hace años.
+                    Apreciamos mucho que tengan experiencia con mascotas
+                    exóticas y siempre nos den los mejores consejos para su
+                    cuidado."
+                  </p>
+                  <div className="testimonial-author">
+                    <div className="author-info">
+                      <h4>Laura Martínez</h4>
+                      <p>Dueña de Tambor</p>
+                      
+                    </div>
+                    <div className="pet-image">
+                      <img
+                        src="https://img.freepik.com/fotos-premium/conejo-curioso-blanco-negro_1002763-18.jpg?w=740"
+                        alt="Mascota 3"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="testimonial-card">
+                <div className="testimonial-content">
+                  <p className="testimonial-text">
+                    "Llevamos a nuestro conejo Tambor a Pet-Lovers desde hace años.
+                    Apreciamos mucho que tengan experiencia con mascotas
+                    exóticas y siempre nos den los mejores consejos para su
+                    cuidado."
+                  </p>
+                  <div className="testimonial-author">
+                    <div className="author-info">
+                      <h4>Laura Martínez</h4>
+                      <p>Dueña de Tambor</p>
+                      
+                    </div>
+                    <div className="pet-image">
+                      <img
+                        src="https://img.freepik.com/fotos-premium/conejo-curioso-blanco-negro_1002763-18.jpg?w=740"
+                        alt="Mascota 3"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div className="testimonial-nav">
               <div className="nav-dot active" onClick={() => showSlide(0)}></div>
               <div className="nav-dot" onClick={() => showSlide(1)}></div>
               <div className="nav-dot" onClick={() => showSlide(2)}></div>
+              <div className="nav-dot" onClick={() => showSlide(3)}></div>
             </div>
           </div>
         </div>
@@ -507,16 +536,6 @@ const PagPrincipal = () => {
                     <span className="time">Cerrado</span>
                   </li>
                 </ul>
-              </div>
-
-              <div className="emergency-notice">
-                
-                <div className="emergency-text">
-                  Emergencias 24/7:{" "}
-                  <a href="tel:+123456789" className="emergency-phone">
-                    +57 3214972944
-                  </a>
-                </div>
               </div>
             </div>
 
