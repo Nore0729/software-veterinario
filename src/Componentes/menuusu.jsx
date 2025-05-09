@@ -41,11 +41,6 @@ const Layout = ({ children, userName }) => {
       ]
     },
     {
-      title: "Recordatorios",
-      icon: <FaBell />,
-      path: "/recordatorios"
-    },
-    {
       title: "Configuración",
       icon: <FaCog />,
       subItems: [

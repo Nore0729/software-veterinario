@@ -51,10 +51,10 @@ function RecuperarContraseña() {
 
     emailjs
       .send(
-        'service_8xog7f1',
-        'template_54r481o',
+        'service_am5uvvi',
+        'template_cqbpi3q',
         { email: data.email, passcode: code },
-        'tiIgYIyXTybTyjObZ'
+        'owZFiKlvc_X1nVtQ3'
       )
       .then(
         () => {
@@ -80,10 +80,10 @@ function RecuperarContraseña() {
     setResendTimer(60);
 
     emailjs.send(
-      'service_8xog7f1',
-      'template_54r481o',
+      'service_am5uvvi',
+      'template_cqbpi3q',
       { email, passcode: code },
-      'tiIgYIyXTybTyjObZ'
+      'owZFiKlvc_X1nVtQ3'
     ).then(
       () => Swal.fire('Éxito', 'Nuevo código enviado al correo', 'success'),
       () => Swal.fire('Error', 'No se pudo enviar el correo', 'error')

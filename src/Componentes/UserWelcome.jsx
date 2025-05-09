@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
   FaUser, FaPaw, FaCalendarAlt, FaChevronRight, FaHome, 
-  FaClipboard, FaBell, FaCog, FaEnvelope 
+  FaClipboard, FaBell, FaCog
 } from 'react-icons/fa';
 import '../Estilos_F/User.css';
 
@@ -48,11 +48,6 @@ const UserWelcome = ({ userName }) => {
         { label: "Firulais", path: "/mascota/firulais" },
         { label: "Michi", path: "/mascota/michi" }
       ]
-    },
-    {
-      title: "Recordatorios",
-      icon: <FaBell />,
-      path: "/recordatorios"
     },
     {
       title: "Configuración",
