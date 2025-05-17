@@ -160,21 +160,15 @@ function Roles() {
             </a>
           </li>
           <li>
-            <a href="/MasRegis">
-              <PawPrint className="nav-icon" size={18} />
-              <span>Mascotas</span>
+            <a href="/Roles">
+              <ShieldCheck className="nav-icon" size={18} />
+              <span>Roles</span>
             </a>
           </li>
           <li>
             <a href="/Veterinarios">
               <Stethoscope className="nav-icon" size={18} />
               <span>Veterinarios</span>
-            </a>
-          </li>
-          <li>
-            <a href="/Roles">
-              <ShieldCheck className="nav-icon" size={18} />
-              <span>Roles</span>
             </a>
           </li>
           <li>

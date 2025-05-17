@@ -39,11 +39,7 @@ function App() {
           <Route path="/mascotas" element={<Mascotas />} />
           <Route path="/PoliticasP" element={<PoliticasP />} />
           <Route path="/Ubicacion" element={<Ubicacion />} />
-          <Route path="/Usuarios" element={<Usuarios />} />
-          <Route path="/Roles" element={<Roles />} />
           <Route path="/Recuperarcontraseña" element={<RecuperarContraseña />} />
-          <Route path="/MasRegis" element={<MasRegis />} />
-          <Route path="/Veterinarios" element={<Veterinarios />} />
           <Route path="/Pacientes" element={<Pacientes />} />
           <Route path="/Consultas" element={<Consultas />} />
           <Route path="/ HistorialMedico" element={< HistorialMedico />} />
@@ -52,6 +48,10 @@ function App() {
         {/* Rutas internas sin header/footer */}
         <Route element={<Privado />}>
           <Route path="/Admin" element={<Admin />} />
+          <Route path="/Usuarios" element={<Usuarios />} />
+          <Route path="/MasRegis" element={<MasRegis />} />
+          <Route path="/Roles" element={<Roles />} />
+          <Route path="/Veterinarios" element={<Veterinarios />} />
           <Route path="/UserWelcome" element={<UserWelcome />} />
           <Route path="/Datospro" element={<DatosPro />} />
           <Route path="/ayudapro" element={<Ayudapro />} />
