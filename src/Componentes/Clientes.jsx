@@ -1,5 +1,5 @@
-import "../Estilos_F/Usuarios.css";
-import "../Estilos_F/Administrador.css";
+import "../Estilos_F/ClienteAdmin.css";
+import AdminLayout from "./AdminLayout";
 import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faEdit, faTrash, faSearch, faSave, faTimes } from "@fortawesome/free-solid-svg-icons";
@@ -160,58 +160,12 @@ const Usuarios = () => {
   });
 
   return (
+    <AdminLayout>
     <div className="admin-container">
-      <header className="admin-header">
-        <div className="admin-header-content">
-          <div className="admin-logo-container">
-            <div className="admin-title">Pet Lovers</div>
-          </div>
-          <div className="admin-user-section">
-            <div className="admin-avatar-wrapper">
-              <img src="/placeholder.svg?height=32&width=32" alt="avatar" className="admin-avatar" />
-              <div className="admin-user-info">
-                <span className="admin-doctor-name">Dr. Rodríguez</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <nav className="admin-sidebar">
-        <div className="sidebar-header">
-          <h1>Menú</h1>
-        </div>
-        <ul>
-          <li className="active">
-            <a href="/Usuarios">
-              <Users className="nav-icon" size={18} />
-              <span>Usuarios</span>
-            </a>
-          </li>
-          <li>
-            <a href="/Roles">
-              <ShieldCheck className="nav-icon" size={18} />
-              <span>Roles</span>
-            </a>
-          </li>
-          <li>
-            <a href="/Veterinarios">
-              <Stethoscope className="nav-icon" size={18} />
-              <span>Veterinarios</span>
-            </a>
-          </li>
-          <li>
-            <a href="/">
-              <LogOut className="nav-icon" size={18} />
-              <span>Cerrar Sesión</span>
-            </a>
-          </li>
-        </ul>
-      </nav>
 
       <main className="admin-main">
         <div className="usuarios-container">
-          <h1>Registro de Usuarios</h1>
+          <h1>Registro de Clientes</h1>
 
           {notificacion.mostrar && (
             <div className={`notificacion ${notificacion.tipo}`}>
@@ -221,7 +175,7 @@ const Usuarios = () => {
 
           <div className="acciones-superiores">
             <button className="btn-agregar" onClick={handleAgregar}>
-              <FontAwesomeIcon icon={faPlus} /> Nuevo Usuario
+              <FontAwesomeIcon icon={faPlus} /> Nuevo Cliente
             </button>
             <button className="btn-reiniciar" onClick={() => setBusqueda("")}>Limpiar Búsqueda</button>
           </div>
@@ -376,6 +330,7 @@ const Usuarios = () => {
         </div>
       </main>
     </div>
+    </AdminLayout>
   );
 };
 

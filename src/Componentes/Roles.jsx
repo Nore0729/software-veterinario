@@ -1,8 +1,8 @@
 import { useState } from "react";
+import AdminLayout from "../Componentes/AdminLayout";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faEdit, faTrash, faToggleOn, faToggleOff, faCheck, faTimes } from "@fortawesome/free-solid-svg-icons";
 import "../Estilos_F/Roles.css";
-import "../Estilos_F/Administrador.css";
 import { Users, PawPrint, Stethoscope, ShieldCheck, LogOut } from 'lucide-react';
 
 function Roles() {
@@ -132,54 +132,8 @@ function Roles() {
   };
 
   return (
+    <AdminLayout>
     <div className="admin-container">
-      <header className="admin-header">
-        <div className="admin-header-content">
-          <div className="admin-logo-container">
-            <div className="admin-title">Pet Lovers</div>
-          </div>
-          <div className="admin-user-section">
-            <div className="admin-avatar-wrapper">
-              <img src="/placeholder.svg?height=32&width=32" alt="avatar" className="admin-avatar" />
-              <div className="admin-user-info">
-                <span className="admin-doctor-name">Dr. Rodríguez</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
-      <nav className="admin-sidebar">
-        <div className="sidebar-header">
-          <h1>Menú</h1>
-        </div>
-        <ul>
-          <li className="active">
-            <a href="/Usuarios">
-              <Users className="nav-icon" size={18} />
-              <span>Usuarios</span>
-            </a>
-          </li>
-          <li>
-            <a href="/Roles">
-              <ShieldCheck className="nav-icon" size={18} />
-              <span>Roles</span>
-            </a>
-          </li>
-          <li>
-            <a href="/Veterinarios">
-              <Stethoscope className="nav-icon" size={18} />
-              <span>Veterinarios</span>
-            </a>
-          </li>
-          <li>
-            <a href="/">
-              <LogOut className="nav-icon" size={18} />
-              <span>Cerrar Sesión</span>
-            </a>
-          </li>
-        </ul>
-      </nav>
-
       <main className="admin-main">
         <div className="roles-container">
           <h1>Gestión de Roles</h1>
@@ -328,6 +282,7 @@ function Roles() {
         </div>
       </main>
     </div>
+    </AdminLayout>
   );
 }
 

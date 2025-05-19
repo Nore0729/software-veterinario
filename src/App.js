@@ -10,9 +10,8 @@ import Servicios from "./Componentes/Servicios"
 import Mascotas from "./Componentes/Mascotas"
 import PoliticasP from "./Componentes/PoliticasP"
 import Ubicacion from "./Componentes/Ubicacion"
-import Usuarios from "./Componentes/Usuarios"
+import Clientes from "./Componentes/Clientes"
 import Roles from "./Componentes/Roles"
-import MasRegis from "./Componentes/MasRegis"
 import Veterinarios from "./Componentes/Veterinarios"
 import RecuperarContraseña from "./Componentes/Recuperarcontraseña"
 import Admin from "./Componentes/Admin"
@@ -23,6 +22,7 @@ import HistorialMedico from "./Componentes/HistorialMedico"
 import Pacientes from "./Componentes/Pacientes"
 import Consultas from "./Componentes/Consultas"
 import VeterinarioPer from "./Componentes/VeterinarioPer"
+import MenuAdmin from "./Componentes/MenuAdmin"
 
 function App() {
   return (
@@ -47,9 +47,9 @@ function App() {
 
         {/* Rutas internas sin header/footer */}
         <Route element={<Privado />}>
+          <Route path="/MenuAdmin" element={<MenuAdmin />} />
           <Route path="/Admin" element={<Admin />} />
-          <Route path="/Usuarios" element={<Usuarios />} />
-          <Route path="/MasRegis" element={<MasRegis />} />
+          <Route path="/Clientes" element={<Clientes />} />
           <Route path="/Roles" element={<Roles />} />
           <Route path="/Veterinarios" element={<Veterinarios />} />
           <Route path="/UserWelcome" element={<UserWelcome />} />

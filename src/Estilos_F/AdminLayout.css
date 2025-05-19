@@ -1,0 +1,27 @@
+
+.admin-layout-container {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+}
+
+.admin-content-wrapper {
+  flex: 1;
+  padding: 20px;
+  margin-left: 250px; 
+  transition: margin-left 0.3s ease;
+  overflow-y: auto;
+}
+
+
+.menu-collapsed .admin-content-wrapper {
+  margin-left: 60px; 
+}
+
+/* Ajustes para dispositivos móviles */
+@media (max-width: 768px) {
+  .admin-content-wrapper {
+    margin-left: 0;
+    width: 100%;
+  }
+}
