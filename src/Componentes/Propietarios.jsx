@@ -92,7 +92,6 @@ function RegistroPropietario() {
   };
   return (
     <div className="registro-container">
-      {/* Barra de progreso */}
       <div className="progress-tracker">
         <div className="progress-bar" style={{ width: `${progress}%` }} />
         <span className="progress-text">{progress}% completado</span>

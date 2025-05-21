@@ -1,340 +1,360 @@
-import "../Estilos_F/ClienteAdmin.css";
-import AdminLayout from "./AdminLayout";
-import axios from "axios";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus, faEdit, faTrash, faSearch, faSave, faTimes } from "@fortawesome/free-solid-svg-icons";
-import { useEffect, useState } from "react";
-import { Users, PawPrint, Stethoscope, ShieldCheck, LogOut } from 'lucide-react';
 
-const Usuarios = () => {
-  const [usuarios, setUsuarios] = useState([]);
-  const [busqueda, setBusqueda] = useState("");
-  const [mostrarFormulario, setMostrarFormulario] = useState(false);
-  const [editandoId, setEditandoId] = useState(null);
-  const [notificacion, setNotificacion] = useState({ mostrar: false, mensaje: "", tipo: "" });
-  const [nuevoUsuario, setNuevoUsuario] = useState({
-    nombre: "",
-    apellido: "",
-    tipoDoc: "DNI",
-    numDoc: "",
-    email: "",
-    telefono: "",
-    password: ""
-  });
+import "../Estilos_F/ClienteAdmin.css"
+import AdminLayout from "./AdminLayout"
+import axios from "axios"
+import { useEffect, useState } from "react"
+import { User, AtSign, Lock, ChevronRight, ChevronLeft } from "lucide-react"
+import { useForm } from "react-hook-form"
+import { useNavigate, Link } from "react-router-dom"
+import Swal from "sweetalert2"
 
-  useEffect(() => {
-    fetch('/api/usuarios')
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Error al obtener los usuarios');
-        }
-        return response.json();
-      })
-      .then((data) => {
-        setUsuarios(data);
-      })
-      .catch((error) => {
-        mostrarNotificacion('Error al obtener los usuarios.', 'error');
-        console.error('Error al obtener los usuarios:', error);
-      });
-  }, []);
+function RegistroPropietario() {
+  const [step, setStep] = useState(1)
+  const [progress, setProgress] = useState(0)
+  const navigate = useNavigate()
 
-  const handleEliminar = (id) => {
-    const confirmacion = window.confirm("¿Estás seguro de que quieres eliminar este usuario?");
-    if (confirmacion) {
-      axios.delete(`/api/eliminar-usuario/${id}`)
-        .then(() => {
-          setUsuarios(usuarios.filter((usuario) => usuario.id !== id));
-          mostrarNotificacion('Usuario eliminado correctamente.', 'exito');
-        })
-        .catch((error) => {
-          mostrarNotificacion('Error al eliminar el usuario.', 'error');
-          console.error('Error al eliminar el usuario:', error);
-        });
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    watch,
+    trigger,
+  } = useForm({ mode: "onChange" })
+
+  const password = watch("password")
+  const formValues = watch()
+
+  const requiredFields = {
+    1: ["tipoDocumento", "documento", "nombre", "fechaNacimiento"],
+    2: ["telefono", "email", "direccion"],
+    3: ["password", "confirmPassword", "terms"],
+  }
+
+  const validarEdad = (fecha) => {
+    const hoy = new Date()
+    const nacimiento = new Date(fecha)
+    let edad = hoy.getFullYear() - nacimiento.getFullYear()
+    const mes = hoy.getMonth() - nacimiento.getMonth()
+    if (mes < 0 || (mes === 0 && hoy.getDate() < nacimiento.getDate())) {
+      edad--
     }
-  };
+    return edad >= 18
+  }
 
-  const handleEditar = (usuario) => {
-    setEditandoId(usuario.id);
-    setNuevoUsuario({
-      nombre: usuario.nombre,
-      apellido: usuario.apellido,
-      tipoDoc: usuario.tipoDoc,
-      numDoc: usuario.numDoc,
-      email: usuario.email,
-      telefono: usuario.telefono,
-      password: ""
-    });
-    setMostrarFormulario(true);
-  };
-
-  const handleAgregar = () => {
-    setEditandoId(null);
-    setNuevoUsuario({
-      nombre: "",
-      apellido: "",
-      tipoDoc: "DNI",
-      numDoc: "",
-      email: "",
-      telefono: "",
-      password: ""
-    });
-    setMostrarFormulario(true);
-  };
-
-  const handleCancelar = () => {
-    setMostrarFormulario(false);
-    setNuevoUsuario({
-      nombre: "",
-      apellido: "",
-      tipoDoc: "DNI",
-      numDoc: "",
-      email: "",
-      telefono: "",
-      password: ""
-    });
-    setEditandoId(null);
-  };
-
-  const mostrarNotificacion = (mensaje, tipo) => {
-    setNotificacion({ mostrar: true, mensaje, tipo });
-    setTimeout(() => {
-      setNotificacion({ mostrar: false, mensaje: "", tipo: "" });
-    }, 5000);
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const { nombre, apellido, tipoDoc, numDoc, email, telefono, password } = nuevoUsuario;
-
-    if (nombre && apellido && tipoDoc && numDoc && email && telefono && (editandoId || password)) {
-      if (editandoId) {
-        const datosActualizados = { ...nuevoUsuario };
-        if (!password) delete datosActualizados.password;
-
-        axios.put(`/api/actualizar-usuario/${editandoId}`, datosActualizados)
-          .then(() => {
-            setUsuarios(usuarios.map(usuario =>
-              usuario.id === editandoId ? { ...usuario, ...datosActualizados } : usuario
-            ));
-            mostrarNotificacion('Usuario actualizado correctamente.', 'exito');
-            handleCancelar();
-          })
-          .catch((error) => {
-            mostrarNotificacion('Error al actualizar el usuario.', 'error');
-            console.error('Error al actualizar el usuario:', error);
-          });
-      } else {
-        axios.post('/api/registro-usuario', nuevoUsuario)
-          .then((response) => {
-            setUsuarios([
-              ...usuarios,
-              {
-                id: response.data?.id || (usuarios.length > 0 ? Math.max(...usuarios.map(u => u.id)) + 1 : 1),
-                ...nuevoUsuario,
-                fechaRegistro: new Date().toISOString().split("T")[0]
-              }
-            ]);
-            mostrarNotificacion('Usuario registrado exitosamente.', 'exito');
-            handleCancelar();
-          })
-          .catch((error) => {
-            mostrarNotificacion('Error al registrar el usuario.', 'error');
-            console.error('Error al registrar el usuario:', error);
-          });
+  const nextStep = async () => {
+    // Verificar si hay campos requeridos para este paso
+    if (requiredFields[step] && requiredFields[step].length > 0) {
+      // Validar solo los campos del paso actual
+      const isValid = await trigger(requiredFields[step])
+      if (isValid) {
+        setStep(step + 1)
       }
     } else {
-      mostrarNotificacion("Todos los campos son obligatorios.", 'error');
+      // Si no hay campos requeridos, avanzar al siguiente paso
+      setStep(step + 1)
     }
-  };
+  }
 
-  const usuariosFiltrados = usuarios.filter((usuario) => {
-    const terminoBusqueda = busqueda.toLowerCase();
-    return (
-      usuario.nombre.toLowerCase().includes(terminoBusqueda) ||
-      usuario.apellido.toLowerCase().includes(terminoBusqueda) ||
-      usuario.numDoc.toLowerCase().includes(terminoBusqueda) ||
-      usuario.email.toLowerCase().includes(terminoBusqueda) ||
-      usuario.telefono.toLowerCase().includes(terminoBusqueda)
-    );
-  });
+
+
+  const onSubmit = async (data) => {
+    try {
+      // Asegurarse de que los datos coincidan con lo que espera el backend
+      const formData = {
+        tipoDocumento: data.tipoDocumento,
+        documento: data.documento,
+        nombre: data.nombre,
+        fechaNacimiento: data.fechaNacimiento,
+        telefono: data.telefono,
+        email: data.email,
+        direccion: data.direccion,
+        password: data.password,
+      }
+
+      const response = await axios.post("/api/registro-propietario", formData)
+
+      Swal.fire({
+        title: "<strong>Registro exitoso!</strong>",
+        html: `<i>El propietario <strong>${data.nombre}</strong> fue registrado</i>`,
+        icon: "success",
+        timer: 3000,
+        didClose: () => {
+          // Guardar nombre y correo en localStorage
+          localStorage.setItem("nombre", data.nombre)
+          localStorage.setItem("email", data.email)
+          navigate("/UserWelcome")
+        },
+      })
+    } catch (error) {
+      console.error("Error al registrar:", error)
+
+      Swal.fire({
+        title: "<strong>Error!</strong>",
+        html: `<i>No se pudo registrar al propietario. Intenta nuevamente.</i>`,
+        icon: "error",
+        timer: 3000,
+      })
+    }
+  }
 
   return (
     <AdminLayout>
-    <div className="admin-container">
+      <div className="admin-container">
+        <main className="admin-main">
+          <div className="registro-container">
+            <h2>Registro de Propietario</h2>
 
-      <main className="admin-main">
-        <div className="usuarios-container">
-          <h1>Registro de Clientes</h1>
 
-          {notificacion.mostrar && (
-            <div className={`notificacion ${notificacion.tipo}`}>
-              {notificacion.mensaje}
-            </div>
-          )}
+            <form onSubmit={handleSubmit(onSubmit)}>
+              {/* PASO 1: Información Personal */}
+                <fieldset className="form-section">
+                  <legend>
+                    <User className="icon-legend" /> Información Personal
+                  </legend>
 
-          <div className="acciones-superiores">
-            <button className="btn-agregar" onClick={handleAgregar}>
-              <FontAwesomeIcon icon={faPlus} /> Nuevo Cliente
-            </button>
-            <button className="btn-reiniciar" onClick={() => setBusqueda("")}>Limpiar Búsqueda</button>
-          </div>
+                  <div className="input-group">
+                    <div className="label-container">
+                      <User className="icon-small" />
+                      <label>Tipo de Documento *</label>
+                    </div>
+                    <select
+                      {...register("tipoDocumento", { required: "Campo obligatorio" })}
+                      className={errors.tipoDocumento ? "error" : ""}
+                    >
+                      <option value="">Seleccionar</option>
+                      <option value="CC">Cédula</option>
+                      <option value="CE">Cédula Extranjería</option>
+                      <option value="PA">Pasaporte</option>
+                    </select>
+                    {errors.tipoDocumento && <span className="error-message">{errors.tipoDocumento.message}</span>}
+                  </div>
 
-          {mostrarFormulario && (
-            <form className="formulario-nuevo" onSubmit={handleSubmit}>
-            <h3>{editandoId ? "Editar Usuario" : "Agregar Usuario"}</h3>
-            <div className="form-row">
-              <div className="form-group">
-                <label>Nombre</label>
-                <input
-                  type="text"
-                  placeholder="Nombre"
-                  value={nuevoUsuario.nombre}
-                  onChange={(e) =>
-                    setNuevoUsuario({ ...nuevoUsuario, nombre: e.target.value })
-                  }
-                  pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$"
-                  title="El nombre solo debe contener letras"
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label>Apellido</label>
-                <input
-                  type="text"
-                  placeholder="Apellido"
-                  value={nuevoUsuario.apellido}
-                  onChange={(e) =>
-                    setNuevoUsuario({ ...nuevoUsuario, apellido: e.target.value })
-                  }
-                  pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$"
-                  title="El apellido solo debe contener letras"
-                  required
-                />
-              </div>
-            </div>
-          
-            <div className="form-row">
-              <div className="form-group">
-                <label>Tipo de Documento</label>
-                <select
-                  value={nuevoUsuario.tipoDoc}
-                  onChange={(e) =>
-                    setNuevoUsuario({ ...nuevoUsuario, tipoDoc: e.target.value })
-                  }
-                  required
-                >
-                  <option value="DNI">DNI</option>
-                  <option value="Cédula">Cédula</option>
-                  <option value="Pasaporte">Pasaporte</option>
-                </select>
-              </div>
-              <div className="form-group">
-                <label>Número de Documento</label>
-                <input
-                  type="text"
-                  placeholder="Número de documento"
-                  value={nuevoUsuario.numDoc}
-                  onChange={(e) =>
-                    setNuevoUsuario({ ...nuevoUsuario, numDoc: e.target.value })
-                  }
-                  pattern="^\d{5,12}$"
-                  title="El número de documento debe contener solo números y entre 5 y 12 dígitos"
-                  required
-                />
-              </div>
-            </div>
-          
-            <div className="form-row"/>
-              <div className="form-group">
-                <label>Correo Electrónico</label>
-                <input
-                  type="email"
-                  placeholder="Correo electrónico"
-                  value={nuevoUsuario.email}
-                  onChange={(e) =>
-                    setNuevoUsuario({ ...nuevoUsuario, email: e.target.value })
-                  }
-                  pattern="^[^@\s]+@[^@\s]+\.[^@\s]+$"
-                  title="Ingrese un correo electrónico válido"
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label>Teléfono</label>
-                <input
-                  type="tel"
-                  placeholder="Número de teléfono"
-                  value={nuevoUsuario.telefono}
-                  onChange={(e) =>
-                    setNuevoUsuario({ ...nuevoUsuario, telefono: e.target.value })
-                  }
-                  pattern="^\d{10}$"
-                  title="El número de teléfono debe tener exactamente 10 dígitos"
-                  required
-                />
-              </div>
+                  <div className="input-group">
+                    <div className="label-container">
+                      <User className="icon-small" />
+                      <label>Número de Documento *</label>
+                    </div>
+                    <input
+                      type="text"
+                      {...register("documento", {
+                        required: "Campo obligatorio",
+                        pattern: {
+                          value: /^[0-9]+$/,
+                          message: "Solo números permitidos",
+                        },
+                        minLength: {
+                          value: 6,
+                          message: "Mínimo 6 caracteres",
+                        },
+                        maxLength: {
+                          value: 12,
+                          message: "Máximo 12 caracteres",
+                        },
+                      })}
+                      className={errors.documento ? "error" : ""}
+                      placeholder="Escribe tu número de documento"
+                    />
+                    {errors.documento && <span className="error-message">{errors.documento.message}</span>}
+                  </div>
+
+                  <div className="input-group">
+                    <div className="label-container">
+                      <User className="icon-small" />
+                      <label>Nombre Completo *</label>
+                    </div>
+                    <input
+                      type="text"
+                      {...register("nombre", {
+                        required: "Campo obligatorio",
+                        pattern: {
+                          value: /^[A-Za-zÁÉÍÓÚáéíóúñÑ ]+$/,
+                          message: "Solo letras permitidas",
+                        },
+                        minLength: {
+                          value: 3,
+                          message: "Mínimo 3 caracteres",
+                        },
+                      })}
+                      className={errors.nombre ? "error" : ""}
+                      placeholder="Escribe tu nombre"
+                    />
+                    {errors.nombre && <span className="error-message">{errors.nombre.message}</span>}
+                  </div>
+
+                  <div className="input-group">
+                    <div className="label-container">
+                      <User className="icon-small" />
+                      <label>Fecha de Nacimiento *</label>
+                    </div>
+                    <input
+                      type="date"
+                      {...register("fechaNacimiento", {
+                        required: "Campo obligatorio",
+                        validate: (value) => validarEdad(value) || "Debes ser mayor de 18 años",
+                      })}
+                      className={errors.fechaNacimiento ? "error" : ""}
+                    />
+                    {errors.fechaNacimiento && <span className="error-message">{errors.fechaNacimiento.message}</span>}
+                  </div>
+                </fieldset>
               
-          
-            <div className="form-buttons">
-              <button type="submit" className="btn-guardar">
-                <FontAwesomeIcon icon={editandoId ? faSave : faPlus} />{" "}
-                {editandoId ? " Guardar Cambios" : " Registrar Usuario"}
-              </button>
-              <button type="button" className="btn-cancelar" onClick={handleCancelar}>
-                <FontAwesomeIcon icon={faTimes} /> Cancelar
-              </button>
-            </div>
-          </form>
-          
-          )}
 
-          <div className="busqueda-container">
-            <input type="text" placeholder="Buscar Usuario..." value={busqueda} onChange={(e) => setBusqueda(e.target.value)} />
-            <FontAwesomeIcon icon={faSearch} />
-          </div>
+              {/* PASO 2: Contacto */}
+              
+                <fieldset className="form-section">
+                  <legend>
+                    <AtSign className="icon-legend" /> Información de Contacto
+                  </legend>
 
-          <div className="tabla-usuarios">
-            <table>
-              <thead>
-                <tr>
-                  <th>Nombre</th>
-                  <th>Apellido</th>
-                  <th>Documento</th>
-                  <th>Email</th>
-                  <th>Teléfono</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                {usuariosFiltrados.map((usuario) => (
-                  <tr key={usuario.id}>
-                    <td>{usuario.nombre}</td>
-                    <td>{usuario.apellido}</td>
-                    <td>{usuario.numDoc}</td>
-                    <td>{usuario.email}</td>
-                    <td>{usuario.telefono}</td>
-                    <td>
-                      <button className="btn-editar" onClick={() => handleEditar(usuario)}>
-                        <FontAwesomeIcon icon={faEdit} />
-                      </button>
-                      <button className="btn-eliminar" onClick={() => handleEliminar(usuario.id)}>
-                        <FontAwesomeIcon icon={faTrash} />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                  <div className="input-group">
+                    <div className="label-container">
+                      <User className="icon-small" />
+                      <label>Teléfono *</label>
+                    </div>
+                    <input
+                      type="tel"
+                      {...register("telefono", {
+                        required: "Campo obligatorio",
+                        pattern: {
+                          value: /^[0-9]+$/,
+                          message: "Solo números permitidos",
+                        },
+                        minLength: {
+                          value: 10,
+                          message: "Mínimo 10 dígitos",
+                        },
+                      })}
+                      className={errors.telefono ? "error" : ""}
+                      placeholder="Escribe tu teléfono"
+                    />
+                    {errors.telefono && <span className="error-message">{errors.telefono.message}</span>}
+                  </div>
+
+                  <div className="input-group">
+                    <div className="label-container">
+                      <AtSign className="icon-small" />
+                      <label>Correo Electrónico *</label>
+                    </div>
+                    <input
+                      type="email"
+                      {...register("email", {
+                        required: "Campo obligatorio",
+                        pattern: {
+                          value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                          message: "Correo no válido",
+                        },
+                      })}
+                      className={errors.email ? "error" : ""}
+                      placeholder="tu@correo.com"
+                    />
+                    {errors.email && <span className="error-message">{errors.email.message}</span>}
+                  </div>
+
+                  <div className="input-group">
+                    <div className="label-container">
+                      <User className="icon-small" />
+                      <label>Dirección *</label>
+                    </div>
+                    <input
+                      type="text"
+                      {...register("direccion", {
+                        required: "Campo obligatorio",
+                        minLength: {
+                          value: 10,
+                          message: "Mínimo 10 caracteres",
+                        },
+                      })}
+                      className={errors.direccion ? "error" : ""}
+                      placeholder="Escribe tu dirección"
+                    />
+                    {errors.direccion && <span className="error-message">{errors.direccion.message}</span>}
+                  </div>
+                </fieldset>
+            
+
+              {/* PASO 3: Seguridad */}
+             
+                <fieldset className="form-section">
+                  <legend>
+                    <Lock className="icon-legend" /> Seguridad
+                  </legend>
+
+                  <div className="input-group">
+                    <div className="label-container">
+                      <Lock className="icon-small" />
+                      <label>Contraseña *</label>
+                    </div>
+                    <input
+                      type="password"
+                      {...register("password", {
+                        required: "Campo obligatorio",
+                        minLength: {
+                          value: 8,
+                          message: "Mínimo 8 caracteres",
+                        },
+                        pattern: {
+                          value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+                          message: "Debe incluir mayúscula, minúscula, número y símbolo",
+                        },
+                      })}
+                      className={errors.password ? "error" : ""}
+                      placeholder="Crea una contraseña segura"
+                    />
+                    {errors.password && <span className="error-message">{errors.password.message}</span>}
+                  </div>
+
+                  <div className="input-group">
+                    <div className="label-container">
+                      <Lock className="icon-small" />
+                      <label>Confirmar Contraseña *</label>
+                    </div>
+                    <input
+                      type="password"
+                      {...register("confirmPassword", {
+                        required: "Campo obligatorio",
+                        validate: (value) => value === password || "Las contraseñas no coinciden",
+                      })}
+                      className={errors.confirmPassword ? "error" : ""}
+                      placeholder="Repite tu contraseña"
+                    />
+                    {errors.confirmPassword && <span className="error-message">{errors.confirmPassword.message}</span>}
+                  </div>
+
+                  <div className="terms-group">
+                    <input
+                      type="checkbox"
+                      id="terms"
+                      {...register("terms", {
+                        required: "Debes aceptar los términos y condiciones",
+                      })}
+                    />
+                    <label htmlFor="terms">
+                      Acepto los <Link to="/terminos">Términos y Condiciones</Link> y el{" "}
+                      <Link to="/privacidad">Aviso de Privacidad</Link>
+                    </label>
+                    {errors.terms && <span className="error-message">{errors.terms.message}</span>}
+                  </div>
+                </fieldset>
+             
+
+              {/* Navegación entre pasos */}
+              <div className="form-navigation">
+                  <button type="submit" className="submit-btn">
+                    Registrar Propietario
+                  </button>
+                
+              </div>
+
+              
+            </form>
           </div>
-        </div>
-      </main>
-    </div>
+        </main>
+      </div>
     </AdminLayout>
-  );
-};
+  )
+}
 
-export default Usuarios;
+export default RegistroPropietario
 
 
 
