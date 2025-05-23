@@ -23,6 +23,9 @@ import Pacientes from "./Componentes/Pacientes"
 import Consultas from "./Componentes/Consultas"
 import VeterinarioPer from "./Componentes/VeterinarioPer"
 import MenuAdmin from "./Componentes/MenuAdmin"
+import InicioAdmin from "./Componentes/InicioAdmin"
+import FormularioUsu from "./PanelAdmin/FormularioUsu"
+
 
 function App() {
   return (
@@ -47,6 +50,8 @@ function App() {
 
         {/* Rutas internas sin header/footer */}
         <Route element={<Privado />}>
+          <Route path="/FormularioUsu" element={<FormularioUsu />} />
+          <Route path="/InicioAdmin" element={<InicioAdmin />} />
           <Route path="/MenuAdmin" element={<MenuAdmin />} />
           <Route path="/Admin" element={<Admin />} />
           <Route path="/Clientes" element={<Clientes />} />

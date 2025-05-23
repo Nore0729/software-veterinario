@@ -156,19 +156,13 @@ function Veterinarios() {
     <AdminLayout> 
     <div className="veterinarios-container">
       <h1>Veterinarios Registrados</h1>
-
       {notificacion.mostrar && (
         <div className={`notificacion ${notificacion.tipo}`}>
           <FontAwesomeIcon icon={notificacion.tipo === "exito" ? faCheck : faTimes} />
           {notificacion.mensaje}
         </div>
       )}
-
       <div className="controles-superiores">
-        <button className="btn-agregar" onClick={handleAgregar}>
-          <FontAwesomeIcon icon={faPlus} /> Nuevo Veterinario
-        </button>
-
         <div className="busqueda-container">
           <input
             type="text"

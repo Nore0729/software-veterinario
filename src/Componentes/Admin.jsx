@@ -236,10 +236,6 @@ function Administradores() {
       )}
 
       <div className="controles-superiores">
-        <button className="btn-agregar" onClick={handleAgregar}>
-          <FontAwesomeIcon icon={faPlus} /> Nuevo Administrador
-        </button>
-
         <div className="busqueda-container">
           <input
             type="text"
@@ -262,8 +258,6 @@ function Administradores() {
 
       {mostrarFormulario && (
         <form className="formulario-administrador" onSubmit={handleSubmit}>
-          <h2>{editandoId ? "Editar Administrador" : "Agregar Nuevo Administrador"}</h2>
-
           <div className="form-row">
             <div className="form-group">
               <label>Nombre completo:</label>

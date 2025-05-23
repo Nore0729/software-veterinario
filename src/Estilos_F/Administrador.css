@@ -1,0 +1,424 @@
+/* Estilos generales */
+.administradores-container {
+  padding: 2rem;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.administradores-container h1 {
+  color: #2c3e50;
+  margin-bottom: 2rem;
+  font-size: 2rem;
+  font-weight: 600;
+  border-bottom: 2px solid #e1e5eb;
+  padding-bottom: 0.5rem;
+}
+
+/* Notificaciones */
+.notificacion {
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.notificacion.exito {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.notificacion.error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+/* Controles superiores */
+.controles-superiores {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.btn-agregar {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: background-color 0.3s;
+}
+
+.btn-agregar:hover {
+  background-color: #218838;
+}
+
+/* Busqueda */
+.busqueda-container {
+  position: relative;
+  flex: 1;
+  min-width: 250px;
+}
+
+.busqueda-container input {
+  width: 100%;
+  padding: 0.5rem 1rem 0.5rem 2.5rem;
+  border-radius: 4px;
+  border: 1px solid #ced4da;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+.busqueda-container input:focus {
+  border-color: #80bdff;
+  box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+}
+
+.icono-busqueda {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6c757d;
+}
+
+/* Filtro rol */
+.filtro-rol {
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  border: 1px solid #ced4da;
+  background-color: white;
+  font-size: 1rem;
+  min-width: 200px;
+  outline: none;
+  cursor: pointer;
+}
+
+.filtro-rol:focus {
+  border-color: #80bdff;
+  box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+}
+
+/* Formulario */
+.formulario-administrador {
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  margin-bottom: 2rem;
+}
+
+.formulario-administrador h2 {
+  color: #495057;
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+}
+
+.form-row {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.form-group {
+  flex: 1;
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #495057;
+  font-weight: 500;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  border: 1px solid #ced4da;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  border-color: #80bdff;
+  box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+}
+
+.form-group input[type="file"] {
+  padding: 0.5rem 0;
+}
+
+.preview-image {
+  margin-top: 1rem;
+  max-width: 150px;
+  max-height: 150px;
+  border-radius: 4px;
+  border: 1px solid #dee2e6;
+}
+
+.cambiar-password {
+  margin: 1rem 0;
+}
+
+.btn-toggle-password {
+  background-color: transparent;
+  border: none;
+  color: #007bff;
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 0.25rem 0;
+}
+
+.btn-toggle-password:hover {
+  text-decoration: underline;
+}
+
+.password-section {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px dashed #dee2e6;
+}
+
+.form-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.btn-guardar {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 0.5rem 1.5rem;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.btn-guardar:hover {
+  background-color: #0069d9;
+}
+
+.btn-cancelar {
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  padding: 0.5rem 1.5rem;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.btn-cancelar:hover {
+  background-color: #5a6268;
+}
+
+/* Tabla */
+.tabla-container {
+  overflow-x: auto;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.tabla-administradores {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tabla-administradores thead tr {
+  background-color: #343a40;
+  color: white;
+}
+
+.tabla-administradores th {
+  padding: 1rem;
+  text-align: left;
+  font-weight: 500;
+}
+
+.tabla-administradores tr {
+  border-bottom: 1px solid #dee2e6;
+}
+
+.tabla-administradores tr:hover {
+  background-color: #f8f9fa;
+}
+
+.tabla-administradores td {
+  padding: 1rem;
+  vertical-align: middle;
+}
+
+.foto-administrador {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* Badges */
+.badge-rol {
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.badge-rol.super-admin {
+  background-color: #6f42c1;
+  color: white;
+}
+
+.badge-rol.administrador {
+  background-color: #007bff;
+  color: white;
+}
+
+.badge-rol.moderador {
+  background-color: #17a2b8;
+  color: white;
+}
+
+.badge-estado {
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.badge-estado.activo {
+  background-color: #28a745;
+  color: white;
+}
+
+.badge-estado.inactivo {
+  background-color: #dc3545;
+  color: white;
+}
+
+/* Filas inactivas */
+.fila-inactiva {
+  opacity: 0.7;
+  background-color: #f8f9fa;
+}
+
+/* Acciones tabla */
+.acciones-tabla {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-editar {
+  background-color: #ffc107;
+  color: #212529;
+  border: none;
+  padding: 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.btn-editar:hover {
+  background-color: #e0a800;
+}
+
+.btn-eliminar {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.btn-eliminar:hover {
+  background-color: #c82333;
+}
+
+/* Sin resultados */
+.sin-resultados {
+  text-align: center;
+  padding: 2rem;
+  color: #6c757d;
+  background-color: white;
+  border-radius: 8px;
+  margin-top: 1rem;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .form-row {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .controles-superiores {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .busqueda-container, .filtro-rol, .btn-agregar {
+    width: 100%;
+  }
+  
+  .tabla-administradores {
+    display: block;
+  }
+  
+  .tabla-administradores thead {
+    display: none;
+  }
+  
+  .tabla-administradores tr {
+    display: block;
+    margin-bottom: 1rem;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+  }
+  
+  .tabla-administradores td {
+    display: block;
+    text-align: right;
+    padding-left: 50%;
+    position: relative;
+  }
+  
+  .tabla-administradores td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 1rem;
+    width: calc(50% - 1rem);
+    padding-right: 1rem;
+    text-align: left;
+    font-weight: bold;
+  }
+  
+  .acciones-tabla {
+    justify-content: flex-end;
+  }
+}

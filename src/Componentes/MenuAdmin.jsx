@@ -49,6 +49,12 @@ function Administrador() {
           <h1>Menú</h1>
         </div>
         <ul>
+           <li>
+            <a href="/InicioAdmin">
+              <Stethoscope className="nav-icon" size={18} />
+              <span>Inicio</span>
+            </a>
+          </li>
           <li
             className={`dropdown-menu ${dropdownOpen ? "active" : ""}`}
             onMouseEnter={handleMouseEnter}
@@ -75,13 +81,13 @@ function Administrador() {
                   <span>Administradores</span>
                 </a>
               </li>
+              <li>
+                <a href="/Roles">
+                  <ShieldCheck className="nav-icon" size={18} />
+                  <span>Roles</span>
+                </a>
+              </li>
             </ul>
-          </li>
-          <li>
-            <a href="/Roles">
-              <ShieldCheck className="nav-icon" size={18} />
-              <span>Roles</span>
-            </a>
           </li>
           <li>
             <a href="/Veterinarios">

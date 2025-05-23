@@ -15,8 +15,8 @@ app.use(cors());
 const db = mysql.createConnection({
   host: 'localhost',
   user: 'root',
-  password: '',
-  database: 'veterinaria',
+  password: '12345678',
+  database: 'veterinaria2',
   port: '3306'
 });
 
@@ -219,3 +219,64 @@ app.post('/api/registro-mascota', async (req, res) => {
 });
 
 
+
+
+app.post('/api/usuarios', async (req, res) => {
+  const { tipoDocumento, documento, nombreCompleto, fechaNacimiento, telefono, email } = req.body;
+
+  if (!tipoDocumento || !documento || !nombreCompleto || !fechaNacimiento || !telefono || !email) {
+    return res.status(400).json({ 
+      error: 'Faltan campos obligatorios',
+      details: {
+        missingFields: [
+          !tipoDocumento && 'tipoDocumento',
+          !documento && 'documento',
+          !nombreCompleto && 'nombreCompleto',
+          !fechaNacimiento && 'fechaNacimiento',
+          !telefono && 'telefono',
+          !email && 'email'
+        ].filter(Boolean)
+      }
+    });
+  }
+
+  try {
+    // Verificar si usuario existe
+    const [existingUsers] = await db.promise().query(
+      'SELECT id FROM usuarios WHERE documento = ? OR email = ?', 
+      [documento, email]
+    );
+
+    if (existingUsers.length > 0) {
+      return res.status(409).json({ 
+        error: 'Usuario ya existe',
+        conflict: {
+          documento: existingUsers.some(u => u.documento === documento),
+          email: existingUsers.some(u => u.email === email)
+        }
+      });
+    }
+
+    // Insertar nuevo usuario
+    const [result] = await db.promise().query(
+      `INSERT INTO usuarios 
+       (tipoDocumento, documento, nombreCompleto, fechaNacimiento, telefono, email)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+      [tipoDocumento, documento, nombreCompleto, fechaNacimiento, telefono, email]
+    );
+
+    res.status(201).json({ 
+      success: true,
+      userId: result.insertId,
+      message: 'Usuario registrado exitosamente'
+    });
+
+  } catch (error) {
+    console.error('Error en la base de datos:', error);
+    // Asegúrate de enviar error como JSON
+    res.status(500).json({ 
+      error: 'Error interno del servidor',
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+});
