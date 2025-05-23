@@ -67,8 +67,7 @@ function RegistroPropietario() {
   const onSubmit = async (data) => {
     try {
       const response = await axios.post('http://localhost:3000/api/registro-propietario', data);
-      
-      Swal.fire({
+      if (response.status === 201) Swal.fire({
         title: '<strong>Registro exitoso!</strong>',
         html: `<i>El propietario <strong>${data.nombre}</strong> fue registrado</i>`,
         icon: 'success',
