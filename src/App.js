@@ -19,10 +19,12 @@ import Admin from "./Componentes/Admin"
 import UserWelcome from "./Componentes/UserWelcome"
 import DatosPro from "./Componentes/Datospro"
 import Ayudapro from "./Componentes/ayudapro"
+import CookieConsent from "./Componentes/CookieConsent"
 
 function App() {
   return (
     <BrowserRouter>
+     <CookieConsent />
       <Routes>
         {/* Rutas normales con header/footer */}
         <Route element={<MainLayout />}>
