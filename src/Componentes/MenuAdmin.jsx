@@ -40,6 +40,12 @@ function Administrador() {
                 <span className="admin-doctor-name">Dr. Rodríguez</span>
               </div>
             </div>
+              <div className="Cerrar-sesion">
+                <button>
+                  <LogOut className="nav-icon" size={18} />
+                  <span>Cerrar Sesión</span>
+                </button>
+              </div>
           </div>
         </div>
       </header>
@@ -63,7 +69,6 @@ function Administrador() {
             <a href="#" className="dropdown-toggle">
               <Users className="nav-icon" size={18} />
               <span>Usuarios</span>
-              <ChevronDown className={`dropdown-arrow ${dropdownOpen ? "open" : ""}`} size={16} />
             </a>
             <ul className={`dropdown-content ${dropdownOpen ? "show" : ""}`}>
               <li>
@@ -83,22 +88,21 @@ function Administrador() {
               </li>
               <li>
                 <a href="/Roles">
-                  <ShieldCheck className="nav-icon" size={18} />
                   <span>Roles</span>
                 </a>
               </li>
             </ul>
           </li>
           <li>
-            <a href="/Veterinarios">
+            <a href="/ServiciosAdmin">
               <Stethoscope className="nav-icon" size={18} />
               <span>Servicios</span>
             </a>
           </li>
           <li>
-            <a href="/">
-              <LogOut className="nav-icon" size={18} />
-              <span>Cerrar Sesión</span>
+            <a href="/Veterinarios">
+              <Stethoscope className="nav-icon" size={18} />
+              <span>Citas</span>
             </a>
           </li>
         </ul>

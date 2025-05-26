@@ -25,6 +25,7 @@ import VeterinarioPer from "./Componentes/VeterinarioPer"
 import MenuAdmin from "./Componentes/MenuAdmin"
 import InicioAdmin from "./Componentes/InicioAdmin"
 import FormularioUsu from "./PanelAdmin/FormularioUsu"
+import ServiciosAdmin from "./Componentes/ServiciosAdmin"
 
 
 function App() {
@@ -57,6 +58,7 @@ function App() {
           <Route path="/Clientes" element={<Clientes />} />
           <Route path="/Roles" element={<Roles />} />
           <Route path="/Veterinarios" element={<Veterinarios />} />
+          <Route path="/ServiciosAdmin" element={<ServiciosAdmin />} />
           <Route path="/UserWelcome" element={<UserWelcome />} />
           <Route path="/Datospro" element={<DatosPro />} />
           <Route path="/ayudapro" element={<Ayudapro />} />
