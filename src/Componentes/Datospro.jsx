@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import '../Estilos_F/Datospro.css';
 import axios from 'axios';
 
 const Datospro = () => {
   const [datos, setDatos] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const email = localStorage.getItem('email'); // o usa el ID si lo tienes
@@ -21,6 +23,10 @@ const Datospro = () => {
   if (!datos) {
     return <div>Cargando datos...</div>;
   }
+
+  const handleActualizar = () => {
+    navigate('/Actualizarpro');
+  };
 
   return (
     <div className="datospro-container">
@@ -50,6 +56,10 @@ const Datospro = () => {
         <label>Fecha de Registro:</label>
         <input type="text" value={new Date(datos.fechaRegistro).toLocaleString()} readOnly />
       </form>
+
+      <button className="btn-actualizar" onClick={handleActualizar}>
+        Actualizar datos
+      </button>
     </div>
   );
 };

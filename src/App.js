@@ -19,14 +19,14 @@ import Admin from "./Componentes/Admin"
 import UserWelcome from "./Componentes/UserWelcome"
 import DatosPro from "./Componentes/Datospro"
 import Ayudapro from "./Componentes/ayudapro"
-import CookieConsent from "./Componentes/CookieConsent"
 
 function App() {
   return (
     <BrowserRouter>
      <CookieConsent />
       <Routes>
-        {/* Rutas normales con header/footer */}
+
+        {/* Rutas públicas con header/footer */}
         <Route element={<MainLayout />}>
           <Route path="/" element={<PagPrincipal />} />
           <Route path="/login" element={<Login />} />
@@ -42,18 +42,31 @@ function App() {
           <Route path="/Recuperarcontraseña" element={<RecuperarContraseña />} />
           <Route path="/MasRegis" element={<MasRegis />} />
           <Route path="/Veterinarios" element={<Veterinarios />} />
+          <Route path="/AyudaU" element={<AyudaU />} />
         </Route>
 
-        {/* Rutas internas sin header/footer */}
+        {/* Rutas protegidas (admin o similares) */}
         <Route element={<Privado />}>
           <Route path="/Admin" element={<Admin />} />
+        </Route>
+
+        {/* Rutas con menú lateral del usuario logueado */}
+        <Route element={<UserLayout />}>
           <Route path="/UserWelcome" element={<UserWelcome />} />
           <Route path="/Datospro" element={<DatosPro />} />
-          <Route path="/ayudapro" element={<Ayudapro />} />
+          <Route path="/Ayudapro" element={<Ayudapro />} />
+          <Route path="/Actualizarpro" element={<Actualizarpro />} /> 
+          {/* <Route path="/mascota/firulais" element={<FichaFirulais />} />
+          <Route path="/mascota/michi" element={<FichaMichi />} />
+          <Route path="/citas-proximas" element={<CitasProximas />} />
+          <Route path="/historial-citas" element={<HistorialCitas />} />
+          <Route path="/recordatorios" element={<Recordatorios />} /> */}
         </Route>
+
       </Routes>
     </BrowserRouter>
-  )
+  );
 }
 
-export default App
+export default App;
+

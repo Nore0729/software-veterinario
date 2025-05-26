@@ -149,8 +149,39 @@ app.get('/Propietarios/:email', (req, res) => {
 });
 
 
-app.listen(port, () => {
-  console.log(`Servidor corriendo en http://localhost:${port}`);
+app.put('/api/propietarios/:email', async (req, res) => {
+  const emailOriginal = req.params.email;
+  const { telefono, email, direccion, password } = req.body;
+
+  if (!telefono || !email || !direccion || !password) {
+    return res.status(400).json({ message: 'Todos los campos son obligatorios' });
+  }
+
+  try { 
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const query = `
+      UPDATE propietarios
+      SET telefono = ?, email = ?, direccion = ?, password = ?
+      WHERE email = ?
+    `;
+
+    db.query(query, [telefono, email, direccion, hashedPassword, emailOriginal], (err, result) => {
+      if (err) {
+        console.error('Error al actualizar propietario:', err);
+        return res.status(500).json({ message: 'Error en el servidor al actualizar datos' });
+      }
+
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ message: 'Propietario no encontrado' });
+      }
+
+      res.json({ message: 'Datos actualizados correctamente' });
+    });
+  } catch (error) {
+    console.error('Error al hashear la contraseña:', error);
+    res.status(500).json({ message: 'Error en el servidor' });
+  }
 });
 
 
@@ -198,3 +229,6 @@ app.get('/api/usuarios', (req, res) => {
   });
 });
 
+app.listen(port, () => {
+  console.log(`Servidor corriendo en http://localhost:${port}`);
+});
