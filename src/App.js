@@ -19,6 +19,7 @@ import Admin from "./Componentes/Admin"
 import UserWelcome from "./Componentes/UserWelcome"
 import DatosPro from "./Componentes/Datospro"
 import Ayudapro from "./Componentes/ayudapro"
+import AyudaU from "./Componentes/AyudaU"
 
 function App() {
   return (
@@ -40,6 +41,7 @@ function App() {
           <Route path="/Recuperarcontraseña" element={<RecuperarContraseña />} />
           <Route path="/MasRegis" element={<MasRegis />} />
           <Route path="/Veterinarios" element={<Veterinarios />} />
+          <Route path="/AyudaU" element={<AyudaU />} />
         </Route>
 
         {/* Rutas internas sin header/footer */}
