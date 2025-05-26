@@ -51,6 +51,7 @@ function App() {
           <Route path="/Recuperarcontraseña" element={<RecuperarContraseña />} />
           <Route path="/MasRegis" element={<MasRegis />} />
           <Route path="/Veterinarios" element={<Veterinarios />} />
+          <Route path="/AyudaU" element={<AyudaU />} />
         </Route>
 
         {/* Rutas protegidas (admin o similares) */}
