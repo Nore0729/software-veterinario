@@ -31,8 +31,10 @@ import ServiciosAdmin from "./Componentes/ServiciosAdmin"
 function App() {
   return (
     <BrowserRouter>
+     <CookieConsent />
       <Routes>
-        {/* Rutas normales con header/footer */}
+
+        {/* Rutas públicas con header/footer */}
         <Route element={<MainLayout />}>
           <Route path="/" element={<PagPrincipal />} />
           <Route path="/login" element={<Login />} />
@@ -47,9 +49,12 @@ function App() {
           <Route path="/Pacientes" element={<Pacientes />} />
           <Route path="/Consultas" element={<Consultas />} />
           <Route path="/ HistorialMedico" element={< HistorialMedico />} />
+          <Route path="/MasRegis" element={<MasRegis />} />
+          <Route path="/Veterinarios" element={<Veterinarios />} />
+          <Route path="/AyudaU" element={<AyudaU />} />
         </Route>
 
-        {/* Rutas internas sin header/footer */}
+        {/* Rutas protegidas (admin o similares) */}
         <Route element={<Privado />}>
           <Route path="/FormularioUsu" element={<FormularioUsu />} />
           <Route path="/InicioAdmin" element={<InicioAdmin />} />
@@ -64,9 +69,24 @@ function App() {
           <Route path="/ayudapro" element={<Ayudapro />} />
           <Route path="/VeterinarioPer" element={<VeterinarioPer />} />
         </Route>
+
+        {/* Rutas con menú lateral del usuario logueado */}
+        <Route element={<UserLayout />}>
+          <Route path="/UserWelcome" element={<UserWelcome />} />
+          <Route path="/Datospro" element={<DatosPro />} />
+          <Route path="/Ayudapro" element={<Ayudapro />} />
+          <Route path="/Actualizarpro" element={<Actualizarpro />} /> 
+          {/* <Route path="/mascota/firulais" element={<FichaFirulais />} />
+          <Route path="/mascota/michi" element={<FichaMichi />} />
+          <Route path="/citas-proximas" element={<CitasProximas />} />
+          <Route path="/historial-citas" element={<HistorialCitas />} />
+          <Route path="/recordatorios" element={<Recordatorios />} /> */}
+        </Route>
+
       </Routes>
     </BrowserRouter>
-  )
+  );
 }
 
-export default App
+export default App;
+

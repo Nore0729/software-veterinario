@@ -15,8 +15,8 @@ app.use(cors());
 const db = mysql.createConnection({
   host: 'localhost',
   user: 'root',
-  password: '12345678',
-  database: 'veterinaria2',
+  password: '',
+  database: 'veterinaria',
   port: '3306'
 });
 
@@ -133,49 +133,64 @@ app.post('/api/reset-password', async (req, res) => {
   }
 });
 
-// app.get('/Propietarios/:email', (req, res) => {
-//   const email = req.params.email;
-//   const sql = 'SELECT * FROM propietarios WHERE email = ?';
-//   db.query(sql, [email], (err, result) => {
-//     if (err) {
-//       console.error('Error al consultar propietario:', err);
-//       res.status(500).json({ error: 'Error al consultar' });
-//     } else if (result.length === 0) {
-//       res.status(404).json({ error: 'No se encontró el propietario' });
-//     } else {
-//       res.json(result[0]);
-//     }
-//   });
-// });
+app.get('/Propietarios/:email', (req, res) => {
+  const email = req.params.email;
+  const sql = 'SELECT * FROM propietarios WHERE email = ?';
+  db.query(sql, [email], (err, result) => {
+    if (err) {
+      console.error('Error al consultar propietario:', err);
+      res.status(500).json({ error: 'Error al consultar' });
+    } else if (result.length === 0) {
+      res.status(404).json({ error: 'No se encontró el propietario' });
+    } else {
+      res.json(result[0]);
+    }
+  });
+});
 
-// Ruta para registrar mascota con documento del propietario
-app.post('/api/registro-mascota', async (req, res) => {
-  const {
-    documento,
-    nombre,
-    especie,
-    raza,
-    genero,
-    color,
-    fechaNacimiento,
-    peso,
-    tamano,
-    estadoReproductivo,
-    vacunado,
-    observaciones
-  } = req.body;
 
-  // Validar que todos los campos requeridos estén presentes
-  if (
-    !documento ||
-    !nombre ||
-    !especie ||
-    !raza ||
-    !genero ||
-    !fechaNacimiento ||
-    !tamano ||
-    !estadoReproductivo
-  ) {
+app.put('/api/propietarios/:email', async (req, res) => {
+  const emailOriginal = req.params.email;
+  const { telefono, email, direccion, password } = req.body;
+
+  if (!telefono || !email || !direccion || !password) {
+    return res.status(400).json({ message: 'Todos los campos son obligatorios' });
+  }
+
+  try { 
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const query = `
+      UPDATE propietarios
+      SET telefono = ?, email = ?, direccion = ?, password = ?
+      WHERE email = ?
+    `;
+
+    db.query(query, [telefono, email, direccion, hashedPassword, emailOriginal], (err, result) => {
+      if (err) {
+        console.error('Error al actualizar propietario:', err);
+        return res.status(500).json({ message: 'Error en el servidor al actualizar datos' });
+      }
+
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ message: 'Propietario no encontrado' });
+      }
+
+      res.json({ message: 'Datos actualizados correctamente' });
+    });
+  } catch (error) {
+    console.error('Error al hashear la contraseña:', error);
+    res.status(500).json({ message: 'Error en el servidor' });
+  }
+});
+
+
+
+// RUTA PARA REGISTRAR USUARIOS
+app.post('/api/registro-usuario', async (req, res) => {
+  const { tipoDoc, numDoc, nombre, apellido, email, telefono, password } = req.body;
+
+  if (!tipoDoc || !numDoc || !nombre || !apellido || !email || !telefono || !password) {
     return res.status(400).send('Todos los campos son obligatorios');
   }
 
@@ -218,65 +233,19 @@ app.post('/api/registro-mascota', async (req, res) => {
   }
 });
 
+// RUTA PARA OBTENER TODOS LOS USUARIOS (nombre corregido)
+app.get('/api/usuarios', (req, res) => {
+  const query = 'SELECT id, tipoDoc, numDoc, nombre, apellido, email, telefono FROM usuarios';
 
-
-
-app.post('/api/usuarios', async (req, res) => {
-  const { tipoDocumento, documento, nombreCompleto, fechaNacimiento, telefono, email } = req.body;
-
-  if (!tipoDocumento || !documento || !nombreCompleto || !fechaNacimiento || !telefono || !email) {
-    return res.status(400).json({ 
-      error: 'Faltan campos obligatorios',
-      details: {
-        missingFields: [
-          !tipoDocumento && 'tipoDocumento',
-          !documento && 'documento',
-          !nombreCompleto && 'nombreCompleto',
-          !fechaNacimiento && 'fechaNacimiento',
-          !telefono && 'telefono',
-          !email && 'email'
-        ].filter(Boolean)
-      }
-    });
-  }
-
-  try {
-    // Verificar si usuario existe
-    const [existingUsers] = await db.promise().query(
-      'SELECT id FROM usuarios WHERE documento = ? OR email = ?', 
-      [documento, email]
-    );
-
-    if (existingUsers.length > 0) {
-      return res.status(409).json({ 
-        error: 'Usuario ya existe',
-        conflict: {
-          documento: existingUsers.some(u => u.documento === documento),
-          email: existingUsers.some(u => u.email === email)
-        }
-      });
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error('Error al obtener los usuarios:', err);
+      return res.status(500).send('Error al obtener los usuarios');
     }
+    res.json(results);
+  });
+});
 
-    // Insertar nuevo usuario
-    const [result] = await db.promise().query(
-      `INSERT INTO usuarios 
-       (tipoDocumento, documento, nombreCompleto, fechaNacimiento, telefono, email)
-       VALUES (?, ?, ?, ?, ?, ?)`,
-      [tipoDocumento, documento, nombreCompleto, fechaNacimiento, telefono, email]
-    );
-
-    res.status(201).json({ 
-      success: true,
-      userId: result.insertId,
-      message: 'Usuario registrado exitosamente'
-    });
-
-  } catch (error) {
-    console.error('Error en la base de datos:', error);
-    // Asegúrate de enviar error como JSON
-    res.status(500).json({ 
-      error: 'Error interno del servidor',
-      details: process.env.NODE_ENV === 'development' ? error.message : undefined
-    });
-  }
+app.listen(port, () => {
+  console.log(`Servidor corriendo en http://localhost:${port}`);
 });
