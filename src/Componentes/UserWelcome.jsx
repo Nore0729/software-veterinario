@@ -1,15 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { 
-  FaUser, FaPaw, FaCalendarAlt, FaChevronRight, FaHome, 
-  FaClipboard, FaBell, FaCog
-} from 'react-icons/fa';
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { FaPaw, FaCalendarAlt } from 'react-icons/fa';
+import {FaPaw, FaCalendarAlt, FaChevronRight, FaHome, FaClipboard, FaBell, FaCog} from 'react-icons/fa';
 import '../Estilos_F/User.css';
 
 const UserWelcome = ({ userName }) => {
+  const navigate = useNavigate(); 
   const [userData, setUserData] = useState({
     nombre: '',
     email: '',

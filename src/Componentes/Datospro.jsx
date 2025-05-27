@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import Layout from '../Componentes/menuusu';  // Asegúrate de que la ruta sea la correcta
+import Layout from '../Componentes/menuusu';
 import '../Estilos_F/Datospro.css';
 
 const Datospro = () => {
@@ -9,7 +9,7 @@ const Datospro = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const email = localStorage.getItem('email'); // o usa el ID si lo tienes
+    const email = localStorage.getItem('email');
     if (email) {
       axios.get(`http://localhost:3001/propietarios/${email}`)
         .then(response => {
@@ -57,19 +57,14 @@ const Datospro = () => {
 
           <label>Fecha de Registro:</label>
           <input type="text" value={new Date(datos.fechaRegistro).toLocaleString()} readOnly />
+
+          <button className="btn-actualizar" onClick={handleActualizar}>
+            Actualizar datos
+          </button>
         </form>
       </div>
     </Layout>
-        <label>Fecha de Registro:</label>
-        <input type="text" value={new Date(datos.fechaRegistro).toLocaleString()} readOnly />
-      </form>
-
-      <button className="btn-actualizar" onClick={handleActualizar}>
-        Actualizar datos
-      </button>
-    </div>
   );
 };
 
 export default Datospro;
-
