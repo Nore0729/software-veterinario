@@ -10,6 +10,17 @@ const Footer = () => {
         <footer className="footer">
             <div className="footer-container">
                 <div className="footer-column">
+                    <h3>Desarrolladores</h3>
+                    <ul>
+                        <li>
+                            <li><a href="#">Ayda Alejandra Linares</a></li>
+                            <li><a href="#">Yenifer Garcia Bermudez</a></li>
+                            <li><a href="#">David Andres Guzman</a></li>
+                            <li><a href="#">Andres Felipe Nieves</a></li>
+                        </li>
+                    </ul>
+                </div>
+                <div className="footer-column">
                     <h3>Síguenos</h3>
                     <ul>
                         <li>

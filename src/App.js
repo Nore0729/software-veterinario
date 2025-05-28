@@ -50,7 +50,7 @@ function App() {
           <Route path="/Recuperarcontraseña" element={<RecuperarContraseña />} />
           <Route path="/Pacientes" element={<Pacientes />} />
           <Route path="/Consultas" element={<Consultas />} />
-          <Route path="/HistorialMedico" element={<HistorialMedico />} /> {/* Corregido: espacio eliminado */}
+          <Route path="/HistorialMedico" element={<HistorialMedico />} /> 
           <Route path="/Veterinarios" element={<Veterinarios />} />
           <Route path="/AyudaU" element={<AyudaU />} />
         </Route>

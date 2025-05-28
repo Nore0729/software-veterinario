@@ -187,7 +187,7 @@ app.put('/api/propietarios/:email', async (req, res) => {
 
 
 // RUTA PARA REGISTRAR USUARIOS
-app.post('/api/registro-usuario', async (req, res) => {
+app.post('/api/registro-usuari', async (req, res) => {
   const { tipoDoc, numDoc, nombre, apellido, email, telefono, password } = req.body;
 
   if (!tipoDoc || !numDoc || !nombre || !apellido || !email || !telefono || !password) {
@@ -249,3 +249,35 @@ app.get('/api/usuarios', (req, res) => {
 app.listen(port, () => {
   console.log(`Servidor corriendo en http://localhost:${port}`);
 });
+
+
+// ruta para registtrar usuarios
+
+app.post('/api/registro-Usuario', async (req, res) => {
+  const { tipoDocumento, documento, nombre, fechaNacimiento, telefono, email, direccion, password } = req.body;
+
+  if (!tipoDocumento || !documento || !nombre || !fechaNacimiento || !telefono || !email || !direccion || !password) {
+    return res.status(400).send('Todos los campos son obligatorios');
+  }
+
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const query = `
+      INSERT INTO usuarios
+      (tipoDocumento, documento, nombre, fechaNacimiento, telefono, email, direccion, password) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+
+    db.query(query, [tipoDocumento, documento, nombre, fechaNacimiento, telefono, email, direccion, hashedPassword], (err, results) => {
+      if (err) {
+        console.error('Error al insertar los datos:', err);
+        return res.status(500).send('Hubo un problema al registrar el usuario');
+      }
+      res.status(201).send('usuario registrado exitosamente');
+    });
+
+  } catch (error) {
+    console.error('Error al encriptar la contraseña:', error);
+    return res.status(500).send('Error del servidor');
+  }
+});
+ 
