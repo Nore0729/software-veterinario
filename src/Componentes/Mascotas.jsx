@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
@@ -20,12 +20,11 @@ function RegistroMascota() {
   } = useForm({ mode: 'onChange' });
 
   const requiredFields = {
-    1: ['documentoPropietario', 'nombre', 'especie', 'raza', 'genero'],
+    1: ['documento', 'nombre', 'especie', 'raza', 'genero'],
     2: ['color', 'fechaNacimiento', 'peso', 'tamano', 'estadoReproductivo'],
     3: ['vacunado', 'observaciones']
   };
 
-  // Calcula progreso automáticamente
   useEffect(() => {
     let filledFields = 0;
     requiredFields[step].forEach(field => {
@@ -49,10 +48,12 @@ function RegistroMascota() {
   const prevStep = () => setStep(step - 1);
 
   const onSubmit = async (data) => {
+    // Convertir vacunado a booleano
+    data.vacunado = data.vacunado === "Sí" ? true : false;
+
     try {
       const response = await axios.post('http://localhost:3000/api/registro-mascota', data);
-      
-      Swal.fire({
+      if (response.status === 201) Swal.fire({
         title: '<strong>Registro exitoso!</strong>',
         html: `<i>La mascota <strong>${data.nombre}</strong> fue registrada</i>`,
         icon: 'success',
@@ -74,7 +75,6 @@ function RegistroMascota() {
 
   return (
     <div className="registro-container">
-      {/* Barra de progreso */}
       <div className="progress-tracker">
         <div className="progress-bar" style={{ width: `${progress}%` }} />
         <span className="progress-text">{progress}% completado</span>
@@ -87,7 +87,6 @@ function RegistroMascota() {
       </header>
 
       <form onSubmit={handleSubmit(onSubmit)}>
-        {/* PASO 1: Información General */}
         {step === 1 && (
           <fieldset className="form-section">
             <legend><User className="icon-legend" /> Información General</legend>
@@ -99,7 +98,7 @@ function RegistroMascota() {
               </div>
               <input
                 type="text"
-                {...register("documentoPropietario", {
+                {...register("documento", {
                   required: "Campo obligatorio",
                   pattern: {
                     value: /^[0-9]+$/,
@@ -114,11 +113,11 @@ function RegistroMascota() {
                     message: "Máximo 15 caracteres"
                   }
                 })}
-                className={errors.documentoPropietario ? 'error' : ''}
+                className={errors.documento ? 'error' : ''}
                 placeholder="Número de documento del propietario"
               />
-              {errors.documentoPropietario && (
-                <span className="error-message">{errors.documentoPropietario.message}</span>
+              {errors.documento && (
+                <span className="error-message">{errors.documento.message}</span>
               )}
             </div>
 
@@ -204,7 +203,6 @@ function RegistroMascota() {
           </fieldset>
         )}
 
-        {/* PASO 2: Datos Adicionales */}
         {step === 2 && (
           <fieldset className="form-section">
             <legend><AtSign className="icon-legend" /> Datos Adicionales</legend>
@@ -247,6 +245,7 @@ function RegistroMascota() {
               </div>
               <input
                 type="number"
+                step="0.01"
                 {...register("peso")}
                 className={errors.peso ? 'error' : ''}
                 placeholder="Escribe el peso de la mascota"
@@ -292,7 +291,6 @@ function RegistroMascota() {
           </fieldset>
         )}
 
-        {/* PASO 3: Seguridad */}
         {step === 3 && (
           <fieldset className="form-section">
             <legend><Lock className="icon-legend" /> Seguridad</legend>
@@ -322,8 +320,8 @@ function RegistroMascota() {
               </div>
               <textarea
                 {...register("observaciones")}
-                className={errors.observaciones ? 'error' : ''}
-                placeholder="Escribe las observaciones de la mascota"
+                rows={4}
+                placeholder="Escribe cualquier observación adicional"
               />
               {errors.observaciones && (
                 <span className="error-message">{errors.observaciones.message}</span>
@@ -332,41 +330,34 @@ function RegistroMascota() {
           </fieldset>
         )}
 
-        {/* Navegación entre pasos */}
         <div className="form-navigation">
           {step > 1 && (
-            <button 
-              type="button" 
-              onClick={prevStep} 
-              className="nav-btn prev-btn"
-            >
-              <ChevronLeft size={18} /> Anterior
+            <button type="button" className="btn-prev" onClick={prevStep}>
+              <ChevronLeft /> Anterior
             </button>
           )}
-          
-          {step < 3 ? (
-            <button 
-              type="button" 
-              onClick={nextStep} 
-              className="nav-btn next-btn"
-            >
-              Siguiente <ChevronRight size={18} />
-            </button>
-          ) : (
-            <button type="submit" className="submit-btn">
-              Registrar Mascota
+          {step < 3 && (
+            <button type="button" className="btn-next" onClick={nextStep}>
+              Siguiente <ChevronRight />
             </button>
           )}
-        </div>
-
-        <div className="login-link">
-          ¿Ya tienes cuenta? <Link to="/login">Inicia sesión</Link>
+          {step === 3 && (
+            <button type="submit" className="btn-submit">
+              Registrar
+            </button>
+          )}
         </div>
       </form>
+
+      <footer className="form-footer">
+        <Link to="/MascotasBienvenida">Volver a Bienvenida</Link>
+      </footer>
     </div>
   );
 }
 
 export default RegistroMascota;
+
+
 
 

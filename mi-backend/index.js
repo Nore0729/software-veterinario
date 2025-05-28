@@ -94,6 +94,62 @@ app.post('/api/login', (req, res) => {
   });
 });
 
+// registro de la mascota 
+app.post('/api/registro-mascota', (req, res) => {
+  const {
+    documento,
+    nombre,
+    especie,
+    raza,
+    genero,
+    color,
+    fechaNacimiento,
+    peso,
+    tamano,
+    estadoReproductivo,
+    vacunado,
+    observaciones
+  } = req.body;
+
+  // Validar campos obligatorios
+  if (!documento || !nombre) {
+    return res.status(400).send('Documento del propietario y nombre de la mascota son obligatorios');
+  }
+
+  const query = `
+    INSERT INTO mascotas (
+      documento, nombre, especie, raza, genero, color,
+      fechaNacimiento, peso, tamano, estadoReproductivo, vacunado, observaciones
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `;
+
+  db.query(
+    query,
+    [
+      documento,
+      nombre,
+      especie || null,
+      raza || null,
+      genero || null,
+      color || null,
+      fechaNacimiento || null,
+      peso || null,
+      tamano || null,
+      estadoReproductivo || null,
+      vacunado === true || vacunado === "true" ? 1 : 0,
+      observaciones || null
+    ],
+    (err, results) => {
+      if (err) {
+        console.error('Error al registrar la mascota:', err);
+        return res.status(500).send('Hubo un problema al registrar la mascota');
+      }
+      res.status(201).send('Mascota registrada exitosamente');
+    }
+  );
+});
+
+
 // Endpoint para restablecer la contraseña
 app.post('/api/reset-password', async (req, res) => {
   const { email, newPassword } = req.body;

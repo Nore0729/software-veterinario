@@ -15,6 +15,37 @@
 //   fechaRegistro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 // );
 
+// INSERT INTO propietarios (
+//   tipoDocumento,documento, nombre,fechaNacimiento,  telefono, email, direccion,password 
+// ) VALUES
+// ('c.c','11223344', 'Carlos','1982-11-05', '3209876543', 'carlos.ramirez@example.com', 'Carrera 10 #20-30','Alejandra18*');
+
+
+// CREATE TABLE mascotas (
+//   id INT AUTO_INCREMENT PRIMARY KEY,
+//   documento VARCHAR(15) NOT NULL, -- documento del propietario
+//   nombre VARCHAR(100) NOT NULL,
+//   especie VARCHAR(50),
+//   raza VARCHAR(50),
+//   genero VARCHAR(10),
+//   color VARCHAR(30),
+//   fechaNacimiento DATE,
+//   peso DECIMAL(5,2),
+//   tamano VARCHAR(20),
+//   estadoReproductivo VARCHAR(30),
+//   vacunado BOOLEAN DEFAULT FALSE,
+//   observaciones TEXT,
+//   fechaRegistro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+//   FOREIGN KEY (documento) REFERENCES propietarios(documento)
+// );
+
+// INSERT INTO  mascotas (
+//   documento, nombre,especie,raza,genero,color,fechaNacimiento,peso,tamano,estadoReproductivo,vacunado,observaciones
+// ) VALUES
+// ('11223344', 'lazi','perro', 'pincher', 'hembra', 'blanca', '1982-11-05','4','6','castrado','1','vsdfgdjbckjsdgfuibcvbd');
+
+
+
 // DELIMITER $$
 
 // CREATE PROCEDURE veterinaria.ModifyPassword(
@@ -50,5 +81,11 @@
 
 // DELIMITER ;
 
+// SELECT p.nombre AS propietario, p.documento, m.nombre AS mascota, m.especie, m.raza, m.genero, m.color, m.fechaNacimiento, m.peso, m.tamano, m.estadoReproductivo, m.vacunado, m.observaciones
+// FROM mascotas m
+// JOIN propietarios p ON m.documento = p.documento
+// WHERE p.documento = '11223344';
 
+
+// select * from mascotas;
 // select * from propietarios;
