@@ -1,96 +1,86 @@
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import {
+  Home,
+  CalendarPlus,
+  Stethoscope,
+  Users2,
+  Dog,
+  LogOut,
+} from "lucide-react";
 import "../Estilos_F/VeterinarioPer.css";
-import { Outlet, NavLink } from "react-router-dom";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUserMd, faCalendarAlt, faPaw, faNotesMedical, faSyringe, } from "@fortawesome/free-solid-svg-icons";
+import { logoutWithConfirmation } from "../Componentes/authUtils";
 
-function Veterinario() {
+const Veterinarios = () => {
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
+
+  const handleLogout = () => {
+    const logoutButton = document.querySelector(".vet-header-logout");
+    if (logoutButton) {
+      logoutButton.style.animation = "fadeOutRight 0.4s forwards";
+      setTimeout(() => {
+        logoutWithConfirmation();
+      }, 400);
+    } else {
+      logoutWithConfirmation();
+    }
+  };
+
   return (
-    <div className="vet-container">
+    <div className="veterinarios-container">
       <header className="vet-header">
-        <div className="vet-header-content">
-          <div className="vet-logo-container">
-            <div className="vet-title">Pet Lovers</div>
+        <div className="vet-header-logo">PET LOVERS</div>
+
+        <div className="vet-header-right">
+          <div className="vet-header-usuario">
+            <span>Veterinario</span>
+            <img src="/images/usuario.png" alt="Usuario" className="vet-usuario-img" />
           </div>
-          <div className="vet-user-section">
-            <div className="vet-avatar-wrapper">
-              <img 
-                src="/vet-avatar.png" 
-                alt="avatar" 
-                className="vet-avatar" 
-                onError={(e) => {
-                  e.target.onerror = null; 
-                  e.target.src = "/default-avatar.png";
-                }}
-              />
-              <div className="vet-user-info">
-                <span className="vet-doctor-name">Dr. Veterinario</span>
-                <span className="vet-specialty">Cirujano</span>
-              </div>
-            </div>
+
+          <div className="vet-header-logout" onClick={handleLogout}>
+            <LogOut className="vet-icon" />
+            <span>Cerrar sesión</span>
           </div>
         </div>
       </header>
 
-      <nav className="vet-sidebar">
-        <div className="sidebar-header">
-          <h1>
-            <FontAwesomeIcon icon={faUserMd} className="sidebar-icon" />
-            Menú Veterinario
-          </h1>
-        </div>
-        <ul>
-          <li>
-            <NavLink 
-              to="/consultas" 
-              className={({ isActive }) => isActive ? "active" : ""}
-            >
-              <FontAwesomeIcon icon={faNotesMedical} />
-              <span>Consultas</span>
-            </NavLink>
-          </li>
-          <li>
-            <NavLink 
-              to="/pacientes"
-              className={({ isActive }) => isActive ? "active" : ""}
-            >
-              <FontAwesomeIcon icon={faPaw} />
-              <span>Pacientes</span>
-            </NavLink>
-          </li>
-          <li>
-            <NavLink 
-              to="/HistorialMedico"
-              className={({ isActive }) => isActive ? "active" : ""}
-            >
-              <FontAwesomeIcon icon={faNotesMedical} />
-              <span>Historiales Médicos</span>
-            </NavLink>
-          </li>
-          <li>
-            <NavLink 
-              to="/cirugias"
-              className={({ isActive }) => isActive ? "active" : ""}
-            >
-              <FontAwesomeIcon icon={faSyringe} />
-              <span>Cirugías</span>
-            </NavLink>
-          </li>
-          <li>
-            <NavLink 
-              to="/calendario"
-              className={({ isActive }) => isActive ? "active" : ""}
-            >
-              <FontAwesomeIcon icon={faCalendarAlt} />
-              <span>Calendario</span>
-            </NavLink>
-          </li>
-        </ul>
-      </nav>
-      <main className="vet-main">
-        <Outlet />
-      </main>
+      <div className="vet-body">
+        <nav className={`vet-sidebar ${sidebarOpen ? "open" : ""}`}>
+          <ul>
+            <li>
+              <Home className="vet-icon" />
+              <Link to="/InicioVeterinario">Inicio</Link>
+            </li>
+            <li>
+              <CalendarPlus className="vet-icon" />
+              <Link to="/citas">Citas</Link>
+            </li>
+            <li>
+              <Stethoscope className="vet-icon" />
+              <Link to="/consultas">Consultas</Link>
+            </li>
+            <li>
+              <Users2 className="vet-icon" />
+              <Link to="/usuarios">Usuarios</Link>
+            </li>
+            <li>
+              <Dog className="vet-icon" />
+              <Link to="/mascotas">Mascotas</Link>
+            </li>
+          </ul>
+        </nav>
+
+        <main className="vet-content">
+          <h1>Bienvenido a Pet Lovers</h1>
+          <p>Elige una opción del menú para empezar.</p>
+        </main>
+      </div>
     </div>
   );
-}
+};
 
-export default Veterinario;
+export default Veterinarios;
