@@ -56,7 +56,7 @@ const UserWelcome = ({ userName }) => {
 
   return (
     <div className="main-content">
-      <h1>¡Bienvenido, {userData.nombre}!</h1>
+      <h1>¡Bienvenid@, {userData.nombre}!</h1>
 
       <div className="dashboard-cards">
         <div className="info-card">

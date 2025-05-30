@@ -7,15 +7,39 @@ import { FaEye, FaEyeSlash } from 'react-icons/fa';
 export const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [errorGeneral, setErrorGeneral] = useState('');
+  const [emailError, setEmailError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [failedAttempts, setFailedAttempts] = useState(0);
   const navigate = useNavigate();
+
+  // Función para validar formato de email simple
+  const validarEmail = (email) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
+
+  const handleEmailChange = (e) => {
+    const valor = e.target.value.toLowerCase();
+    setEmail(valor);
+
+    if (!validarEmail(valor)) {
+      setEmailError('Correo electrónico inválido');
+    } else {
+      setEmailError('');
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!email || !password) {
-      setError('Por favor completa ambos campos');
+      setErrorGeneral('Por favor completa ambos campos');
+      return;
+    }
+
+    if (emailError) {
+      setErrorGeneral('Por favor corrige el correo electrónico');
       return;
     }
 
@@ -30,11 +54,21 @@ export const Login = () => {
       localStorage.setItem('nombre', name);
       localStorage.setItem('email', userEmail);
 
-      setError('');
+      setErrorGeneral('');
+      setFailedAttempts(0); // resetear contador en login exitoso
       navigate('/UserWelcome');
     } catch (err) {
       console.error('Error al iniciar sesión:', err);
-      setError(err.response?.data?.message || 'Error al iniciar sesión');
+
+      const newFailedAttempts = failedAttempts + 1;
+      setFailedAttempts(newFailedAttempts);
+
+      if (newFailedAttempts >= 3) {
+        alert('Contraseña incorrecta 3 veces. Por favor, recupera tu contraseña.');
+        navigate('/Recuperarcontraseña');
+      } else {
+        setErrorGeneral(err.response?.data?.message || 'Contraseña incorrecta. Intentos restantes: ' + (3 - newFailedAttempts));
+      }
     }
   };
 
@@ -56,9 +90,11 @@ export const Login = () => {
             <input
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={handleEmailChange} // valida y convierte aquí
               placeholder="ejemplo@vet.com"
+              autoComplete="username"
             />
+            {emailError && <p className="error-message">{emailError}</p>}
           </div>
 
           <div className="form-group">
@@ -69,6 +105,7 @@ export const Login = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
+                autoComplete="current-password"
               />
               <span
                 className="password-toggle-icon"
@@ -79,7 +116,8 @@ export const Login = () => {
             </div>
           </div>
 
-          {error && <p className="error-message">{error}</p>}
+          {/* Error general que no sea del email */}
+          {errorGeneral && <p className="error-message">{errorGeneral}</p>}
 
           <button type="submit">Iniciar Sesión</button>
         </form>
@@ -94,3 +132,5 @@ export const Login = () => {
 };
 
 export default Login;
+
+

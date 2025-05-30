@@ -3,20 +3,21 @@ import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { PawPrint, User, AtSign, Lock, ChevronRight, ChevronLeft } from 'lucide-react';
-import axios from 'axios'; 
+import axios from 'axios';
 import '../Estilos_F/Propietarios.css';
 
 function RegistroPropietario() {
   const [step, setStep] = useState(1);
   const [progress, setProgress] = useState(0);
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   const {
-    register, 
-    handleSubmit, 
+    register,
+    handleSubmit,
     formState: { errors },
     watch,
-    trigger
+    trigger,
+    setValue
   } = useForm({ mode: 'onChange' });
 
   const password = watch("password");
@@ -28,7 +29,6 @@ function RegistroPropietario() {
     3: ['password', 'confirmPassword', 'terms']
   };
 
-  // Calcula progreso automáticamente
   useEffect(() => {
     let filledFields = 0;
     requiredFields[step].forEach(field => {
@@ -39,10 +39,8 @@ function RegistroPropietario() {
     });
 
     const baseProgress = (step - 1) * 33;
-    const stepProgress = step === 1 && filledFields === 0 
-      ? 0 
-      : (filledFields / requiredFields[step].length) * 33;
-    
+    const stepProgress = (filledFields / requiredFields[step].length) * 33;
+
     setProgress(Math.min(100, Math.round(baseProgress + stepProgress)));
   }, [formValues, step]);
 
@@ -73,13 +71,11 @@ function RegistroPropietario() {
         icon: 'success',
         timer: 3000,
         didClose: () => {
-          // Guardar nombre y correo en localStorage
           localStorage.setItem('nombre', data.nombre);
           localStorage.setItem('email', data.email);
           navigate('/UserWelcome');
         }
       });
-
     } catch (error) {
       Swal.fire({
         title: '<strong>Error!</strong>',
@@ -89,6 +85,28 @@ function RegistroPropietario() {
       });
     }
   };
+
+  const handleOnlyNumbers = (e, maxLength) => {
+    if (!/^\d*$/.test(e.target.value)) {
+      e.preventDefault();
+      return;
+    }
+    if (e.target.value.length >= maxLength) {
+      e.preventDefault();
+      e.target.value = e.target.value.slice(0, maxLength);
+    }
+  };
+
+  const handleOnlyLetters = (e) => {
+    const value = e.target.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúñÑ ]/g, '');
+    setValue("nombre", value);
+  };
+
+  const handleEmailToLower = (e) => {
+    const value = e.target.value.toLowerCase();
+    setValue("email", value);
+  };
+
   return (
     <div className="registro-container">
       <div className="progress-tracker">
@@ -103,11 +121,10 @@ function RegistroPropietario() {
       </header>
 
       <form onSubmit={handleSubmit(onSubmit)}>
-        {/* PASO 1: Información Personal */}
         {step === 1 && (
           <fieldset className="form-section">
             <legend><User className="icon-legend" /> Información Personal</legend>
-            
+
             <div className="input-group">
               <div className="label-container">
                 <User className="icon-small" />
@@ -119,12 +136,9 @@ function RegistroPropietario() {
               >
                 <option value="">Seleccionar</option>
                 <option value="CC">Cédula</option>
-                <option value="TI">Tarjeta Identidad</option>
                 <option value="CE">Cédula Extranjería</option>
               </select>
-              {errors.tipoDocumento && (
-                <span className="error-message">{errors.tipoDocumento.message}</span>
-              )}
+              {errors.tipoDocumento && <span className="error-message">{errors.tipoDocumento.message}</span>}
             </div>
 
             <div className="input-group">
@@ -134,27 +148,23 @@ function RegistroPropietario() {
               </div>
               <input
                 type="text"
+                maxLength={12}
+                onInput={(e) => {
+                  e.target.value = e.target.value.replace(/\D/g, '').slice(0, 12);
+                }}
                 {...register("documento", {
                   required: "Campo obligatorio",
+                  minLength: { value: 6, message: "Mínimo 6 caracteres" },
+                  maxLength: { value: 12, message: "Máximo 12 caracteres" },
                   pattern: {
                     value: /^[0-9]+$/,
                     message: "Solo números permitidos"
-                  },
-                  minLength: {
-                    value: 6,
-                    message: "Mínimo 6 caracteres"
-                  },
-                  maxLength: {
-                    value: 12,
-                    message: "Máximo 12 caracteres"
                   }
                 })}
                 className={errors.documento ? 'error' : ''}
                 placeholder="Escribe tu número de documento"
               />
-              {errors.documento && (
-                <span className="error-message">{errors.documento.message}</span>
-              )}
+              {errors.documento && <span className="error-message">{errors.documento.message}</span>}
             </div>
 
             <div className="input-group">
@@ -164,23 +174,27 @@ function RegistroPropietario() {
               </div>
               <input
                 type="text"
+                maxLength={50}
                 {...register("nombre", {
-                  required: "Campo obligatorio",
-                  pattern: {
-                    value: /^[A-Za-zÁÉÍÓÚáéíóúñÑ ]+$/,
-                    message: "Solo letras permitidas"
-                  },
-                  minLength: {
-                    value: 3,
-                    message: "Mínimo 3 caracteres"
-                  }
+                required: "Campo obligatorio",
+                minLength: { value: 3, message: "Mínimo 3 caracteres" },
+                maxLength: { value: 50, message: "Máximo 50 caracteres" },
+                pattern: {
+                value: /^[A-Za-zÁÉÍÓÚáéíóúñÑ ]+$/,
+                message: "Solo letras permitidas"
+                }
                 })}
-                className={errors.nombre ? 'error' : ''}
-                placeholder="Escribe tu nombre"
-              />
-              {errors.nombre && (
-                <span className="error-message">{errors.nombre.message}</span>
-              )}
+              className={errors.nombre ? 'error' : ''}
+              placeholder="Escribe tu nombre"
+              onInput={(e) => {
+              let value = e.target.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúñÑ ]/g, '');
+              if (value.length > 50) value = value.slice(0, 50);
+              e.target.value = value;
+              setValue("nombre", value);
+              }}
+           />
+
+              {errors.nombre && <span className="error-message">{errors.nombre.message}</span>}
             </div>
 
             <div className="input-group">
@@ -196,18 +210,15 @@ function RegistroPropietario() {
                 })}
                 className={errors.fechaNacimiento ? 'error' : ''}
               />
-              {errors.fechaNacimiento && (
-                <span className="error-message">{errors.fechaNacimiento.message}</span>
-              )}
+              {errors.fechaNacimiento && <span className="error-message">{errors.fechaNacimiento.message}</span>}
             </div>
           </fieldset>
         )}
 
-        {/* PASO 2: Contacto */}
         {step === 2 && (
           <fieldset className="form-section">
             <legend><AtSign className="icon-legend" /> Información de Contacto</legend>
-            
+
             <div className="input-group">
               <div className="label-container">
                 <User className="icon-small" />
@@ -215,23 +226,22 @@ function RegistroPropietario() {
               </div>
               <input
                 type="tel"
+                maxLength={10}
+                onInput={(e) => {
+                  e.target.value = e.target.value.replace(/\D/g, '').slice(0, 10);
+                }}
                 {...register("telefono", {
                   required: "Campo obligatorio",
+                  minLength: { value: 10, message: "Mínimo 10 dígitos" },
                   pattern: {
                     value: /^[0-9]+$/,
                     message: "Solo números permitidos"
-                  },
-                  minLength: {
-                    value: 10,
-                    message: "Mínimo 10 dígitos"
                   }
                 })}
                 className={errors.telefono ? 'error' : ''}
                 placeholder="Escribe tu teléfono"
               />
-              {errors.telefono && (
-                <span className="error-message">{errors.telefono.message}</span>
-              )}
+              {errors.telefono && <span className="error-message">{errors.telefono.message}</span>}
             </div>
 
             <div className="input-group">
@@ -244,16 +254,15 @@ function RegistroPropietario() {
                 {...register("email", {
                   required: "Campo obligatorio",
                   pattern: {
-                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                    value: /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/,
                     message: "Correo no válido"
                   }
                 })}
                 className={errors.email ? 'error' : ''}
                 placeholder="tu@correo.com"
+                onInput={handleEmailToLower}
               />
-              {errors.email && (
-                <span className="error-message">{errors.email.message}</span>
-              )}
+              {errors.email && <span className="error-message">{errors.email.message}</span>}
             </div>
 
             <div className="input-group">
@@ -262,29 +271,32 @@ function RegistroPropietario() {
                 <label>Dirección *</label>
               </div>
               <input
-                type="text"
-                {...register("direccion", {
-                  required: "Campo obligatorio",
-                  minLength: {
-                    value: 10,
-                    message: "Mínimo 10 caracteres"
-                  }
-                })}
-                className={errors.direccion ? 'error' : ''}
-                placeholder="Escribe tu dirección"
-              />
-              {errors.direccion && (
-                <span className="error-message">{errors.direccion.message}</span>
-              )}
+               type="text"
+              maxLength={30}
+              {...register("direccion", {
+              required: "Campo obligatorio",
+              minLength: { value: 10, message: "Mínimo 10 caracteres" },
+              maxLength: { value: 80, message: "Máximo 30 caracteres" }
+              })}
+              className={errors.direccion ? 'error' : ''}
+              placeholder="Escribe tu dirección"
+              onInput={(e) => {
+              let value = e.target.value;
+              if (value.length > 80) value = value.slice(0, 30);
+              e.target.value = value;
+              setValue("direccion", value);
+              }}
+           />
+
+              {errors.direccion && <span className="error-message">{errors.direccion.message}</span>}
             </div>
           </fieldset>
         )}
 
-        {/* PASO 3: Seguridad */}
         {step === 3 && (
           <fieldset className="form-section">
             <legend><Lock className="icon-legend" /> Seguridad</legend>
-            
+
             <div className="input-group">
               <div className="label-container">
                 <Lock className="icon-small" />
@@ -294,10 +306,7 @@ function RegistroPropietario() {
                 type="password"
                 {...register("password", {
                   required: "Campo obligatorio",
-                  minLength: {
-                    value: 8,
-                    message: "Mínimo 8 caracteres"
-                  },
+                  minLength: { value: 8, message: "Mínimo 8 caracteres" },
                   pattern: {
                     value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
                     message: "Debe incluir mayúscula, minúscula, número y símbolo"
@@ -306,9 +315,7 @@ function RegistroPropietario() {
                 className={errors.password ? 'error' : ''}
                 placeholder="Crea una contraseña segura"
               />
-              {errors.password && (
-                <span className="error-message">{errors.password.message}</span>
-              )}
+              {errors.password && <span className="error-message">{errors.password.message}</span>}
             </div>
 
             <div className="input-group">
@@ -325,9 +332,7 @@ function RegistroPropietario() {
                 className={errors.confirmPassword ? 'error' : ''}
                 placeholder="Repite tu contraseña"
               />
-              {errors.confirmPassword && (
-                <span className="error-message">{errors.confirmPassword.message}</span>
-              )}
+              {errors.confirmPassword && <span className="error-message">{errors.confirmPassword.message}</span>}
             </div>
 
             <div className="terms-group">
@@ -342,31 +347,19 @@ function RegistroPropietario() {
                 Acepto los <Link to="/terminos">Términos y Condiciones</Link> y el{' '}
                 <Link to="/privacidad">Aviso de Privacidad</Link>
               </label>
-              {errors.terms && (
-                <span className="error-message">{errors.terms.message}</span>
-              )}
+              {errors.terms && <span className="error-message">{errors.terms.message}</span>}
             </div>
           </fieldset>
         )}
 
-        {/* Navegación entre pasos */}
         <div className="form-navigation">
           {step > 1 && (
-            <button 
-              type="button" 
-              onClick={prevStep} 
-              className="nav-btn prev-btn"
-            >
+            <button type="button" onClick={prevStep} className="nav-btn prev-btn">
               <ChevronLeft size={18} /> Anterior
             </button>
           )}
-          
           {step < 3 ? (
-            <button 
-              type="button" 
-              onClick={nextStep} 
-              className="nav-btn next-btn"
-            >
+            <button type="button" onClick={nextStep} className="nav-btn next-btn">
               Siguiente <ChevronRight size={18} />
             </button>
           ) : (

@@ -2,13 +2,14 @@
 :root {
   --primary: #6cc5ee;
   --primary-dark: #5ab0d9;
-  --secondary: #f5a623;
+  --secondary: #8fd9f7; /* reemplazado el naranja por azul claro */
   --text-dark: #333333;
   --text-medium: #666666;
   --text-light: #ffffff;
   --bg-light: #f8f8f8;
   --error: #ff4444;
 }
+
 
 /* ===== ESTRUCTURA PRINCIPAL ===== */
 .mascota-container {
@@ -42,10 +43,11 @@
 }
 
 .progress-bar {
-  height: 100%;
-  background: linear-gradient(90deg, var(--primary), var(--secondary));
-  width: 0;
-  transition: width 0.5s cubic-bezier(0.65, 0, 0.35, 1);
+  background: linear-gradient(90deg, var(--primary), var(--secondary)); /* azul-azul claro */
+}
+
+.step-indicator span.active:after {
+  background: var(--secondary); /* azul claro */
 }
 
 .progress-text {
@@ -78,16 +80,6 @@
 .step-indicator span.active {
   color: var(--primary);
   font-weight: 600;
-}
-
-.step-indicator span.active:after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: var(--secondary);
 }
 
 /* ===== FORMULARIO ===== */
