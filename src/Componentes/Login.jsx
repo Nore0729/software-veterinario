@@ -13,7 +13,6 @@ export const Login = () => {
   const [failedAttempts, setFailedAttempts] = useState(0);
   const navigate = useNavigate();
 
-  // Función para validar formato de email simple
   const validarEmail = (email) => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return regex.test(email);
@@ -44,6 +43,7 @@ export const Login = () => {
     }
 
     try {
+      // Primer intento: login básico
       const response = await axios.post('http://localhost:3000/api/login', {
         email,
         password,
@@ -55,19 +55,54 @@ export const Login = () => {
       localStorage.setItem('email', userEmail);
 
       setErrorGeneral('');
-      setFailedAttempts(0); // resetear contador en login exitoso
+      setFailedAttempts(0);
       navigate('/UserWelcome');
     } catch (err) {
-      console.error('Error al iniciar sesión:', err);
+      console.error('Error en login básico:', err);
 
-      const newFailedAttempts = failedAttempts + 1;
-      setFailedAttempts(newFailedAttempts);
+      try {
+        // Segundo intento: login con rol
+        const roleResponse = await axios.post('http://localhost:3000/api/login-rol', {
+          email,
+          password,
+        });
 
-      if (newFailedAttempts >= 3) {
-        alert('Contraseña incorrecta 3 veces. Por favor, recupera tu contraseña.');
-        navigate('/Recuperarcontraseña');
-      } else {
-        setErrorGeneral(err.response?.data?.message || 'Contraseña incorrecta. Intentos restantes: ' + (3 - newFailedAttempts));
+        const { user } = roleResponse.data;
+        localStorage.setItem('userData', JSON.stringify(user));
+
+        switch (user.rol) {
+          case 'propietario':
+            navigate('/UserWelcome');
+            break;
+          case 'veterinario':
+            navigate('/veterinario/dashboard');
+            break;
+          case 'administrador':
+            navigate('/InicioAdmin');
+            break;
+          default:
+            localStorage.setItem('nombre', user.nombre);
+            localStorage.setItem('email', user.email);
+            navigate('/UserWelcome');
+        }
+
+        setErrorGeneral('');
+        setFailedAttempts(0);
+      } catch (err) {
+        console.error('Error en login con rol:', err);
+
+        const newFailedAttempts = failedAttempts + 1;
+        setFailedAttempts(newFailedAttempts);
+
+        if (newFailedAttempts >= 3) {
+          alert('Contraseña incorrecta 3 veces. Por favor, recupera tu contraseña.');
+          navigate('/Recuperarcontraseña');
+        } else {
+          setErrorGeneral(
+            err.response?.data?.message ||
+              'Contraseña incorrecta. Intentos restantes: ' + (3 - newFailedAttempts)
+          );
+        }
       }
     }
   };

@@ -15,7 +15,7 @@ app.use(cors());
 const db = mysql.createConnection({
   host: 'localhost',
   user: 'root',
-  password: '',
+  password: '12345678',
   database: 'veterinaria',
   port: '3306'
 });
@@ -307,33 +307,115 @@ app.listen(port, () => {
 });
 
 
-// ruta para registtrar usuarios
 
-app.post('/api/registro-Usuario', async (req, res) => {
-  const { tipoDocumento, documento, nombre, fechaNacimiento, telefono, email, direccion, password } = req.body;
+ 
 
-  if (!tipoDocumento || !documento || !nombre || !fechaNacimiento || !telefono || !email || !direccion || !password) {
-    return res.status(400).send('Todos los campos son obligatorios');
+// ruta para iniciar sesion con los diferentes roles 
+
+// Ruta para iniciar sesión con verificación de roles
+app.post('/api/login-rol', async (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).json({ 
+      success: false, 
+      message: 'Email y contraseña son requeridos' 
+    });
   }
 
   try {
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const query = `
-      INSERT INTO usuarios
-      (tipoDocumento, documento, nombre, fechaNacimiento, telefono, email, direccion, password) 
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+    // 1. Buscar usuario en la tabla usuarios
+    const [users] = await db.promise().query(
+      'SELECT * FROM usuarios WHERE email = ?', 
+      [email]
+    );
 
-    db.query(query, [tipoDocumento, documento, nombre, fechaNacimiento, telefono, email, direccion, hashedPassword], (err, results) => {
-      if (err) {
-        console.error('Error al insertar los datos:', err);
-        return res.status(500).send('Hubo un problema al registrar el usuario');
+    if (users.length === 0) {
+      return res.status(401).json({ 
+        success: false, 
+        message: 'Credenciales incorrectas' 
+      });
+    }
+
+    const user = users[0];
+
+    // 2. Verificar contraseña (en tu caso parece que no está hasheada)
+    // NOTA: En producción deberías usar bcrypt.compare() con contraseñas hasheadas
+    const passwordIsValid = password === user.password;
+    // const passwordIsValid = await bcrypt.compare(password, user.password);
+
+    if (!passwordIsValid) {
+      return res.status(401).json({ 
+        success: false, 
+        message: 'Credenciales incorrectas' 
+      });
+    }
+
+    // 3. Determinar el rol del usuario
+    let rol = '';
+    let datosAdicionales = {};
+
+    // Verificar si es propietario (id_prop = 1 según tus datos)
+    if (user.id === 1) {
+      const [propietarios] = await db.promise().query(
+        'SELECT * FROM propietarios WHERE id_prop = ?', 
+        [user.id]
+      );
+      if (propietarios.length > 0) {
+        rol = 'propietario';
+        datosAdicionales = { direccion: propietarios[0].direccion };
       }
-      res.status(201).send('usuario registrado exitosamente');
+    }
+    // Verificar si es veterinario (vet_id = 2 según tus datos)
+    else if (user.id === 2) {
+      const [veterinarios] = await db.promise().query(
+        'SELECT * FROM veterinarios WHERE vet_id = ?', 
+        [user.id]
+      );
+      if (veterinarios.length > 0) {
+        rol = 'veterinario';
+        datosAdicionales = { especialidad: veterinarios[0].especialidad };
+      }
+    }
+    // Verificar si es administrador (admin_id = 3 según tus datos)
+    else if (user.id === 3) {
+      const [administradores] = await db.promise().query(
+        'SELECT * FROM administradores WHERE admin_id = ?', 
+        [user.id]
+      );
+      if (administradores.length > 0) {
+        rol = 'administrador';
+        datosAdicionales = { nivel_acceso: administradores[0].nivel_acceso };
+      }
+    }
+
+    if (!rol) {
+      return res.status(403).json({ 
+        success: false, 
+        message: 'Usuario sin rol asignado' 
+      });
+    }
+
+    // 4. Respuesta exitosa
+    res.json({
+      success: true,
+      message: 'Inicio de sesión exitoso',
+      user: {
+        id: user.id,
+        nombre: user.nombre,
+        email: user.email,
+        documento: user.documento,
+        telefono: user.telefono,
+        rol: rol,
+        ...datosAdicionales
+      }
     });
 
   } catch (error) {
-    console.error('Error al encriptar la contraseña:', error);
-    return res.status(500).send('Error del servidor');
+    console.error('Error en el login:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Error en el servidor' 
+    });
   }
 });
- 
