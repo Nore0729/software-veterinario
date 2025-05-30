@@ -1,7 +1,9 @@
+
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
+import { Eye, EyeOff } from 'lucide-react';
 import { PawPrint, User, AtSign, Lock, ChevronRight, ChevronLeft } from 'lucide-react';
 import axios from 'axios';
 import '../Estilos_F/Propietarios.css';
@@ -10,6 +12,8 @@ function RegistroPropietario() {
   const [step, setStep] = useState(1);
   const [progress, setProgress] = useState(0);
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const {
     register,
@@ -86,27 +90,6 @@ function RegistroPropietario() {
     }
   };
 
-  const handleOnlyNumbers = (e, maxLength) => {
-    if (!/^\d*$/.test(e.target.value)) {
-      e.preventDefault();
-      return;
-    }
-    if (e.target.value.length >= maxLength) {
-      e.preventDefault();
-      e.target.value = e.target.value.slice(0, maxLength);
-    }
-  };
-
-  const handleOnlyLetters = (e) => {
-    const value = e.target.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúñÑ ]/g, '');
-    setValue("nombre", value);
-  };
-
-  const handleEmailToLower = (e) => {
-    const value = e.target.value.toLowerCase();
-    setValue("email", value);
-  };
-
   return (
     <div className="registro-container">
       <div className="progress-tracker">
@@ -176,24 +159,24 @@ function RegistroPropietario() {
                 type="text"
                 maxLength={50}
                 {...register("nombre", {
-                required: "Campo obligatorio",
-                minLength: { value: 3, message: "Mínimo 3 caracteres" },
-                maxLength: { value: 50, message: "Máximo 50 caracteres" },
-                pattern: {
-                value: /^[A-Za-zÁÉÍÓÚáéíóúñÑ ]+$/,
-                message: "Solo letras permitidas"
-                }
+                  required: "Campo obligatorio",
+                  minLength: { value: 3, message: "Mínimo 3 caracteres" },
+                  maxLength: { value: 50, message: "Máximo 50 caracteres" },
+                  pattern: {
+                    value: /^[A-Za-zÁÉÍÓÚáéíóúñÑ ]+$/,
+                    message: "Solo letras permitidas"
+                  }
                 })}
-              className={errors.nombre ? 'error' : ''}
-              placeholder="Escribe tu nombre"
-              onInput={(e) => {
-              let value = e.target.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúñÑ ]/g, '');
-              if (value.length > 50) value = value.slice(0, 50);
-              e.target.value = value;
-              setValue("nombre", value);
-              }}
-           />
-
+                className={errors.nombre ? 'error' : ''}
+                placeholder="Escribe tu nombre"
+                onInput={(e) => {
+                  let value = e.target.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúñÑ ]/g, '');
+                  if (value.length > 50) value = value.slice(0, 50);
+                  value = value.toUpperCase();
+                  e.target.value = value;
+                  setValue("nombre", value);
+                }}
+              />
               {errors.nombre && <span className="error-message">{errors.nombre.message}</span>}
             </div>
 
@@ -260,7 +243,10 @@ function RegistroPropietario() {
                 })}
                 className={errors.email ? 'error' : ''}
                 placeholder="tu@correo.com"
-                onInput={handleEmailToLower}
+                onInput={(e) => {
+                  const value = e.target.value.toLowerCase();
+                  setValue("email", value);
+                }}
               />
               {errors.email && <span className="error-message">{errors.email.message}</span>}
             </div>
@@ -271,110 +257,146 @@ function RegistroPropietario() {
                 <label>Dirección *</label>
               </div>
               <input
-               type="text"
-              maxLength={30}
-              {...register("direccion", {
-              required: "Campo obligatorio",
-              minLength: { value: 10, message: "Mínimo 10 caracteres" },
-              maxLength: { value: 80, message: "Máximo 30 caracteres" }
-              })}
-              className={errors.direccion ? 'error' : ''}
-              placeholder="Escribe tu dirección"
-              onInput={(e) => {
-              let value = e.target.value;
-              if (value.length > 80) value = value.slice(0, 30);
-              e.target.value = value;
-              setValue("direccion", value);
-              }}
-           />
-
+                type="text"
+                maxLength={30}
+                {...register("direccion", {
+                  required: "Campo obligatorio",
+                  minLength: { value: 5, message: "Mínimo 5 caracteres" },
+                  maxLength: { value: 30, message: "Máximo 30 caracteres" }
+                })}
+                className={errors.direccion ? 'error' : ''}
+                placeholder="Escribe tu dirección"
+                onInput={(e) => {
+                  let value = e.target.value;
+                  if (value.length > 30) value = value.slice(0, 30);
+                  value = value.toUpperCase();
+                  e.target.value = value;
+                  setValue("direccion", value);
+                }}
+              />
               {errors.direccion && <span className="error-message">{errors.direccion.message}</span>}
             </div>
           </fieldset>
         )}
 
-        {step === 3 && (
-          <fieldset className="form-section">
-            <legend><Lock className="icon-legend" /> Seguridad</legend>
+          {step === 3 && (
+            <fieldset className="form-section">
+              <legend><Lock className="icon-legend" /> Seguridad</legend>
 
-            <div className="input-group">
-              <div className="label-container">
-                <Lock className="icon-small" />
-                <label>Contraseña *</label>
+              {/* Campo Contraseña */}
+              <div className="input-group">
+                <div className="label-container">
+                  <Lock className="icon-small" />
+                  <label>Contraseña *</label>
+                </div>
+                <div className="password-wrapper">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    maxLength={12}
+                    onInput={(e) => {
+                      if (e.target.value.length > 12) {
+                        e.target.value = e.target.value.slice(0, 12);
+                      }
+                    }}
+                    {...register("password", {
+                      required: "Campo obligatorio",
+                      minLength: { value: 6, message: "Mínimo 6 caracteres" },
+                      maxLength: { value: 12, message: "Máximo 12 caracteres" },
+                      validate: value => {
+                        const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/;
+                        return regex.test(value) || 
+                          "Debe contener mayúscula, minúscula, número y símbolo";
+                      }
+                    })}
+                    className={errors.password ? 'error' : ''}
+                    placeholder="Contraseña"
+                  />
+                  <button
+                    type="button"
+                    className="toggle-password"
+                    onClick={() => setShowPassword(!showPassword)}
+                    aria-label="Mostrar/Ocultar contraseña"
+                  >
+                    {showPassword ? <EyeOff /> : <Eye />}
+                  </button>
+                </div>
+                {errors.password && <span className="error-message">{errors.password.message}</span>}
               </div>
-              <input
-                type="password"
-                {...register("password", {
-                  required: "Campo obligatorio",
-                  minLength: { value: 8, message: "Mínimo 8 caracteres" },
-                  pattern: {
-                    value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
-                    message: "Debe incluir mayúscula, minúscula, número y símbolo"
-                  }
-                })}
-                className={errors.password ? 'error' : ''}
-                placeholder="Crea una contraseña segura"
-              />
-              {errors.password && <span className="error-message">{errors.password.message}</span>}
-            </div>
 
-            <div className="input-group">
-              <div className="label-container">
-                <Lock className="icon-small" />
-                <label>Confirmar Contraseña *</label>
+              {/* Campo Confirmar Contraseña */}
+              <div className="input-group">
+                <div className="label-container">
+                  <Lock className="icon-small" />
+                  <label>Confirmar Contraseña *</label>
+                </div>
+                <div className="password-wrapper">
+                  <input
+                    type={showConfirmPassword ? "text" : "password"}
+                    maxLength={12}
+                    onInput={(e) => {
+                      if (e.target.value.length > 12) {
+                        e.target.value = e.target.value.slice(0, 12);
+                      }
+                    }}
+                    {...register("confirmPassword", {
+                      required: "Campo obligatorio",
+                      validate: value => value === watch("password") || "Las contraseñas no coinciden"
+                    })}
+                    className={errors.confirmPassword ? 'error' : ''}
+                    placeholder="Confirmar contraseña"
+                  />
+                  <button
+                    type="button"
+                    className="toggle-password"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    aria-label="Mostrar/Ocultar contraseña"
+                  >
+                    {showConfirmPassword ? <EyeOff /> : <Eye />}
+                  </button>
+                </div>
+                {errors.confirmPassword && <span className="error-message">{errors.confirmPassword.message}</span>}
               </div>
-              <input
-                type="password"
-                {...register("confirmPassword", {
-                  required: "Campo obligatorio",
-                  validate: value => value === password || "Las contraseñas no coinciden"
-                })}
-                className={errors.confirmPassword ? 'error' : ''}
-                placeholder="Repite tu contraseña"
-              />
-              {errors.confirmPassword && <span className="error-message">{errors.confirmPassword.message}</span>}
-            </div>
 
-            <div className="terms-group">
-              <input
-                type="checkbox"
-                id="terms"
-                {...register("terms", {
-                  required: "Debes aceptar los términos y condiciones"
-                })}
-              />
-              <label htmlFor="terms">
-                Acepto los <Link to="/terminos">Términos y Condiciones</Link> y el{' '}
-                <Link to="/privacidad">Aviso de Privacidad</Link>
-              </label>
-              {errors.terms && <span className="error-message">{errors.terms.message}</span>}
-            </div>
-          </fieldset>
-        )}
+              {/* Checkbox términos */}
+              <div className="input-group checkbox-group">
+                <input
+                  type="checkbox"
+                  {...register("terms", { required: "Debes aceptar los términos" })}
+                  id="terms"
+                  className={errors.terms ? 'error' : ''}
+                />
+                <label htmlFor="terms">Acepto los términos y condiciones *</label>
+                {errors.terms && <span className="error-message">{errors.terms.message}</span>}
+              </div>
+            </fieldset>
+          )}
+
+
 
         <div className="form-navigation">
-          {step > 1 && (
-            <button type="button" onClick={prevStep} className="nav-btn prev-btn">
-              <ChevronLeft size={18} /> Anterior
-            </button>
-          )}
-          {step < 3 ? (
-            <button type="button" onClick={nextStep} className="nav-btn next-btn">
-              Siguiente <ChevronRight size={18} />
-            </button>
-          ) : (
-            <button type="submit" className="submit-btn">
-              Registrar Propietario
-            </button>
-          )}
+        {step > 1 && (
+          <button type="button" onClick={prevStep} className="nav-btn prev-btn">
+            <ChevronLeft size={18} /> Anterior
+          </button>
+        )}
+        {step < 3 ? (
+          <button type="button" onClick={nextStep} className="nav-btn next-btn">
+            Siguiente <ChevronRight size={18} />
+          </button>
+        ) : (
+          <button type="submit" className="submit-btn">
+            Registrar Propietario
+          </button>
+        )}
         </div>
 
-        <div className="login-link">
-          ¿Ya tienes cuenta? <Link to="/login">Inicia sesión</Link>
-        </div>
+        <p className="login-link">
+          ¿Ya tienes cuenta? <Link to="/UserLogin">Iniciar sesión</Link>
+        </p>
       </form>
     </div>
   );
 }
 
 export default RegistroPropietario;
+

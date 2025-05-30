@@ -174,7 +174,9 @@ function PanelServicios() {
               <button className="service-modal-close" onClick={closeModal}>
                 Cerrar
               </button>
-              <button className="service-modal-reserve">
+              <button className="service-modal-reserve"
+               onClick={() => window.location.href = "/Login"}
+              >
                 Reservar Cita
               </button>
             </div>

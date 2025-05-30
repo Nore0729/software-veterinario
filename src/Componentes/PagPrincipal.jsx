@@ -104,12 +104,12 @@ const PagPrincipal = () => {
               cuidado y atención personalizada para tu mascota.
             </p>
 
-            <div className="cta-buttons">
-              <Link to="/citas" className="btn btn-primary">
+            <div className="button-container">
+              <Link to="/citas" className="button button-filled">
                 Reservar cita ahora
               </Link>
-              <Link to="/servicios" className="btn btn-outline">
-                Nuestros servicios
+              <Link to="/servicios" className="button button-outline">
+                Conocer servicios
               </Link>
             </div>
 
@@ -418,21 +418,19 @@ const PagPrincipal = () => {
               <div className="testimonial-card">
                 <div className="testimonial-content">
                   <p className="testimonial-text">
-                    "Llevamos a nuestro conejo Tambor a Pet-Lovers desde hace años.
-                    Apreciamos mucho que tengan experiencia con mascotas
-                    exóticas y siempre nos den los mejores consejos para su
-                    cuidado."
+                    "Mi loro Kiwi siempre recibe una atención espectacular en Pet-Lovers.
+                    Me encanta cómo se toman el tiempo para entender sus necesidades especiales. ¡Altamente recomendados!"
                   </p>
                   <div className="testimonial-author">
                     <div className="author-info">
-                      <h4>Laura Martínez</h4>
-                      <p>Dueña de Tambor</p>
+                      <h4>David Guzman</h4>
+                      <p>Dueño de Kiwi</p>
                       
                     </div>
                     <div className="pet-image">
                       <img
-                        src="https://img.freepik.com/fotos-premium/conejo-curioso-blanco-negro_1002763-18.jpg?w=740"
-                        alt="Mascota 3"
+                        src="https://img.freepik.com/foto-gratis/loro-colorido-ramas-arbol_23-2147790036.jpg?w=740"
+                        alt="Mascota 4"
                       />
                     </div>
                   </div>
@@ -442,21 +440,20 @@ const PagPrincipal = () => {
               <div className="testimonial-card">
                 <div className="testimonial-content">
                   <p className="testimonial-text">
-                    "Llevamos a nuestro conejo Tambor a Pet-Lovers desde hace años.
-                    Apreciamos mucho que tengan experiencia con mascotas
-                    exóticas y siempre nos den los mejores consejos para su
-                    cuidado."
+                    "Desde que llevo a mi hurón Max a Pet-Lovers, 
+                    su salud ha mejorado notablemente. El equipo es muy profesional
+                    y tienen mucho amor por los animales.."
                   </p>
                   <div className="testimonial-author">
                     <div className="author-info">
-                      <h4>Laura Martínez</h4>
-                      <p>Dueña de Tambor</p>
+                      <h4>Felipe Nieves</h4>
+                      <p>Dueño de Max</p>
                       
                     </div>
                     <div className="pet-image">
                       <img
-                        src="https://img.freepik.com/fotos-premium/conejo-curioso-blanco-negro_1002763-18.jpg?w=740"
-                        alt="Mascota 3"
+                        src="https://img.freepik.com/foto-gratis/hermoso-huron-blanco-mirando-camara_23-2149219462.jpg?w=740"
+                        alt="Mascota 5"
                       />
                     </div>
                   </div>

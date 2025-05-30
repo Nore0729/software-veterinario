@@ -3,17 +3,26 @@ import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { PawPrint, User, AtSign, Lock, ChevronRight, ChevronLeft } from 'lucide-react';
-import axios from 'axios'; 
+import axios from 'axios';
 import '../Estilos_F/Mascotas.css';
 
 function RegistroMascota() {
   const [step, setStep] = useState(1);
   const [progress, setProgress] = useState(0);
-  const navigate = useNavigate(); 
+  const [razasDisponibles, setRazasDisponibles] = useState([]);
+  const navigate = useNavigate();
+
+  const razasPorEspecie = {
+    canino: ["Labrador Retriever", "Pastor Alemán", "Bulldog", "Beagle", "Poodle"],
+    felino: ["Siamés", "Persa", "Bengalí", "Maine Coon", "Esfinge"],
+    ave: ["Periquito", "Canario", "Cacatúa"],
+    roedor: ["Hámster", "Cobaya", "Ratón"],
+    reptil: ["Tortuga", "Iguana", "Serpiente"]
+  };
 
   const {
-    register, 
-    handleSubmit, 
+    register,
+    handleSubmit,
     formState: { errors },
     watch,
     trigger
@@ -24,6 +33,16 @@ function RegistroMascota() {
     2: ['color', 'fechaNacimiento', 'peso', 'tamano', 'estadoReproductivo'],
     3: ['vacunado', 'observaciones']
   };
+
+  const especieSeleccionada = watch("especie");
+
+  useEffect(() => {
+    if (especieSeleccionada && razasPorEspecie[especieSeleccionada.toLowerCase()]) {
+      setRazasDisponibles(razasPorEspecie[especieSeleccionada.toLowerCase()]);
+    } else {
+      setRazasDisponibles([]);
+    }
+  }, [especieSeleccionada]);
 
   useEffect(() => {
     let filledFields = 0;
@@ -36,7 +55,7 @@ function RegistroMascota() {
 
     const baseProgress = (step - 1) * 33;
     const stepProgress = (filledFields / requiredFields[step].length) * 33;
-    
+
     setProgress(Math.min(100, Math.round(baseProgress + stepProgress)));
   }, [watch(), step]);
 
@@ -48,21 +67,20 @@ function RegistroMascota() {
   const prevStep = () => setStep(step - 1);
 
   const onSubmit = async (data) => {
-    // Convertir vacunado a booleano
-    data.vacunado = data.vacunado === "Sí" ? true : false;
-
+    data.vacunado = data.vacunado === "Sí";
     try {
       const response = await axios.post('http://localhost:3000/api/registro-mascota', data);
-      if (response.status === 201) Swal.fire({
-        title: '<strong>Registro exitoso!</strong>',
-        html: `<i>La mascota <strong>${data.nombre}</strong> fue registrada</i>`,
-        icon: 'success',
-        timer: 3000,
-        didClose: () => {
-          navigate('/MascotasBienvenida');
-        }
-      });
-
+      if (response.status === 201) {
+        Swal.fire({
+          title: '<strong>Registro exitoso!</strong>',
+          html: `<i>La mascota <strong>${data.nombre}</strong> fue registrada</i>`,
+          icon: 'success',
+          timer: 3000,
+          didClose: () => {
+            navigate('/mascota/firulais');
+          }
+        });
+      }
     } catch (error) {
       Swal.fire({
         title: '<strong>Error!</strong>',
@@ -90,7 +108,7 @@ function RegistroMascota() {
         {step === 1 && (
           <fieldset className="form-section">
             <legend><User className="icon-legend" /> Información General</legend>
-            
+
             <div className="input-group">
               <div className="label-container">
                 <User className="icon-small" />
@@ -152,14 +170,17 @@ function RegistroMascota() {
                 <User className="icon-small" />
                 <label>Especie *</label>
               </div>
-              <input
-                type="text"
-                {...register("especie", {
-                  required: "Campo obligatorio",
-                })}
+              <select
+                {...register("especie", { required: "Campo obligatorio" })}
                 className={errors.especie ? 'error' : ''}
-                placeholder="Escribe la especie de la mascota"
-              />
+              >
+                <option value="">Seleccionar especie</option>
+                <option value="Canino">Canino</option>
+                <option value="Felino">Felino</option>
+                <option value="Ave">Ave</option>
+                <option value="Roedor">Roedor</option>
+                <option value="Reptil">Reptil</option>
+              </select>
               {errors.especie && (
                 <span className="error-message">{errors.especie.message}</span>
               )}
@@ -170,14 +191,17 @@ function RegistroMascota() {
                 <User className="icon-small" />
                 <label>Raza *</label>
               </div>
-              <input
-                type="text"
+              <select
                 {...register("raza", {
                   required: "Campo obligatorio",
                 })}
                 className={errors.raza ? 'error' : ''}
-                placeholder="Escribe la raza de la mascota"
-              />
+              >
+                <option value="">Seleccionar</option>
+                {razasDisponibles.map((raza, idx) => (
+                  <option key={idx} value={raza}>{raza}</option>
+                ))}
+              </select>
               {errors.raza && (
                 <span className="error-message">{errors.raza.message}</span>
               )}
@@ -294,7 +318,7 @@ function RegistroMascota() {
         {step === 3 && (
           <fieldset className="form-section">
             <legend><Lock className="icon-legend" /> Seguridad</legend>
-            
+
             <div className="input-group">
               <div className="label-container">
                 <Lock className="icon-small" />
@@ -332,12 +356,12 @@ function RegistroMascota() {
 
         <div className="form-navigation">
           {step > 1 && (
-            <button type="button" className="btn-prev" onClick={prevStep}>
+            <button type="button" className="nav-btn prev-btn" onClick={prevStep}>
               <ChevronLeft /> Anterior
             </button>
           )}
           {step < 3 && (
-            <button type="button" className="btn-next" onClick={nextStep}>
+            <button type="button" className="nav-btn next-btn" onClick={nextStep}>
               Siguiente <ChevronRight />
             </button>
           )}
@@ -348,16 +372,8 @@ function RegistroMascota() {
           )}
         </div>
       </form>
-
-      <footer className="form-footer">
-        <Link to="/MascotasBienvenida">Volver a Bienvenida</Link>
-      </footer>
     </div>
   );
 }
 
 export default RegistroMascota;
-
-
-
-
