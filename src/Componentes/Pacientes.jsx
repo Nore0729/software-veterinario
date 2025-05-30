@@ -23,7 +23,6 @@ const Pacientes = () => {
   const [showNotification, setShowNotification] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState('');
   const [notificationType, setNotificationType] = useState('success');
-  
   const [nuevoPaciente, setNuevoPaciente] = useState({
     nombre: "",
     especie: "Canino",

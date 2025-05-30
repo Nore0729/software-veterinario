@@ -12,11 +12,11 @@ import {
   faEnvelope
 } from '@fortawesome/free-solid-svg-icons'
 import { useNavigate } from "react-router-dom" 
+import React, { useState, useEffect } from 'react';
+
 
 function DashboardAdmin() {
    const navigate = useNavigate()
-
-
   const stats = {
     usuarios: 100,
     clientes: 58,
@@ -28,15 +28,24 @@ function DashboardAdmin() {
   }
 
   const handleNuevoUsuarioClick = () => {
-    navigate("/FormularioUsu") // Navigate to the registration form route
+    navigate("/FormularioUsu") 
   }
+  const [adminName, setAdminName] = useState('')
+
+  useEffect(() => {
+    // Recuperar el nombre del administrador desde localStorage
+    const nombre = localStorage.getItem('nombre');
+    if (nombre) {
+      setAdminName(nombre); // Establecer el nombre del admin en el estado
+    }
+  }, []);
 
   return (
     <AdminLayout>
       <div className="admin-dashboard">
         <header className="dashboard-header">
           <div>
-            <h1>Bienvenido, Administrador</h1>
+            <h1>Bienvenido, {adminName}</h1>
             <p>Aquí tienes un resumen de la actividad del sistema</p>
           </div>
           <div className="header-icons">

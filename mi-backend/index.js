@@ -308,11 +308,42 @@ app.listen(port, () => {
 
 
 
- 
-
 // ruta para iniciar sesion con los diferentes roles 
 
-// Ruta para iniciar sesión con verificación de roles
+const usuariosMock = [
+  {
+    id: 1,
+    nombre: 'Juan Pérez',
+    email: 'juan.perez@gmail.com',
+    password: '123456',  
+    rol: 'propietario',
+    documento: '12345678',
+    telefono: '1234567890',
+    direccion: 'Calle Falsa 123'
+  },
+  {
+    id: 2,
+    nombre: 'Ana Martínez',
+    email: 'ana.martinez@veterinaria.com',
+    password: 'Vet123@',
+    rol: 'veterinario',
+    documento: '87654321',
+    telefono: '0987654321',
+    especialidad: 'Cirugía'
+  },
+  {
+    id: 3,
+    nombre: 'Carlos Gómez',
+    email: 'carlos.gomez@admin.com',
+    password: 'Admin123@',
+    rol: 'administrador',
+    documento: '11122333',
+    telefono: '5554443322',
+    nivel_acceso: 'alto'
+  }
+];
+
+// Ruta para iniciar sesión con verificación de roles y datos quemados
 app.post('/api/login-rol', async (req, res) => {
   const { email, password } = req.body;
 
@@ -324,79 +355,36 @@ app.post('/api/login-rol', async (req, res) => {
   }
 
   try {
-    // 1. Buscar usuario en la tabla usuarios
-    const [users] = await db.promise().query(
-      'SELECT * FROM usuarios WHERE email = ?', 
-      [email]
-    );
+    // Buscar el usuario en los datos "quemados"
+    const user = usuariosMock.find(u => u.email === email);
 
-    if (users.length === 0) {
+    if (!user) {
       return res.status(401).json({ 
         success: false, 
         message: 'Credenciales incorrectas' 
       });
     }
 
-    const user = users[0];
-
-    // 2. Verificar contraseña (en tu caso parece que no está hasheada)
-    // NOTA: En producción deberías usar bcrypt.compare() con contraseñas hasheadas
-    const passwordIsValid = password === user.password;
-    // const passwordIsValid = await bcrypt.compare(password, user.password);
-
-    if (!passwordIsValid) {
+    // Verificar la contraseña (sin hash en este caso)
+    if (user.password !== password) {
       return res.status(401).json({ 
         success: false, 
         message: 'Credenciales incorrectas' 
       });
     }
 
-    // 3. Determinar el rol del usuario
-    let rol = '';
+    // Preparar los datos adicionales según el rol
     let datosAdicionales = {};
 
-    // Verificar si es propietario (id_prop = 1 según tus datos)
-    if (user.id === 1) {
-      const [propietarios] = await db.promise().query(
-        'SELECT * FROM propietarios WHERE id_prop = ?', 
-        [user.id]
-      );
-      if (propietarios.length > 0) {
-        rol = 'propietario';
-        datosAdicionales = { direccion: propietarios[0].direccion };
-      }
-    }
-    // Verificar si es veterinario (vet_id = 2 según tus datos)
-    else if (user.id === 2) {
-      const [veterinarios] = await db.promise().query(
-        'SELECT * FROM veterinarios WHERE vet_id = ?', 
-        [user.id]
-      );
-      if (veterinarios.length > 0) {
-        rol = 'veterinario';
-        datosAdicionales = { especialidad: veterinarios[0].especialidad };
-      }
-    }
-    // Verificar si es administrador (admin_id = 3 según tus datos)
-    else if (user.id === 3) {
-      const [administradores] = await db.promise().query(
-        'SELECT * FROM administradores WHERE admin_id = ?', 
-        [user.id]
-      );
-      if (administradores.length > 0) {
-        rol = 'administrador';
-        datosAdicionales = { nivel_acceso: administradores[0].nivel_acceso };
-      }
+    if (user.rol === 'propietario') {
+      datosAdicionales = { direccion: user.direccion };
+    } else if (user.rol === 'veterinario') {
+      datosAdicionales = { especialidad: user.especialidad };
+    } else if (user.rol === 'administrador') {
+      datosAdicionales = { nivel_acceso: user.nivel_acceso };
     }
 
-    if (!rol) {
-      return res.status(403).json({ 
-        success: false, 
-        message: 'Usuario sin rol asignado' 
-      });
-    }
-
-    // 4. Respuesta exitosa
+    // Respuesta exitosa con rol y datos adicionales
     res.json({
       success: true,
       message: 'Inicio de sesión exitoso',
@@ -406,7 +394,7 @@ app.post('/api/login-rol', async (req, res) => {
         email: user.email,
         documento: user.documento,
         telefono: user.telefono,
-        rol: rol,
+        rol: user.rol,
         ...datosAdicionales
       }
     });

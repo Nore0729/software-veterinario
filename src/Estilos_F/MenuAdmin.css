@@ -1,4 +1,10 @@
 
+.logo-petlovers img {
+  width: 120px;  /* Ajusta el tamaño según sea necesario */
+  height: auto;  /* Mantiene la proporción original */
+}
+
+
 .admin-logo-container {
   display: flex;
   align-items: center;

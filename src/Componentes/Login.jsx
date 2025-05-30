@@ -42,8 +42,42 @@ export const Login = () => {
       return;
     }
 
+    // Datos "quemados" (mock) de usuarios con roles
+    const usuariosMock = [
+      {
+        id: 1,
+        nombre: 'Juan Pérez',
+        email: 'juan.perez@gmail.com',
+        password: 'Cliente2025@', // Contraseña en texto plano (esto sería con hash en producción)
+        rol: 'propietario',
+        documento: '12345678',
+        telefono: '1234567890',
+        direccion: 'Calle Falsa 123'
+      },
+      {
+        id: 2,
+        nombre: 'Ana Martínez',
+        email: 'ana.martinez@veterinaria.com',
+        password: 'Vet2025@',
+        rol: 'veterinario',
+        documento: '87654321',
+        telefono: '0987654321',
+        especialidad: 'Cirugía'
+      },
+      {
+        id: 3,
+        nombre: 'Carlos Gómez',
+        email: 'yenifergb07@gmail.com',
+        password: 'YENIfer2021@',
+        rol: 'administrador',
+        documento: '11122333',
+        telefono: '5554443322',
+        nivel_acceso: 'alto'
+      }
+    ];
+
     try {
-      // Primer intento: login básico
+      // Intenta hacer login con la autenticación básica
       const response = await axios.post('http://localhost:3000/api/login', {
         email,
         password,
@@ -61,21 +95,27 @@ export const Login = () => {
       console.error('Error en login básico:', err);
 
       try {
-        // Segundo intento: login con rol
-        const roleResponse = await axios.post('http://localhost:3000/api/login-rol', {
-          email,
-          password,
-        });
+        // Buscar el usuario en los datos mock
+        const user = usuariosMock.find(
+          (usuario) => usuario.email === email && usuario.password === password
+        );
 
-        const { user } = roleResponse.data;
+        if (!user) {
+          setErrorGeneral('Credenciales incorrectas');
+          setFailedAttempts((prev) => prev + 1);
+          return;
+        }
+
+        // Si encontramos al usuario, lo almacenamos en localStorage
         localStorage.setItem('userData', JSON.stringify(user));
 
+        // Dependiendo del rol, redirigimos a una página específica
         switch (user.rol) {
           case 'propietario':
             navigate('/UserWelcome');
             break;
           case 'veterinario':
-            navigate('/veterinario/dashboard');
+            navigate('/VeterinarioPer');
             break;
           case 'administrador':
             navigate('/InicioAdmin');
@@ -89,8 +129,8 @@ export const Login = () => {
         setErrorGeneral('');
         setFailedAttempts(0);
       } catch (err) {
-        console.error('Error en login con rol:', err);
-
+        console.error('Error en login con rol (mock):', err);
+        setErrorGeneral('Error al autenticar el rol');
         const newFailedAttempts = failedAttempts + 1;
         setFailedAttempts(newFailedAttempts);
 
@@ -99,8 +139,7 @@ export const Login = () => {
           navigate('/Recuperarcontraseña');
         } else {
           setErrorGeneral(
-            err.response?.data?.message ||
-              'Contraseña incorrecta. Intentos restantes: ' + (3 - newFailedAttempts)
+            'Contraseña incorrecta. Intentos restantes: ' + (3 - newFailedAttempts)
           );
         }
       }
@@ -167,5 +206,3 @@ export const Login = () => {
 };
 
 export default Login;
-
-

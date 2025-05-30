@@ -1,12 +1,13 @@
-
 import "../Estilos_F/MenuAdmin.css"
 import { useState } from "react"
-import { Outlet } from "react-router-dom"
+import { Outlet, useNavigate } from "react-router-dom"
 import { Users, Stethoscope, ShieldCheck, LogOut, ChevronDown } from "lucide-react"
 
 function Administrador() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [dropdownOpen, setDropdownOpen] = useState(false)
+  const [adminName, setAdminName] = useState('')
+  const navigate = useNavigate() // Agregar el hook de navigate para redirigir
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen)
@@ -20,6 +21,15 @@ function Administrador() {
     setDropdownOpen(false)
   }
 
+  // Función para manejar el cierre de sesión
+  const handleLogout = () => {
+    // Limpiar el localStorage (o sessionStorage si es necesario)
+    localStorage.clear(); // Elimina todos los datos almacenados en localStorage
+
+    // Redirigir al usuario a la página de login
+    navigate("/login"); // O la ruta correspondiente a tu login
+  }
+
   const defaultContent = (
     <div className="admin-header-actions">
       <h1 className="admin-heading">Bienvenido al Panel de Administración</h1>
@@ -30,32 +40,26 @@ function Administrador() {
     <div className="admin-container">
       <header className="admin-header">
         <div className="admin-header-content">
-          <div className="admin-logo-container">
-            <div className="admin-title">Pet Lovers</div>
+          <div className="logo-petlovers">
+            <img src="https://raw.githubusercontent.com/Nore0729/Img-soft-veterinario/refs/heads/main/GuzPet.png" alt="logo-petlovers" />
           </div>
           <div className="admin-user-section">
             <div className="admin-avatar-wrapper">
-              <img src="/placeholder.svg?height=32&width=32" alt="avatar" className="admin-avatar" />
-              <div className="admin-user-info">
-                <span className="admin-doctor-name">Dr. Rodríguez</span>
-              </div>
+              <span>perfil</span>
             </div>
-              <div className="Cerrar-sesion">
-                <button>
-                  <LogOut className="nav-icon" size={18} />
-                  <span>Cerrar Sesión</span>
-                </button>
-              </div>
+            <div className="Cerrar-sesion">
+              <button onClick={handleLogout}> {/* Agregar la función al botón */}
+                <LogOut className="nav-icon" size={18} />
+                <span>Cerrar Sesión</span>
+              </button>
+            </div>
           </div>
         </div>
       </header>
 
       <nav className={`admin-sidebar ${sidebarOpen ? "open" : ""}`}>
-        <div className="sidebar-header">
-          <h1>Menú</h1>
-        </div>
         <ul>
-           <li>
+          <li>
             <a href="/InicioAdmin">
               <Stethoscope className="nav-icon" size={18} />
               <span>Inicio</span>
@@ -99,14 +103,9 @@ function Administrador() {
               <span>Servicios</span>
             </a>
           </li>
-          <li>
-            <a href="/Veterinarios">
-              <Stethoscope className="nav-icon" size={18} />
-              <span>Citas</span>
-            </a>
-          </li>
         </ul>
       </nav>
+
       <main className="admin-main">
         <Outlet />
       </main>
@@ -116,4 +115,5 @@ function Administrador() {
   )
 }
 
-export default Administrador; 
+export default Administrador;
+
