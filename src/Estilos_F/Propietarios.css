@@ -264,6 +264,60 @@
 .login-link a:hover {
   text-decoration: underline;
 }
+/* Contenedor del input con el icono de ojo */
+.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* Estilo del input de contraseña */
+.password-wrapper input {
+  width: 100%;
+  padding-right: 2.5rem; /* espacio para el botón */
+  font-size: 1rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+/* Botón para mostrar/ocultar contraseña */
+.toggle-password {
+  position: absolute;
+  right: 0.5rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+  font-size: 1.2rem;
+  transition: color 0.3s ease;
+}
+
+/* Cambia color al pasar el mouse */
+.toggle-password:hover {
+  color: #333;
+}
+
+/* Opcional: cambia color si el input tiene error */
+input.error {
+  border-color: #e74c3c;
+}
+
+/* Mensajes de error */
+.error-message {
+  color: #e74c3c;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+/* Para que el icono no afecte al tabulado del teclado */
+.toggle-password:focus {
+  outline: none;
+}
 
 /* Responsive */
 @media (max-width: 768px) {
