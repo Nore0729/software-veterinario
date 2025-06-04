@@ -1,110 +1,154 @@
--- Crear base de datos
-CREATE DATABASE IF NOT EXISTS veterinaria;
+CREATE DATABASE  veterinaria;
 USE veterinaria;
 
--- Tabla de propietarios (ya existente, mejorada)
-CREATE TABLE IF NOT EXISTS propietarios (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  tipoDocumento VARCHAR(10) NOT NULL,
-  documento VARCHAR(15) NOT NULL UNIQUE,
-  nombre VARCHAR(100) NOT NULL,
-  fechaNacimiento DATE,
-  telefono VARCHAR(15),
-  email VARCHAR(100) NOT NULL UNIQUE,
-  direccion VARCHAR(255),
-  password VARCHAR(255) NOT NULL,
-  fechaRegistro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+
+CREATE TABLE usuarios (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+   tipo_Doc VARCHAR(10) NOT NULL,
+   doc VARCHAR(15) NOT NULL UNIQUE,
+   nombre VARCHAR(100) NOT NULL,
+   fecha_Nac DATE,
+   tel VARCHAR(15),
+   email VARCHAR(100) NOT NULL UNIQUE,
+   direccion VARCHAR(255),
+   password VARCHAR(255) NOT NULL,
+   fecha_Regis TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+ select*from usuarios; 
+
+CREATE TABLE propietarios (
+    id_prop INT PRIMARY KEY,
+    FOREIGN KEY (id_prop) REFERENCES usuarios(id) ON DELETE CASCADE
 );
 
--- Tabla de mascotas (ya existente, mejorada)
-CREATE TABLE IF NOT EXISTS mascotas (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  documento VARCHAR(15) NOT NULL,
-  nombre VARCHAR(100) NOT NULL,
-  especie VARCHAR(50),
-  raza VARCHAR(50),
-  genero VARCHAR(10),
-  color VARCHAR(30),
-  fechaNacimiento DATE,
-  peso DECIMAL(5,2),
-  tamano VARCHAR(20),
-  estadoReproductivo VARCHAR(30),
-  vacunado BOOLEAN DEFAULT FALSE,
-  observaciones TEXT,
-  fechaRegistro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (documento) REFERENCES propietarios(documento)
+SELECT 
+    u.id,
+    u.tipo_Doc,
+    u.doc,
+    u.nombre,
+    u.fecha_Nac,
+    u.tel,
+    u.email,
+    u.direccion,
+    u.fecha_Regis
+FROM propietarios p
+INNER JOIN usuarios u ON p.id_prop = u.id;
+
+select * from propietarios; 
+
+
+CREATE TABLE veterinarios (
+    vet_id INT PRIMARY KEY,
+    especialidad VARCHAR(50) NOT NULL,
+    FOREIGN KEY (vet_id) REFERENCES usuarios(id) ON DELETE CASCADE
 );
 
--- Nueva tabla para citas
-CREATE TABLE IF NOT EXISTS citas (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  propietario_id INT NOT NULL,
-  mascota_id INT NOT NULL,
-  fecha DATE NOT NULL,
-  hora TIME NOT NULL,
-  motivo TEXT NOT NULL,
-  estado ENUM('programada', 'completada', 'cancelada') DEFAULT 'programada',
-  observaciones TEXT,
-  fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  fecha_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  FOREIGN KEY (propietario_id) REFERENCES propietarios(id),
-  FOREIGN KEY (mascota_id) REFERENCES mascotas(id)
+
+CREATE TABLE administradores (
+    admin_id INT PRIMARY KEY,
+    nivel_acceso ENUM('basico', 'medio', 'alto') DEFAULT 'medio',
+    FOREIGN KEY (admin_id) REFERENCES usuarios(id) ON DELETE CASCADE
 );
 
--- Nueva tabla para consultas médicas
-CREATE TABLE IF NOT EXISTS consultas (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  propietario_id INT NOT NULL,
-  mascota_id INT NOT NULL,
-  fecha DATETIME NOT NULL,
-  diagnostico TEXT NOT NULL,
-  tratamiento TEXT,
-  observaciones TEXT,
-  peso_actual DECIMAL(5,2),
-  temperatura DECIMAL(4,1),
-  fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (propietario_id) REFERENCES propietarios(id),
-  FOREIGN KEY (mascota_id) REFERENCES mascotas(id)
+
+CREATE TABLE roles (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nom_rol VARCHAR(50) NOT NULL UNIQUE,
+    descripcion VARCHAR(255)
 );
 
--- Tabla para usuarios del sistema (veterinarios, administradores)
-CREATE TABLE IF NOT EXISTS usuarios (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  tipoDoc VARCHAR(10) NOT NULL,
-  numDoc VARCHAR(15) NOT NULL UNIQUE,
-  nombre VARCHAR(100) NOT NULL,
-  apellido VARCHAR(100) NOT NULL,
-  email VARCHAR(100) NOT NULL UNIQUE,
-  telefono VARCHAR(15),
-  password VARCHAR(255) NOT NULL,
-  rol ENUM('veterinario', 'administrador', 'asistente') DEFAULT 'veterinario',
-  activo BOOLEAN DEFAULT TRUE,
-  fechaRegistro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+CREATE TABLE asignacion_roles (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    usu_id INT NOT NULL,
+    rol_id INT NOT NULL,
+    asignado_por INT COMMENT 'ID del admin que asignó el rol',
+    fecha_asignacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (usu_id) REFERENCES usuarios(id),
+    FOREIGN KEY (rol_id) REFERENCES roles(id),
+    FOREIGN KEY (asignado_por) REFERENCES usuarios(id),
+    UNIQUE (usu_id, rol_id)
 );
 
--- Insertar datos de ejemplo
-INSERT INTO propietarios (tipoDocumento, documento, nombre, fechaNacimiento, telefono, email, direccion, password) VALUES
-('C.C', '12345678', 'Juan Pérez', '1985-03-15', '3001234567', 'juan.perez@email.com', 'Calle 123 #45-67', '$2b$10$example'),
-('C.C', '87654321', 'María García', '1990-07-22', '3009876543', 'maria.garcia@email.com', 'Carrera 89 #12-34', '$2b$10$example'),
-('C.C', '11223344', 'Carlos Ramírez', '1982-11-05', '3209876543', 'carlos.ramirez@email.com', 'Carrera 10 #20-30', '$2b$10$example');
 
-INSERT INTO mascotas (documento, nombre, especie, raza, genero, color, fechaNacimiento, peso, tamano, estadoReproductivo, vacunado, observaciones) VALUES
-('12345678', 'Max', 'Perro', 'Golden Retriever', 'Macho', 'Dorado', '2020-05-10', 25.5, 'Grande', 'Entero', TRUE, 'Muy activo y juguetón'),
-('12345678', 'Luna', 'Gato', 'Siamés', 'Hembra', 'Crema', '2021-02-14', 4.2, 'Mediano', 'Esterilizada', TRUE, 'Tranquila y cariñosa'),
-('87654321', 'Rocky', 'Perro', 'Bulldog', 'Macho', 'Blanco', '2019-08-30', 18.0, 'Mediano', 'Castrado', TRUE, 'Problemas respiratorios leves'),
-('11223344', 'Lazi', 'Perro', 'Pincher', 'Hembra', 'Blanca', '2022-01-15', 4.0, 'Pequeño', 'Castrada', TRUE, 'Muy energética');
 
-INSERT INTO usuarios (tipoDoc, numDoc, nombre, apellido, email, telefono, password, rol) VALUES
-('C.C', '98765432', 'Dr. Ana', 'Veterinaria', 'ana.vet@petlovers.com', '3001112233', '$2b$10$example', 'veterinario'),
-('C.C', '11111111', 'Admin', 'Sistema', 'admin@petlovers.com', '3004445566', '$2b$10$example', 'administrador');
+CREATE TABLE mascotas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    doc_pro INT NOT NULL,
+    nombre VARCHAR(50) NOT NULL,
+    especie VARCHAR(50) NOT NULL,
+    raza VARCHAR(50) NOT NULL,
+    genero ENUM('Macho', 'Hembra') NOT NULL,
+    color VARCHAR(30),
+    fecha_nac DATE NOT NULL,
+    peso DECIMAL(5,2) COMMENT 'Peso en kg',
+    tamano ENUM('Pequeño', 'Mediano', 'Grande') NOT NULL,
+    estado_reproductivo ENUM('Intacto', 'Esterilizado', 'Castrado') NOT NULL,
+    vacunado BOOLEAN DEFAULT FALSE,
+    observaciones TEXT,
+    fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (doc_pro) REFERENCES propietarios(id_prop) ON DELETE CASCADE
+);
 
--- Insertar algunas citas de ejemplo
-INSERT INTO citas (propietario_id, mascota_id, fecha, hora, motivo, estado) VALUES
-(1, 1, '2024-01-15', '09:00:00', 'Consulta de rutina y vacunación', 'programada'),
-(1, 2, '2024-01-15', '10:30:00', 'Control post-esterilización', 'programada'),
-(2, 3, '2024-01-16', '14:00:00', 'Revisión problemas respiratorios', 'programada');
 
--- Insertar algunas consultas de ejemplo
-INSERT INTO consultas (propietario_id, mascota_id, fecha, diagnostico, tratamiento, observaciones, peso_actual) VALUES
-(1, 1, '2024-01-10 09:30:00', 'Estado de salud excelente', 'Continuar con dieta actual y ejercicio regular', 'Mascota muy activa, sin problemas detectados', 25.5),
-(2, 3, '2024-01-08 15:00:00', 'Dificultad respiratoria leve', 'Medicamento broncodilatador, evitar ejercicio intenso', 'Mejoría notable desde última consulta', 18.2);
+CREATE TABLE servicios (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    descripcion TEXT,
+    precio DECIMAL(10,2) NOT NULL,
+    duracion_estimada INT COMMENT 'Duración en minutos',
+    estado ENUM('Activo', 'Inactivo') DEFAULT 'Activo'
+);
+
+
+CREATE TABLE citas ( 
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    mascota_id INT NOT NULL,
+    vet_id INT NOT NULL,  
+    servicio_id INT,
+    fecha_hora DATETIME NOT NULL,
+    motivo VARCHAR(255) NOT NULL,
+    estado ENUM('Programada', 'Confirmada', 'Completada', 'Cancelada') DEFAULT 'Programada',
+    notas TEXT,
+    fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (mascota_id) REFERENCES mascotas(id) ON DELETE CASCADE,
+    FOREIGN KEY (vet_id) REFERENCES veterinarios(vet_id) ON DELETE CASCADE,  
+    FOREIGN KEY (servicio_id) REFERENCES servicios(id) ON DELETE SET NULL,
+    INDEX idx_fecha_hora (fecha_hora),
+    INDEX idx_estado (estado)
+);
+
+
+CREATE TABLE servicios_realizados (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    mascota_id INT NOT NULL,
+    servicio_id INT NOT NULL,
+    vet_id INT NOT NULL,  -- Columna declarada como vet_id
+    fecha_hora DATETIME NOT NULL,
+    notas TEXT,
+    FOREIGN KEY (mascota_id) REFERENCES mascotas(id) ON DELETE CASCADE,
+    FOREIGN KEY (servicio_id) REFERENCES servicios(id) ON DELETE CASCADE,
+    FOREIGN KEY (vet_id) REFERENCES veterinarios(vet_id) ON DELETE CASCADE,  
+    INDEX idx_fecha_hora (fecha_hora)
+);
+
+
+CREATE TABLE historias_clinicas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    mascota_id INT NOT NULL,
+    cita_id INT,
+    vet_id INT NOT NULL,  -- Columna declarada como vet_id
+    fecha_consulta DATETIME NOT NULL,
+    motivo_consulta TEXT NOT NULL,
+    examen_fisico TEXT,
+    diagnostico TEXT,
+    tratamiento TEXT,
+    medicamentos TEXT,
+    observaciones TEXT,
+    recomendaciones TEXT,
+    fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (mascota_id) REFERENCES mascotas(id) ON DELETE CASCADE,
+    FOREIGN KEY (cita_id) REFERENCES citas(id) ON DELETE SET NULL,
+    FOREIGN KEY (vet_id) REFERENCES veterinarios(vet_id) ON DELETE CASCADE, 
+    INDEX idx_mascota (mascota_id),
+    INDEX idx_fecha_consulta (fecha_consulta)
+);

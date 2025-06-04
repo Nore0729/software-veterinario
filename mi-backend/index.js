@@ -31,32 +31,44 @@ db.connect((err) => {
 
 // Ruta para registrar propietarios
 app.post('/api/registro-propietario', async (req, res) => {
-  const { tipoDocumento, documento, nombre, fechaNacimiento, telefono, email, direccion, password } = req.body;
+  const { tipo_Doc, doc, nombre, fecha_Nac, tel, email, direccion, password } = req.body;
 
-  if (!tipoDocumento || !documento || !nombre || !fechaNacimiento || !telefono || !email || !direccion || !password) {
-    return res.status(400).send('Todos los campos son obligatorios');
+  if (!tipo_Doc || !doc || !nombre || !fecha_Nac || !tel || !email || !direccion || !password) {
+    return res.status(400).json({ message: "Todos los campos son obligatorios" });
   }
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
-    const query = `
-      INSERT INTO propietarios 
-      (tipoDocumento, documento, nombre, fechaNacimiento, telefono, email, direccion, password) 
+
+    const queryUsuario = `
+      INSERT INTO usuarios
+      (tipo_Doc, doc, nombre, fecha_Nac, tel, email, direccion, password) 
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
 
-    db.query(query, [tipoDocumento, documento, nombre, fechaNacimiento, telefono, email, direccion, hashedPassword], (err, results) => {
+    db.query(queryUsuario, [tipo_Doc, doc, nombre, fecha_Nac, tel, email, direccion, hashedPassword], (err, results) => {
       if (err) {
-        console.error('Error al insertar los datos:', err);
-        return res.status(500).send('Hubo un problema al registrar al propietario');
+        console.error("Error al insertar en usuarios:", err);
+        return res.status(500).json({ message: "Hubo un problema al registrar el usuario" });
       }
-      res.status(201).send('Propietario registrado exitosamente');
-    });
 
+      const usuarioId = results.insertId;
+
+      const queryPropietario = `INSERT INTO propietarios (id_prop) VALUES (?)`;
+      db.query(queryPropietario, [usuarioId], (err2) => {
+        if (err2) {
+          console.error("Error al insertar en propietarios:", err2);
+          return res.status(500).json({ message: "Usuario creado pero hubo un problema al asignar como propietario" });
+        }
+
+        res.status(201).json({ message: "Propietario registrado exitosamente" });
+      });
+    });
   } catch (error) {
     console.error('Error al encriptar la contraseña:', error);
-    return res.status(500).send('Error del servidor');
+    return res.status(500).json({ message: 'Error del servidor' });
   }
 });
+
 
 // Ruta para iniciar sesión
 app.post('/api/login', (req, res) => {
@@ -93,6 +105,7 @@ app.post('/api/login', (req, res) => {
     }
   });
 });
+
 
 // registro de la mascota 
 app.post('/api/registro-mascota', (req, res) => {
