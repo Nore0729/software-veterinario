@@ -1,8 +1,8 @@
 import { useState } from "react";
-import AdminLayout from "../Componentes/AdminLayout";
+import AdminLayout from "../Administrador/AdminLayout";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faEdit, faTrash, faToggleOn, faToggleOff, faCheck, faTimes } from "@fortawesome/free-solid-svg-icons";
-import "../Estilos_F/Roles.css";
+import "../../Estilos_F/Administrador/Roles.css";
 import { Users, PawPrint, Stethoscope, ShieldCheck, LogOut } from 'lucide-react';
 
 function Roles() {

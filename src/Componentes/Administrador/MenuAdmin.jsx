@@ -1,4 +1,4 @@
-import "../Estilos_F/MenuAdmin.css"
+import "../../Estilos_F/Administrador/MenuAdmin.css"
 import { useState } from "react"
 import { Outlet, useNavigate } from "react-router-dom"
 import { Users, Stethoscope, ShieldCheck, LogOut, ChevronDown } from "lucide-react"

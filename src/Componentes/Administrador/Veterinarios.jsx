@@ -1,8 +1,8 @@
-import AdminLayout from "../Componentes/AdminLayout";
+import AdminLayout from "../Administrador/AdminLayout";
 import { useState, useEffect } from "react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faPlus, faEdit, faTrash, faSearch, faCheck, faTimes } from "@fortawesome/free-solid-svg-icons"
-import "../Estilos_F/Veterinarios.css"
+import "../../Estilos_F/Administrador/Veterinarios.css"
 
 function Veterinarios() {
   const [veterinarios, setVeterinarios] = useState([])

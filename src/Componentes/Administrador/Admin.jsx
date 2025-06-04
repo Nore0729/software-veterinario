@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faPlus, faEdit, faTrash, faSearch, faCheck, faTimes } from "@fortawesome/free-solid-svg-icons"
-import "../Estilos_F/Administrador.css" 
-import AdminLayout from "../Componentes/AdminLayout";
+import "../../Estilos_F/Administrador/Administrador.css"
+import AdminLayout from "../Administrador/AdminLayout"
 
 function Administradores() {
   const [administradores, setAdministradores] = useState([])

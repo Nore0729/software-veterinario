@@ -1,9 +1,9 @@
-import AdminLayout from "../Componentes/AdminLayout"
+import AdminLayout from "../Administrador/AdminLayout"
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faSave, faTimes, faCalendarAlt, faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons"
-import "../Estilos_F/FormUsu.css"
+import "../../Estilos_F/Administrador/FormUsu.css"
 
 export default function RegistroUsu() {
   const navigate = useNavigate()
