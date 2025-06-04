@@ -30,6 +30,8 @@ import UserLayout from "./Componentes/UserLayout"; // Añadir esta importación
 import Actualizarpro from "./Componentes/Actualizarpro"; // Añadir esta importación
 import AyudaU from "./Componentes/AyudaU"; // Añadir esta importación
 import CookieConsent from "./Componentes/CookieConsent"; // Añadir esta importación
+import VetMascotas from "./Componentes/VetMascotas";
+import ConsultasVet from "./Componentes/ConsultasVet";
 
 function App() {
   return (
@@ -53,6 +55,8 @@ function App() {
           <Route path="/HistorialMedico" element={<HistorialMedico />} /> 
           <Route path="/Veterinarios" element={<Veterinarios />} />
           <Route path="/AyudaU" element={<AyudaU />} />
+          <Route path="/VetMascotas" element={<VetMascotas />} />
+          <Route path="/ConsultasVet" element={<ConsultasVet/>} />
         </Route>
 
         {/* Rutas protegidas (admin o similares) */}

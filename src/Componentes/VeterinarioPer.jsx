@@ -110,13 +110,17 @@ const Veterinarios = () => {
       transition: { duration: 0.6, delay: 0.3 },
     },
   }
-
+    //----------------------------------------------------------------------------
+    //----------------------------------------------------------------------------
+    //-----------------------------RUTAS-----------------------------------------
+    //----------------------------------------------------------------------------
+    //----------------------------------------------------------------------------
   const menuItems = [
     { icon: Home, text: "Inicio", to: "/InicioVeterinario", description: "Panel principal del sistema" },
     { icon: CalendarPlus, text: "Citas", to: "/citas", description: "Gestiona citas médicas" },
-    { icon: Stethoscope, text: "Consultas", to: "/consultas", description: "Historial de consultas" },
+    { icon: Stethoscope, text: "Consultas", to: "/ConsultasVet", description: "Historial de consultas" },
     { icon: Users2, text: "Usuarios", to: "/usuarios", description: "Administrar usuarios" },
-    { icon: Dog, text: "Mascotas", to: "/mascotas", description: "Registro de mascotas" },
+    { icon: Dog, text: "Mascotas", to: "/VetMascotas", description: "Registro de mascotas" },
   ]
 
   return (
