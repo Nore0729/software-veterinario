@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { PlusCircle, Edit, Trash2, Search, X } from "lucide-react";
-import "../Estilos_F/ServiciosAdmin.css"
-import AdminLayout from "../Componentes/AdminLayout";
+import "../../Estilos_F/Administrador/ServiciosAdmin.css"
+import AdminLayout from "../Administrador/AdminLayout";
 
 function ServiciosAdmin() {
   // Estado para los servicios

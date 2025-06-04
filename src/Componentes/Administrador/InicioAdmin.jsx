@@ -1,5 +1,5 @@
-import AdminLayout from "./AdminLayout"
-import "../Estilos_F/InicioAdmin.css"
+import AdminLayout from "../Administrador/AdminLayout"
+import "../../Estilos_F/Administrador/InicioAdmin.css"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { 
   faUserPlus,

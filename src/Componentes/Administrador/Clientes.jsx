@@ -1,5 +1,5 @@
-import "../Estilos_F/ClienteAdmin.css"
-import AdminLayout from "./AdminLayout"
+import "../../Estilos_F/Administrador/ClienteAdmin.css"
+import AdminLayout from "../Administrador/AdminLayout"
 import { User, AtSign, Phone, Calendar, MapPin, FileText, Edit, Trash2, ToggleLeft, ToggleRight, Search, Plus } from "lucide-react"
 import { useState } from "react"
 

@@ -1,5 +1,3 @@
-"use client"
-
 import { useState, useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { Link, useNavigate } from "react-router-dom"
@@ -15,7 +13,6 @@ function RegistroPropietario() {
   const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-
   // Estados para la dirección estructurada
   const [tipoVia, setTipoVia] = useState("")
   const [numeroVia, setNumeroVia] = useState("")
@@ -40,8 +37,8 @@ function RegistroPropietario() {
   const formValues = watch()
 
   const requiredFields = {
-    1: ["tipoDocumento", "documento", "nombre", "fechaNacimiento"],
-    2: ["telefono", "email", "direccion"],
+    1: ["tipo_Doc", "doc", "nombre", "fecha_Nac"],
+    2: ["tel", "email", "direccion"],
     3: ["password", "confirmPassword", "terms"],
   }
 
@@ -147,8 +144,18 @@ function RegistroPropietario() {
   const prevStep = () => setStep(step - 1)
 
   const onSubmit = async (data) => {
+    const requestData = {
+      tipo_Doc: data.tipo_Doc,
+      doc: data.doc,
+      nombre: data.nombre,
+      fecha_Nac: data.fecha_Nac,
+      tel: data.tel,
+      email: data.email,
+      direccion: data.direccion,
+      password: data.password
+    };
     try {
-      const response = await axios.post("http://localhost:3000/api/registro-propietario", data)
+      const response = await axios.post("http://localhost:3000/api/registro-propietario", requestData)
       if (response.status === 201)
         Swal.fire({
           title: "<strong>Registro exitoso!</strong>",
@@ -199,14 +206,14 @@ function RegistroPropietario() {
                 <label>Tipo de Documento *</label>
               </div>
               <select
-                {...register("tipoDocumento", { required: "Campo obligatorio" })}
-                className={errors.tipoDocumento ? "error" : ""}
+                {...register("tipo_Doc", { required: "Campo obligatorio" })}
+                className={errors.tipo_Doc ? "error" : ""}
               >
                 <option value="">Seleccionar</option>
                 <option value="CC">Cédula</option>
                 <option value="CE">Cédula Extranjería</option>
               </select>
-              {errors.tipoDocumento && <span className="error-message">{errors.tipoDocumento.message}</span>}
+              {errors.tipo_Doc&& <span className="error-message">{errors.tipo_Doc.message}</span>}
             </div>
 
             <div className="input-group">
@@ -220,7 +227,7 @@ function RegistroPropietario() {
                 onInput={(e) => {
                   e.target.value = e.target.value.replace(/\D/g, "").slice(0, 12)
                 }}
-                {...register("documento", {
+                {...register("doc", {
                   required: "Campo obligatorio",
                   minLength: { value: 6, message: "Mínimo 6 caracteres" },
                   maxLength: { value: 12, message: "Máximo 12 caracteres" },
@@ -229,10 +236,10 @@ function RegistroPropietario() {
                     message: "Solo números permitidos",
                   },
                 })}
-                className={errors.documento ? "error" : ""}
+                className={errors.doc ? "error" : ""}
                 placeholder="Escribe tu número de documento"
               />
-              {errors.documento && <span className="error-message">{errors.documento.message}</span>}
+              {errors.doc && <span className="error-message">{errors.doc.message}</span>}
             </div>
 
             <div className="input-group">
@@ -272,13 +279,13 @@ function RegistroPropietario() {
               </div>
               <input
                 type="date"
-                {...register("fechaNacimiento", {
+                {...register("fecha_Nac", {
                   required: "Campo obligatorio",
                   validate: (value) => validarEdad(value) || "Debes ser mayor de 18 años",
                 })}
-                className={errors.fechaNacimiento ? "error" : ""}
+                className={errors.fecha_Nac ? "error" : ""}
               />
-              {errors.fechaNacimiento && <span className="error-message">{errors.fechaNacimiento.message}</span>}
+              {errors.fecha_Nac && <span className="error-message">{errors.fecha_Nac.message}</span>}
             </div>
           </fieldset>
         )}
@@ -300,7 +307,7 @@ function RegistroPropietario() {
                 onInput={(e) => {
                   e.target.value = e.target.value.replace(/\D/g, "").slice(0, 10)
                 }}
-                {...register("telefono", {
+                {...register("tel", {
                   required: "Campo obligatorio",
                   minLength: { value: 10, message: "Mínimo 10 dígitos" },
                   pattern: {
@@ -308,10 +315,10 @@ function RegistroPropietario() {
                     message: "Solo números permitidos",
                   },
                 })}
-                className={errors.telefono ? "error" : ""}
+                className={errors.tel ? "error" : ""}
                 placeholder="Escribe tu teléfono"
               />
-              {errors.telefono && <span className="error-message">{errors.telefono.message}</span>}
+              {errors.tel && <span className="error-message">{errors.tel.message}</span>}
             </div>
 
             <div className="input-group">

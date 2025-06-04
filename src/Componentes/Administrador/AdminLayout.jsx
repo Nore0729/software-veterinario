@@ -1,6 +1,6 @@
 import React from 'react';
-import MenuAdmin from '../Componentes/MenuAdmin';
-import '../Estilos_F/AdminLayout.css'; 
+import MenuAdmin from '../Administrador/MenuAdmin';
+import "../../Estilos_F/Administrador/AdminLayout.css"
 
 function AdminLayout({ children }) {
   return (

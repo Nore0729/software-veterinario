@@ -10,11 +10,7 @@ import Servicios from "./Componentes/Servicios";
 import Mascotas from "./Componentes/Mascotas";
 import PoliticasP from "./Componentes/PoliticasP";
 import Ubicacion from "./Componentes/Ubicacion";
-import Clientes from "./Componentes/Clientes";
-import Roles from "./Componentes/Roles";
-import Veterinarios from "./Componentes/Veterinarios";
 import RecuperarContraseña from "./Componentes/Recuperarcontraseña";
-import Admin from "./Componentes/Admin";
 import UserWelcome from "./Componentes/UserWelcome";
 import DatosPro from "./Componentes/Datospro";
 import Ayudapro from "./Componentes/ayudapro";
@@ -22,16 +18,23 @@ import HistorialMedico from "./Componentes/HistorialMedico";
 import Pacientes from "./Componentes/Pacientes";
 import Consultas from "./Componentes/Consultas";
 import VeterinarioPer from "./Componentes/VeterinarioPer";
-import MenuAdmin from "./Componentes/MenuAdmin";
-import InicioAdmin from "./Componentes/InicioAdmin";
-import FormularioUsu from "./PanelAdmin/FormularioUsu";
-import ServiciosAdmin from "./Componentes/ServiciosAdmin";
 import UserLayout from "./Componentes/UserLayout"; // Añadir esta importación
 import Actualizarpro from "./Componentes/Actualizarpro"; // Añadir esta importación
 import AyudaU from "./Componentes/AyudaU"; // Añadir esta importación
 import CookieConsent from "./Componentes/CookieConsent"; // Añadir esta importación
 import VetMascotas from "./Componentes/VetMascotas";
 import ConsultasVet from "./Componentes/ConsultasVet";
+
+///////// Importaciones Panel Administrador
+import MenuAdmin from "./Componentes/Administrador/MenuAdmin";
+// import AdminLayout from "./Componentes/Administrador/AdminLayout";
+import Clientes from "./Componentes/Administrador/Clientes";
+import Veterinarios from "./Componentes/Administrador/Veterinarios";
+import Admin from "./Componentes/Administrador/Admin";
+import Roles from "./Componentes/Administrador/Roles"
+import ServiciosAdmin from "./Componentes/Administrador/ServiciosAdmin"
+import FormularioUsu from "./Componentes/Administrador/FormularioUsu";
+import InicioAdmin from "./Componentes/Administrador/InicioAdmin";
 
 function App() {
   return (
