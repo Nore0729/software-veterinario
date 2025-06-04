@@ -308,102 +308,30 @@ app.listen(port, () => {
 
 
 
-// ruta para iniciar sesion con los diferentes roles 
 
-const usuariosMock = [
-  {
-    id: 1,
-    nombre: 'Juan Pérez',
-    email: 'juan.perez@gmail.com',
-    password: '123456',  
-    rol: 'propietario',
-    documento: '12345678',
-    telefono: '1234567890',
-    direccion: 'Calle Falsa 123'
-  },
-  {
-    id: 2,
-    nombre: 'Ana Martínez',
-    email: 'ana.martinez@veterinaria.com',
-    password: 'Vet123@',
-    rol: 'veterinario',
-    documento: '87654321',
-    telefono: '0987654321',
-    especialidad: 'Cirugía'
-  },
-  {
-    id: 3,
-    nombre: 'Carlos Gómez',
-    email: 'carlos.gomez@admin.com',
-    password: 'Admin123@',
-    rol: 'administrador',
-    documento: '11122333',
-    telefono: '5554443322',
-    nivel_acceso: 'alto'
-  }
-];
+// POST - Crear nuevo usuario
 
-// Ruta para iniciar sesión con verificación de roles y datos quemados
-app.post('/api/login-rol', async (req, res) => {
-  const { email, password } = req.body;
-
-  if (!email || !password) {
-    return res.status(400).json({ 
-      success: false, 
-      message: 'Email y contraseña son requeridos' 
-    });
-  }
-
-  try {
-    // Buscar el usuario en los datos "quemados"
-    const user = usuariosMock.find(u => u.email === email);
-
-    if (!user) {
-      return res.status(401).json({ 
-        success: false, 
-        message: 'Credenciales incorrectas' 
-      });
+app.post("/api/usuarios", async (req, res) => {
+    const { tipo_Doc, doc, nombre, fecha_Nac, tel, email, direccion, password } = req.body; 
+    if (!tipo_Doc || !doc || !nombre || !fecha_Nac || !tel || !email || !direccion || !password) {
+        return res.status(400).json({ message :"Todos los campos son obligatorios"});
     }
 
-    // Verificar la contraseña (sin hash en este caso)
-    if (user.password !== password) {
-      return res.status(401).json({ 
-        success: false, 
-        message: 'Credenciales incorrectas' 
-      });
-    }
-
-    // Preparar los datos adicionales según el rol
-    let datosAdicionales = {};
-
-    if (user.rol === 'propietario') {
-      datosAdicionales = { direccion: user.direccion };
-    } else if (user.rol === 'veterinario') {
-      datosAdicionales = { especialidad: user.especialidad };
-    } else if (user.rol === 'administrador') {
-      datosAdicionales = { nivel_acceso: user.nivel_acceso };
-    }
-
-    // Respuesta exitosa con rol y datos adicionales
-    res.json({
-      success: true,
-      message: 'Inicio de sesión exitoso',
-      user: {
-        id: user.id,
-        nombre: user.nombre,
-        email: user.email,
-        documento: user.documento,
-        telefono: user.telefono,
-        rol: user.rol,
-        ...datosAdicionales
-      }
-    });
-
-  } catch (error) {
-    console.error('Error en el login:', error);
-    res.status(500).json({ 
-      success: false, 
-      message: 'Error en el servidor' 
-    });
+    try { 
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const query = `
+        INSERT INTO usuarios
+        (tipo_Doc, doc, nombre, fecha_Nac, tel, email, direccion, password) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+      db.query(query, [tipo_Doc, doc, nombre, fecha_Nac, tel, email, direccion, hashedPassword], (err, results) => {
+        if (err) {
+          console.error("Error al insertar los datos:", err);
+          return res.status(500).json({ message: "Hubo un problema al registrar el usuario"});
+        }
+        res.status(201).json({ message: "Usuario registrado exitosamente" });
+      }); 
+    } catch (error) {
+    console.error('Error al encriptar la contraseña:', error);
+    return res.status(500).json({ message :'Error del servidor'});
   }
 });
