@@ -42,13 +42,13 @@ export const Login = () => {
       return;
     }
 
-    // Datos "quemados" (mock) de usuarios con roles
+    // Usuarios mock para fallback (puedes quitar si solo usas backend)
     const usuariosMock = [
       {
         id: 1,
         nombre: 'Juan Pérez',
         email: 'juan.perez@gmail.com',
-        password: 'Cliente2025@', // Contraseña en texto plano (esto sería con hash en producción)
+        password: 'Cliente2025@',
         rol: 'propietario',
         documento: '12345678',
         telefono: '1234567890',
@@ -77,25 +77,38 @@ export const Login = () => {
     ];
 
     try {
-      // Intenta hacer login con la autenticación básica
+      // Intenta login al backend
       const response = await axios.post('http://localhost:3000/api/login', {
         email,
         password,
       });
 
-      const { name, userEmail } = response.data;
+      // Ajusta estos campos si tu backend devuelve otros nombres:
+      // Por ejemplo aquí asumo que backend devuelve { nombre, email }
+      const { nombre, email: userEmail, rol } = response.data;
 
-      localStorage.setItem('nombre', name);
+      if (!nombre || !userEmail) {
+        throw new Error('Datos de usuario incompletos desde backend');
+      }
+
+      localStorage.setItem('nombre', nombre);
       localStorage.setItem('email', userEmail);
+      localStorage.setItem('rol', rol || ''); // Guarda rol si existe
 
       setErrorGeneral('');
       setFailedAttempts(0);
-      navigate('/UserWelcome');
-    } catch (err) {
-      console.error('Error en login básico:', err);
 
+      // Navegar según rol (ajusta las rutas si es necesario)
+      if (rol === 'propietario') navigate('/UserWelcome');
+      else if (rol === 'veterinario') navigate('/VeterinarioPer');
+      else if (rol === 'administrador') navigate('/InicioAdmin');
+      else navigate('/UserWelcome');
+
+    } catch (err) {
+      console.error('Error en login backend:', err);
+
+      // Fallback a usuarios mock si backend falla
       try {
-        // Buscar el usuario en los datos mock
         const user = usuariosMock.find(
           (usuario) => usuario.email === email && usuario.password === password
         );
@@ -103,13 +116,21 @@ export const Login = () => {
         if (!user) {
           setErrorGeneral('Credenciales incorrectas');
           setFailedAttempts((prev) => prev + 1);
+          if (failedAttempts + 1 >= 3) {
+            alert('Contraseña incorrecta 3 veces. Por favor, recupera tu contraseña.');
+            navigate('/Recuperarcontraseña');
+          }
           return;
         }
 
-        // Si encontramos al usuario, lo almacenamos en localStorage
         localStorage.setItem('userData', JSON.stringify(user));
+        localStorage.setItem('nombre', user.nombre);
+        localStorage.setItem('email', user.email);
+        localStorage.setItem('rol', user.rol);
 
-        // Dependiendo del rol, redirigimos a una página específica
+        setErrorGeneral('');
+        setFailedAttempts(0);
+
         switch (user.rol) {
           case 'propietario':
             navigate('/UserWelcome');
@@ -121,27 +142,11 @@ export const Login = () => {
             navigate('/InicioAdmin');
             break;
           default:
-            localStorage.setItem('nombre', user.nombre);
-            localStorage.setItem('email', user.email);
             navigate('/UserWelcome');
         }
-
-        setErrorGeneral('');
-        setFailedAttempts(0);
-      } catch (err) {
-        console.error('Error en login con rol (mock):', err);
+      } catch (error) {
+        console.error('Error en login con rol (mock):', error);
         setErrorGeneral('Error al autenticar el rol');
-        const newFailedAttempts = failedAttempts + 1;
-        setFailedAttempts(newFailedAttempts);
-
-        if (newFailedAttempts >= 3) {
-          alert('Contraseña incorrecta 3 veces. Por favor, recupera tu contraseña.');
-          navigate('/Recuperarcontraseña');
-        } else {
-          setErrorGeneral(
-            'Contraseña incorrecta. Intentos restantes: ' + (3 - newFailedAttempts)
-          );
-        }
       }
     }
   };
@@ -164,7 +169,7 @@ export const Login = () => {
             <input
               type="email"
               value={email}
-              onChange={handleEmailChange} // valida y convierte aquí
+              onChange={handleEmailChange}
               placeholder="ejemplo@vet.com"
               autoComplete="username"
             />
@@ -184,13 +189,13 @@ export const Login = () => {
               <span
                 className="password-toggle-icon"
                 onClick={() => setShowPassword(!showPassword)}
+                style={{ cursor: 'pointer' }}
               >
                 {showPassword ? <FaEyeSlash /> : <FaEye />}
               </span>
             </div>
           </div>
 
-          {/* Error general que no sea del email */}
           {errorGeneral && <p className="error-message">{errorGeneral}</p>}
 
           <button type="submit">Iniciar Sesión</button>

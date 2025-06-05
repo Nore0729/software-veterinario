@@ -1,6 +1,6 @@
 CREATE DATABASE  veterinaria;
 USE veterinaria;
-
+drop database veterinaria;
 
 CREATE TABLE usuarios (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -71,9 +71,11 @@ CREATE TABLE asignacion_roles (
 
 
 
+DROP TABLE IF EXISTS mascotas;
+
 CREATE TABLE mascotas (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    doc_pro INT NOT NULL,
+    doc_pro VARCHAR(15) NOT NULL, 
     nombre VARCHAR(50) NOT NULL,
     especie VARCHAR(50) NOT NULL,
     raza VARCHAR(50) NOT NULL,
@@ -86,9 +88,8 @@ CREATE TABLE mascotas (
     vacunado BOOLEAN DEFAULT FALSE,
     observaciones TEXT,
     fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (doc_pro) REFERENCES propietarios(id_prop) ON DELETE CASCADE
+    FOREIGN KEY (doc_pro) REFERENCES usuarios(doc) ON DELETE CASCADE
 );
-
 
 CREATE TABLE servicios (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -152,3 +153,56 @@ CREATE TABLE historias_clinicas (
     INDEX idx_mascota (mascota_id),
     INDEX idx_fecha_consulta (fecha_consulta)
 );
+
+
+DELIMITER $$
+
+CREATE PROCEDURE veterinaria.ModifyPassword(
+  IN user_email VARCHAR(255),
+  IN p_password VARCHAR(255)
+)
+BEGIN
+    DECLARE user_exists INT;
+    DECLARE user_id INT;
+
+    SELECT COUNT(*), u.id INTO user_exists, user_id
+    FROM usuarios u
+    INNER JOIN propietarios p ON u.id = p.id_prop
+    WHERE u.email = user_email;
+
+    
+    IF user_exists = 0 THEN
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'Usuario no encontrado o no es propietario';
+    ELSE
+        
+        UPDATE usuarios
+        SET password = p_password
+        WHERE id = user_id;
+    END IF;
+END$$
+
+DELIMITER ;
+
+SELECT 
+    m.id AS id_mascota,
+    m.nombre AS nombre_mascota,
+    m.especie,
+    m.raza,
+    m.genero,
+    m.color,
+    m.fecha_nac,
+    m.peso,
+    m.tamano,
+    m.estado_reproductivo,
+    m.vacunado,
+    m.observaciones,
+    m.fecha_registro,
+    u.nombre AS nombre_propietario,
+    u.doc AS documento_propietario,
+    u.tel,
+    u.email,
+    u.direccion
+FROM mascotas m
+INNER JOIN usuarios u ON m.doc_pro = u.doc
+ORDER BY m.fecha_registro DESC;
