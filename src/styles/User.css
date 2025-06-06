@@ -1,0 +1,391 @@
+/* ===========================
+   0) Estilos nuevos para Topbar
+   =========================== */
+
+/* Contenedor fijo en la parte superior */
+.topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;                         /* Altura de la topbar, ajusta si quieres otro tamaño */
+  background-color: #73acf3;            /* Mismo color base que tu sidebar */
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 200;                         /* Para que quede por encima de sidebar y main-content */
+}
+
+.topbar-left {
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+}
+
+.btn-logout-top {
+  background: transparent;
+  border: none;
+  color: white;
+  font-weight: 600;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.btn-logout-top:hover {
+  opacity: 0.8;
+}
+
+.icon-logout-top {
+  font-size: 1.1rem;
+}
+
+/* ===========================
+   1) Tu CSS original, sin cambios exc. los comentados
+   =========================== */
+
+/* Estructura Principal */
+.user-dashboard {
+  display: flex;
+  min-height: 100vh;
+  font-family: 'Arial', sans-serif;
+  background-color: #e0e7f1;
+  position: relative;
+
+  /* → Sólo agregamos esto para empujar todo hacia abajo 60px */
+  padding-top: 60px;
+}
+
+/* Barra lateral */
+.sidebar {
+  width: 60px;
+  height: 100vh;          /* ← Cambiamos a: calc(100vh - 60px) para que no quede debajo de la topbar */
+  background: #73acf3;
+  color: white;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  position: fixed;
+  z-index: 100;
+  border-right: 2px solid rgba(255, 255, 255, 0.1);
+
+  /* ↓ Añadimos esto para que inicie justo debajo de la topbar */
+  top: 60px;
+  height: calc(100vh - 60px);
+}
+
+.sidebar.expanded {
+  width: 280px;
+  box-shadow: 2px 0 15px rgba(0, 0, 0, 0.2);
+
+  /* ↓ También para la versión expandida */
+  top: 60px;
+  height: calc(100vh - 60px);
+}
+
+/* Perfil de usuario */
+.user-profile {
+  display: flex;
+  align-items: center;
+  padding: 20px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  white-space: nowrap;
+  height: 80px;
+}
+
+.profile-icon {
+  font-size: 24px;
+  min-width: 24px;
+  color: #44a6f1;
+}
+
+.user-profile h3 {
+  margin: 0 0 0 15px;
+  font-size: 1.1rem;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  color: white;
+}
+
+.sidebar.expanded .user-profile h3 {
+  opacity: 1;
+}
+
+/* Menú */
+.side-menu {
+  padding: 15px 0;
+  height: calc(100vh - 80px);
+  overflow-y: auto;
+}
+
+.menu-item {
+  margin-bottom: 5px;
+}
+
+.menu-link, .menu-header {
+  display: flex;
+  align-items: center;
+  padding: 12px 15px;
+  color: white;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.menu-link:hover, .menu-header:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.menu-icon {
+  font-size: 18px;
+  min-width: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #bbdefb;
+}
+
+.menu-text {
+  margin-left: 15px;
+  opacity: 0;
+  transition: opacity 0.2s ease 0.1s;
+  font-size: 0.95rem;
+}
+
+.sidebar.expanded .menu-text {
+  opacity: 1;
+}
+
+.menu-arrow {
+  margin-left: auto;
+  font-size: 12px;
+  transition: transform 0.2s ease;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.menu-header:hover .menu-arrow {
+  transform: translateX(3px);
+  color: white;
+}
+
+/* Submenú */
+.submenu {
+  background: #73acf3;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.sidebar.expanded .menu-item:hover .submenu {
+  max-height: 500px;
+}
+
+.submenu-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 15px 10px 54px;
+  color: #e0e0e0;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+  gap: 10px;
+}
+
+.submenu-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: white;
+  padding-left: 58px;
+}
+
+.submenu-icon {
+  font-size: 14px;
+}
+
+/* Contenido principal */
+.main-content {
+  flex: 1;
+  padding: 30px 30px 30px 90px;
+  transition: padding-left 0.3s ease;
+  min-height: 100vh;
+}
+
+.sidebar.expanded ~ .main-content {
+  padding-left: 310px;
+}
+
+/* Resto de tus estilos (tarjetas, listas, responsive, etc.) */
+/* Tarjetas de información */
+.dashboard-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 25px;
+  margin-top: 20px;
+}
+
+.info-card {
+  background: white;
+  border-radius: 10px;
+  padding: 25px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease;
+}
+
+.info-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+.info-card h2 {
+  color: #002a5e;
+  font-size: 1.3rem;
+  margin-top: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Lista de mascotas */
+.pet-list {
+  margin: 15px 0;
+}
+
+.pet-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.pet-item:last-child {
+  border-bottom: none;
+}
+
+.pet-item img {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #6d9e4f;
+}
+
+.pet-item h3 {
+  margin: 0 0 5px 0;
+  color: #002a5e;
+  font-size: 1rem;
+}
+
+.pet-item p {
+  margin: 0;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+/* Lista de citas */
+.appointment-list {
+  list-style: none;
+  padding: 0;
+  margin: 15px 0;
+}
+
+.appointment-list li {
+  padding: 12px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.appointment-list li:last-child {
+  border-bottom: none;
+}
+
+.appointment-list strong {
+  color: #002a5e;
+  font-size: 0.95rem;
+}
+
+.appointment-list p {
+  margin: 5px 0 0 0;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+/* Enlace "Ver todos" */
+.view-all {
+  display: inline-block;
+  margin-top: 15px;
+  color: #0066cc;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.view-all:hover {
+  color: #004499;
+  text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 50px;
+  }
+  
+  .sidebar.expanded {
+    width: 250px;
+  }
+  
+  .main-content {
+    padding-left: 80px;
+  }
+  
+  .sidebar.expanded ~ .main-content {
+    padding-left: 260px;
+  }
+  
+  .dashboard-cards {
+    grid-template-columns: 1fr;
+  }
+
+  /* Ajustamos top y height también en móvil */
+  .sidebar {
+    top: 60px;
+    height: calc(100vh - 60px);
+  }
+  .sidebar.expanded {
+    top: 60px;
+    height: calc(100vh - 60px);
+  }
+}
+
+@media (max-width: 576px) {
+  .sidebar {
+    transform: translateX(-100%);
+    top: 60px;
+    height: calc(100vh - 60px);
+  }
+  
+  .sidebar.expanded {
+    transform: translateX(0);
+    width: 80%;
+    box-shadow: 0 0 0 100vw rgba(0, 0, 0, 0.5);
+    top: 60px;
+    height: calc(100vh - 60px);
+  }
+  
+  .main-content {
+    padding-left: 30px;
+  }
+  
+  .sidebar.expanded ~ .main-content {
+    padding-left: 30px;
+  }
+}

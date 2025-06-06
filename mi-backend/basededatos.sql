@@ -72,8 +72,6 @@ CREATE TABLE asignacion_roles (
 
 
 
-DROP TABLE IF EXISTS mascotas;
-
 CREATE TABLE mascotas (
     id INT AUTO_INCREMENT PRIMARY KEY,
     doc_pro VARCHAR(15) NOT NULL, 

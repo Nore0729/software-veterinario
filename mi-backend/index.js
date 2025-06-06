@@ -13,7 +13,7 @@ app.use(cors());
 const db = mysql.createConnection({
   host: 'localhost',
   user: 'root',
-  password: '12345678',
+  password: '',
   database: 'veterinaria',
   port: '3306',
 });
@@ -140,58 +140,76 @@ app.listen(port, () => {
 
 
 // Registrar mascota
-app.post('/api/registro-mascota', (req, res) => {
+app.post('/api/registro-mascota', async (req, res) => {
   const {
-    documento,
+    doc_pro,
     nombre,
     especie,
     raza,
     genero,
     color,
-    fechaNacimiento,
+    fecha_nac,
     peso,
     tamano,
-    estadoReproductivo,
+    estado_reproductivo,
     vacunado,
     observaciones
   } = req.body;
 
-  if (!documento || !nombre) {
-    return res.status(400).send('Documento del propietario y nombre de la mascota son obligatorios');
+  try {
+    const connection = await mysql.createConnection(dbConfig);
+
+    const query = `
+      INSERT INTO mascotas (
+        doc_pro, nombre, especie, raza, genero, color, fecha_nac, peso,
+        tamano, estado_reproductivo, vacunado, observaciones
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    await connection.execute(query, [
+      doc_pro,
+      nombre,
+      especie,
+      raza,
+      genero,           // debe ser 'Macho' o 'Hembra'
+      color || null,
+      fecha_nac,        // debe ser formato 'YYYY-MM-DD'
+      peso || null,
+      tamano,           // debe ser 'Pequeño', 'Mediano' o 'Grande'
+      estado_reproductivo,  // 'Intacto', 'Esterilizado', 'Castrado'
+      vacunado ? 1 : 0,     // BOOLEAN se envía como 1 o 0
+      observaciones || null
+    ]);
+
+    await connection.end();
+
+    res.status(201).json({ message: 'Mascota registrada con éxito' });
+  } catch (error) {
+    console.error('Error al insertar mascota:', error);
+    res.status(500).json({ error: 'Error al registrar mascota' });
+  }
+});
+
+// Listar mascotas de un propietario
+app.get('/api/mascotas/:doc_pro', (req, res) => {
+  const { doc_pro } = req.params;
+
+  if (!doc_pro) {
+    return res.status(400).json({ error: 'Documento del propietario es obligatorio' });
   }
 
-  const query = `
-    INSERT INTO mascotas (
-      documento, nombre, especie, raza, genero, color,
-      fechaNacimiento, peso, tamano, estadoReproductivo, vacunado, observaciones
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `;
+  const query = 'SELECT * FROM mascotas WHERE doc_pro = ?';
 
-  db.query(
-    query,
-    [
-      documento,
-      nombre,
-      especie || null,
-      raza || null,
-      genero || null,
-      color || null,
-      fechaNacimiento || null,
-      peso || null,
-      tamano || null,
-      estadoReproductivo || null,
-      vacunado === true || vacunado === "true" ? 1 : 0,
-      observaciones || null
-    ],
-    (err) => {
-      if (err) {
-        console.error('Error al registrar la mascota:', err);
-        return res.status(500).send('Hubo un problema al registrar la mascota');
-      }
-      res.status(201).send('Mascota registrada exitosamente');
+  db.query(query, [doc_pro], (err, results) => {
+    if (err) {
+      console.error('Error al obtener las mascotas:', err);
+      return res.status(500).json({ error: 'Error en el servidor al obtener las mascotas' });
     }
-  );
+
+    res.json(results); // Devuelve la lista de mascotas en formato JSON
+  });
 });
+
 
 // Restablecer contraseña
 app.post('/api/reset-password', async (req, res) => {
@@ -246,12 +264,13 @@ app.get('/api/propietarios/:email', (req, res) => {
   });
 });
 
+
 // Actualizar datos del propietario
 app.put('/api/propietarios/:email', async (req, res) => {
   const emailOriginal = req.params.email;
-  const { telefono, email, direccion, password } = req.body;
+  const { tel, email, direccion, password } = req.body; 
 
-  if (!telefono || !email || !direccion || !password) {
+  if (!tel || !email || !direccion || !password) {
     return res.status(400).json({ message: 'Todos los campos son obligatorios' });
   }
 
@@ -264,7 +283,7 @@ app.put('/api/propietarios/:email', async (req, res) => {
       WHERE email = ? AND id IN (SELECT id_prop FROM propietarios)
     `;
 
-    db.query(query, [telefono, email, direccion, hashedPassword, emailOriginal], (err, result) => {
+    db.query(query, [tel, email, direccion, hashedPassword, emailOriginal], (err, result) => {
       if (err) {
         console.error('Error al actualizar propietario:', err);
         return res.status(500).json({ message: 'Error en el servidor al actualizar datos' });
@@ -281,7 +300,6 @@ app.put('/api/propietarios/:email', async (req, res) => {
     res.status(500).json({ message: 'Error en el servidor' });
   }
 });
-
 
 
 // Registrar usuario general
@@ -330,7 +348,6 @@ app.post('/api/registro-usuario', async (req, res) => {
 // conexion de registrar usuario por parte de administrador
 // por favor no tocar la conexion 
 
-// Ruta para registrar propietarios
 app.post("/api/usuarios", async (req, res) => {
   const { tipo_Doc, doc, nombre, fecha_Nac, tel, email, direccion, password } = req.body;
   if (!tipo_Doc || !doc || !nombre || !fecha_Nac || !tel || !email || !direccion || !password) {
