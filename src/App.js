@@ -1,85 +1,40 @@
+// src/App.js
+import React from 'react';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import MainLayout from "./Componentes/MainLayout";
-import Privado from "./Componentes/privado";
-import PagPrincipal from "./Componentes/PagPrincipal";
-import Login from "./Componentes/Login";
-import Citas from "./Componentes/Citas";
-import Propietarios from "./Componentes/Propietarios";
-import Ayuda from "./Componentes/Ayuda";
-import Servicios from "./Componentes/Servicios";
-import Mascotas from "./Componentes/Mascotas";
-import PoliticasP from "./Componentes/PoliticasP";
-import Ubicacion from "./Componentes/Ubicacion";
-import RecuperarContraseña from "./Componentes/Recuperarcontraseña";
-import UserWelcome from "./Componentes/UserWelcome";
-import DatosPro from "./Componentes/Datospro";
-import Ayudapro from "./Componentes/ayudapro";
-import HistorialMedico from "./Componentes/HistorialMedico";
-import Pacientes from "./Componentes/Pacientes";
-import Consultas from "./Componentes/Consultas";
-import VeterinarioPer from "./Componentes/VeterinarioPer";
-import UserLayout from "./Componentes/UserLayout"; // Añadir esta importación
-import Actualizarpro from "./Componentes/Actualizarpro"; // Añadir esta importación
-import AyudaU from "./Componentes/AyudaU"; // Añadir esta importación
-import CookieConsent from "./Componentes/CookieConsent"; // Añadir esta importación
-import VetMascotas from "./Componentes/VetMascotas";
-import ConsultasVet from "./Componentes/ConsultasVet";
 
-///////// Importaciones Panel Administrador
-import MenuAdmin from "./Componentes/Administrador/MenuAdmin";
-// import AdminLayout from "./Componentes/Administrador/AdminLayout";
-import Clientes from "./Componentes/Administrador/Clientes";
-import Veterinarios from "./Componentes/Administrador/Veterinarios";
-import Admin from "./Componentes/Administrador/Admin";
-import Roles from "./Componentes/Administrador/Roles"
-import ServiciosAdmin from "./Componentes/Administrador/ServiciosAdmin"
-import FormularioUsu from "./Componentes/Administrador/FormularioUsu";
-import InicioAdmin from "./Componentes/Administrador/InicioAdmin";
+// Layouts y Guards
+import MainLayout from "./layout/MainLayout";
+import Privado from "./services/privado"; // Guard para Admin y Veterinario
+import UserLayout from "./layout/UserLayout"; // Layout para usuarios generales
+
+// Módulos de Rutas
+import PublicRoutes from "./routes/publicas.rutas.js";
+import AdminRoutes from "./routes/admin.rutas.js";
+import UserSpecificRoutes from "./routes/usuario.rutas.js";
+import VeterinarioRoutes from "./routes/veterinario.rutas.js";
+
+// Otros Componentes (si son globales a la App)
+import CookieConsent from "./components/CookieConsent";
 
 function App() {
   return (
     <BrowserRouter>
       <CookieConsent />
       <Routes>
-        {/* Rutas públicas con header/footer */}
+        {/* Rutas públicas con MainLayout */}
         <Route element={<MainLayout />}>
-          <Route path="/" element={<PagPrincipal />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/citas" element={<Citas />} />
-          <Route path="/servicios" element={<Servicios />} />
-          <Route path="/propietarios" element={<Propietarios />} />
-          <Route path="/ayuda" element={<Ayuda />} />
-          <Route path="/mascotas" element={<Mascotas />} />
-          <Route path="/PoliticasP" element={<PoliticasP />} />
-          <Route path="/Ubicacion" element={<Ubicacion />} />
-          <Route path="/Recuperarcontraseña" element={<RecuperarContraseña />} />
-          <Route path="/Pacientes" element={<Pacientes />} />
-          <Route path="/Consultas" element={<Consultas />} />
-          <Route path="/HistorialMedico" element={<HistorialMedico />} /> 
-          <Route path="/Veterinarios" element={<Veterinarios />} />
-          <Route path="/AyudaU" element={<AyudaU />} />
-          <Route path="/VetMascotas" element={<VetMascotas />} />
-          <Route path="/ConsultasVet" element={<ConsultasVet/>} />
+          {PublicRoutes()}
         </Route>
 
-        {/* Rutas protegidas (admin o similares) */}
+        {/* Rutas protegidas por "Privado" (Admin y Veterinario) */}
         <Route element={<Privado />}>
-          <Route path="/FormularioUsu" element={<FormularioUsu />} />
-          <Route path="/InicioAdmin" element={<InicioAdmin />} />
-          <Route path="/MenuAdmin" element={<MenuAdmin />} />
-          <Route path="/Admin" element={<Admin />} />
-          <Route path="/Clientes" element={<Clientes />} />
-          <Route path="/Roles" element={<Roles />} />
-          <Route path="/ServiciosAdmin" element={<ServiciosAdmin />} />
-          <Route path="/VeterinarioPer" element={<VeterinarioPer />} />
+          {AdminRoutes()}
+          {VeterinarioRoutes()} {/* Rutas de veterinario ahora bajo Privado */}
         </Route>
 
-        {/* Rutas con menú lateral del usuario logueado */}
+        {/* Rutas con UserLayout para usuarios logueados */}
         <Route element={<UserLayout />}>
-          <Route path="/UserWelcome" element={<UserWelcome />} />
-          <Route path="/Datospro" element={<DatosPro />} />
-          <Route path="/Ayudapro" element={<Ayudapro />} />
-          <Route path="/Actualizarpro" element={<Actualizarpro />} />
+          {UserSpecificRoutes()}
         </Route>
       </Routes>
     </BrowserRouter>
