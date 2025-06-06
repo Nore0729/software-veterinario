@@ -13,7 +13,7 @@ app.use(cors());
 const db = mysql.createConnection({
   host: 'localhost',
   user: 'root',
-  password: '',
+  password: '12345678',
   database: 'veterinaria',
   port: '3306',
 });
@@ -282,6 +282,8 @@ app.put('/api/propietarios/:email', async (req, res) => {
   }
 });
 
+
+
 // Registrar usuario general
 app.post('/api/registro-usuario', async (req, res) => {
   const { tipo_Doc, doc, nombre, fecha_Nac, tel, email, direccion, password } = req.body;
@@ -324,7 +326,125 @@ app.post('/api/registro-usuario', async (req, res) => {
   });
 });
 
-// Servidor escuchando
-app.listen(port, () => {
-  console.log(`Servidor corriendo en http://localhost:${port}`);
+
+// conexion de registrar usuario por parte de administrador
+// por favor no tocar la conexion 
+
+// Ruta para registrar propietarios
+app.post("/api/usuarios", async (req, res) => {
+  const { tipo_Doc, doc, nombre, fecha_Nac, tel, email, direccion, password } = req.body;
+  if (!tipo_Doc || !doc || !nombre || !fecha_Nac || !tel || !email || !direccion || !password) {
+    return res.status(400).send("Todos los campos son obligatorios")
+  }
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10)
+    const query = `
+      INSERT INTO usuarios
+      (tipo_Doc, doc, nombre, fecha_Nac, tel, email, direccion, password) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+    db.query(query,[tipo_Doc, doc, nombre, fecha_Nac, tel, email, direccion, hashedPassword],
+      (err, results) => {
+        if (err) {
+          console.error("Error al insertar los datos:", err)
+          return res.status(500).json({ message: "Hubo un problema al registrar al usuario"})
+        }
+        res.status(201).json({ message: "usuario registrado exitosamente"})
+      },
+    )
+  } catch (error) {
+    console.error("Error al encriptar la contraseña:", error)
+    return res.status(500).json({ message: "Error del servidor"})
+  }
+})
+
+
+// conexion de registrar roles por parte de administrador
+// por favor no tocar la conexion 
+
+app.post("/api/roles", async (req, res) => {
+  const { nom_rol, descripcion } = req.body;
+  if (!nom_rol || !descripcion) {
+    return res.status(400).send("Todos los campos son obligatorios");
+  }
+  try {
+    const query = `
+      INSERT INTO roles
+      (nom_rol, descripcion) 
+      VALUES (?, ?)`;
+    db.query(query, [nom_rol, descripcion],
+      (err, results) => {
+        if (err) {
+          console.error("Error al insertar los datos:", err);
+          return res.status(500).json({ message: "Hubo un problema al registrar el rol"});
+        }
+        // Devuelve el objeto completo del rol creado
+        const nuevoRol = {
+          id: results.insertId,  // Obtenemos el ID autogenerado
+          nom_rol: nom_rol,
+          descripcion: descripcion
+        };
+        res.status(201).json(nuevoRol);  // Enviamos el rol completo
+      }
+    );
+  } catch (error) {
+    return res.status(500).json({ message: "Error del servidor"});
+  }
+});
+
+
+// api para obtener todos los roles de la base de datos
+app.get("/api/obtener_roles", async (req, res) => {
+  try {
+    const query = "SELECT id, nom_rol, descripcion FROM roles";
+    db.query(query, (err, results) => {
+      if (err) {
+        console.error("Error al obtener los roles:", err);
+        return res.status(500).json({ message: "Hubo un problema al obtener los roles" });
+      }
+      res.status(200).json(results);
+    });
+  } catch (error) {
+    return res.status(500).json({ message: "Error del servidor" });
+  }
+});
+
+
+// Api de servicios desde administrador 
+
+app.post("/api/servicios", async (req, res) => {
+  const { nombre, descripcion, precio,  duracion_estimada } = req.body;
+  if (!nombre || !descripcion || !precio || !duracion_estimada) {
+    return res.status(400).send("Todos los campos son obligatorios")
+  }
+  try {
+    const query = `
+      INSERT INTO servicios
+      ( nombre, descripcion, precio, duracion_estimada) 
+      VALUES (?, ?, ?, ?)`
+    db.query(query,[nombre, descripcion, precio, duracion_estimada],
+      (err, results) => {
+        if (err) {
+          console.error("Error al insertar los datos:", err)
+          return res.status(500).json({ message: "Hubo un problema al registrar el servicio"})
+        }
+        res.status(201).json({ message: "servicio registrado exitosamente"})
+      },
+    )
+  } catch (error) {
+    return res.status(500).json({ message: "Error del servidor"})
+  }
+})
+
+// Api para eliminar servicio 
+app.delete("/api/servicios/:id", (req, res) => {
+  const { id } = req.params;
+  
+  const query = "DELETE FROM servicios WHERE id = ?";
+  db.query(query, [id], (err, result) => {
+    if (err) return res.status(500).json({ error: err.message });
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: "Servicio no encontrado" });
+    }
+    res.json({ message: "Servicio eliminado", id });
+  });
 });

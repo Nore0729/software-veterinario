@@ -65,17 +65,17 @@ function RegistroClientes() {
 
         <div className="clientes-table-container">
           <table className="clientes-table">
-            <thead>
+           <thead>
               <tr>
-                <th>ID</th>
-                <th>Documento</th>
-                <th>Nombre Completo</th>
-                <th>Fecha Nacimiento</th>
-                <th>Teléfono</th>
-                <th>Email</th>
-                <th>Dirección</th>
-                <th>Estado</th>
-                <th>Acciones</th>
+                <th style={{ color: 'white' }}>ID</th>
+                <th style={{ color: 'white' }}>Documento</th>
+                <th style={{ color: 'white' }}>Nombre Completo</th>
+                <th style={{ color: 'white' }}>Fecha Nacimiento</th>
+                <th style={{ color: 'white' }}>Teléfono</th>
+                <th style={{ color: 'white' }}>Email</th>
+                <th style={{ color: 'white' }}>Dirección</th>
+                <th style={{ color: 'white' }}>Estado</th>
+                <th style={{ color: 'white' }}>Acciones</th>
               </tr>
             </thead>
             <tbody>

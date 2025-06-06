@@ -65,7 +65,7 @@ function ServiciosAdmin() {
     }
     
     // Limpiar formulario
-    setFormData({ nombre: "", descripcion: "", precio: "", duracion: "" });
+    setFormData({ nombre: "", descripcion: "", precio: "", duracion_estimada: "" });
     setEditando(false);
     setIdActual(null);
   };
@@ -76,7 +76,7 @@ function ServiciosAdmin() {
       nombre: servicio.nombre,
       descripcion: servicio.descripcion,
       precio: servicio.precio,
-      duracion: servicio.duracion
+      duracion_estimada: servicio.duracion_estimada
     });
     setEditando(true);
     setIdActual(servicio.id);
@@ -144,8 +144,8 @@ function ServiciosAdmin() {
               <label>Duración (min)</label>
               <input
                 type="number"
-                name="duracion"
-                value={formData.duracion}
+                name="duracion_estimada"
+                value={formData.duracion_estimada}
                 onChange={handleChange}
                 min="5"
                 required

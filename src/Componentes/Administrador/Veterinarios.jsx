@@ -154,7 +154,7 @@ function Veterinarios() {
 
   return (
     <AdminLayout> 
-    <div className="veterinarios-container">
+    <div className="veterinarios">
       <h1>Veterinarios Registrados</h1>
       {notificacion.mostrar && (
         <div className={`notificacion ${notificacion.tipo}`}>

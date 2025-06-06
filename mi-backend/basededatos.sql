@@ -1,3 +1,4 @@
+
 CREATE DATABASE  veterinaria;
 USE veterinaria;
 drop database veterinaria;

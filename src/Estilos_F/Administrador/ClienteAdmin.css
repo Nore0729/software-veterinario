@@ -12,7 +12,7 @@
 }
 
 .clientes-header h1 {
-  color: #2c3e50;
+  color: #524c4c;
   margin-bottom: 2rem;
   font-size: 2rem;
   font-weight: 600;
@@ -66,7 +66,7 @@
 .clientes-table-container {
   background-color: white;
   border-radius: 0.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px rgb(156, 156, 156);
   overflow-x: auto;
 }
 
@@ -77,7 +77,7 @@
 }
 
 .clientes-table th {
-  background-color: #f3f4f6;
+  background-color: #302e2e;
   padding: 1rem;
   text-align: left;
   font-weight: 600;
@@ -89,7 +89,7 @@
   padding: 1rem;
   border-bottom: 1px solid #f3f4f6;
   font-size: 0.9rem;
-  color: #4b5563;
+  color: #1f1f1f;
   vertical-align: middle;
 }
 
