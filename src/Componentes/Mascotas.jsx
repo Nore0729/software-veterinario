@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { PawPrint, User, AtSign, Lock, ChevronRight, ChevronLeft } from 'lucide-react';
 import axios from 'axios';
@@ -29,9 +29,9 @@ function RegistroMascota() {
   } = useForm({ mode: 'onChange' });
 
   const requiredFields = {
-    1: ['documento', 'nombre', 'especie', 'raza', 'genero'],
-    2: ['color', 'fechaNacimiento', 'peso', 'tamano', 'estadoReproductivo'],
-    3: ['vacunado', 'observaciones']
+    1: ['doc_pro', 'nombre', 'especie', 'raza', 'genero'],
+    2: ['fecha_nac', 'tamano', 'estado_reproductivo'],
+    3: ['vacunado'] // observaciones no es obligatorio
   };
 
   const especieSeleccionada = watch("especie");
@@ -45,37 +45,38 @@ function RegistroMascota() {
   }, [especieSeleccionada]);
 
   useEffect(() => {
+    // Actualiza el progreso según campos llenos de la etapa actual
+    const values = watch();
     let filledFields = 0;
     requiredFields[step].forEach(field => {
-      const value = watch(field);
-      if (value && value.toString().trim() !== '') {
-        filledFields++;
-      }
+      const val = values[field];
+      if (val && val.toString().trim() !== '') filledFields++;
     });
 
     const baseProgress = (step - 1) * 33;
     const stepProgress = (filledFields / requiredFields[step].length) * 33;
-
     setProgress(Math.min(100, Math.round(baseProgress + stepProgress)));
   }, [watch(), step]);
 
   const nextStep = async () => {
-    const isValid = await trigger(requiredFields[step]);
-    if (isValid) setStep(step + 1);
+    const valid = await trigger(requiredFields[step]);
+    if (valid) setStep(step + 1);
   };
 
   const prevStep = () => setStep(step - 1);
 
   const onSubmit = async (data) => {
     data.vacunado = data.vacunado === "Sí";
+
     try {
       const response = await axios.post('http://localhost:3000/api/registro-mascota', data);
       if (response.status === 201) {
         Swal.fire({
-          title: '<strong>Registro exitoso!</strong>',
-          html: `<i>La mascota <strong>${data.nombre}</strong> fue registrada</i>`,
+          title: 'Registro exitoso!',
+          html: `La mascota <strong>${data.nombre}</strong> fue registrada.`,
           icon: 'success',
-          timer: 3000,
+          timer: 2500,
+          timerProgressBar: true,
           didClose: () => {
             navigate('/mascota/firulais');
           }
@@ -83,10 +84,11 @@ function RegistroMascota() {
       }
     } catch (error) {
       Swal.fire({
-        title: '<strong>Error!</strong>',
-        html: `<i>No se pudo registrar la mascota. Intenta nuevamente.</i>`,
+        title: 'Error!',
+        html: 'No se pudo registrar la mascota. Intenta nuevamente.',
         icon: 'error',
-        timer: 3000
+        timer: 3000,
+        timerProgressBar: true
       });
     }
   };
@@ -101,7 +103,9 @@ function RegistroMascota() {
       <header className="registro-header">
         <PawPrint className="icon-paw" />
         <h1>Registro de Mascota</h1>
-        <p>Paso {step} de 3 - {step === 1 ? 'Información General' : step === 2 ? 'Datos Adicionales' : 'Seguridad'}</p>
+        <p>
+          Paso {step} de 3 - {step === 1 ? 'Información General' : step === 2 ? 'Datos Adicionales' : 'Seguridad'}
+        </p>
       </header>
 
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -110,119 +114,77 @@ function RegistroMascota() {
             <legend><User className="icon-legend" /> Información General</legend>
 
             <div className="input-group">
-              <div className="label-container">
-                <User className="icon-small" />
-                <label>Documento del Propietario *</label>
-              </div>
+              <label>Documento del Propietario *</label>
               <input
                 type="text"
-                {...register("documento", {
+                {...register("doc_pro", {
                   required: "Campo obligatorio",
-                  pattern: {
-                    value: /^[0-9]+$/,
-                    message: "Solo números permitidos"
-                  },
-                  minLength: {
-                    value: 6,
-                    message: "Mínimo 6 caracteres"
-                  },
-                  maxLength: {
-                    value: 15,
-                    message: "Máximo 15 caracteres"
-                  }
+                  pattern: { value: /^[0-9]+$/, message: "Solo números permitidos" },
+                  minLength: { value: 6, message: "Mínimo 6 caracteres" },
+                  maxLength: { value: 15, message: "Máximo 15 caracteres" }
                 })}
-                className={errors.documento ? 'error' : ''}
-                placeholder="Número de documento del propietario"
+                className={errors.doc_pro ? 'error' : ''}
+                placeholder="Número de documento"
               />
-              {errors.documento && (
-                <span className="error-message">{errors.documento.message}</span>
-              )}
+              {errors.doc_pro && <span className="error-message">{errors.doc_pro.message}</span>}
             </div>
 
             <div className="input-group">
-              <div className="label-container">
-                <User className="icon-small" />
-                <label>Nombre de la Mascota *</label>
-              </div>
+              <label>Nombre de la Mascota *</label>
               <input
                 type="text"
                 {...register("nombre", {
                   required: "Campo obligatorio",
-                  pattern: {
-                    value: /^[A-Za-zÁÉÍÓÚáéíóúñÑ ]+$/,
-                    message: "Solo letras permitidas"
-                  },
-                  minLength: {
-                    value: 3,
-                    message: "Mínimo 3 caracteres"
-                  }
+                  pattern: { value: /^[A-Za-zÁÉÍÓÚáéíóúñÑ ]+$/, message: "Solo letras permitidas" },
+                  minLength: { value: 3, message: "Mínimo 3 caracteres" }
                 })}
                 className={errors.nombre ? 'error' : ''}
-                placeholder="Escribe el nombre de la mascota"
+                placeholder="Nombre mascota"
               />
-              {errors.nombre && (
-                <span className="error-message">{errors.nombre.message}</span>
-              )}
+              {errors.nombre && <span className="error-message">{errors.nombre.message}</span>}
             </div>
 
             <div className="input-group">
-              <div className="label-container">
-                <User className="icon-small" />
-                <label>Especie *</label>
-              </div>
+              <label>Especie *</label>
               <select
                 {...register("especie", { required: "Campo obligatorio" })}
                 className={errors.especie ? 'error' : ''}
               >
                 <option value="">Seleccionar especie</option>
-                <option value="Canino">Canino</option>
-                <option value="Felino">Felino</option>
-                <option value="Ave">Ave</option>
-                <option value="Roedor">Roedor</option>
-                <option value="Reptil">Reptil</option>
+                <option value="canino">Canino</option>
+                <option value="felino">Felino</option>
+                <option value="ave">Ave</option>
+                <option value="roedor">Roedor</option>
+                <option value="reptil">Reptil</option>
               </select>
-              {errors.especie && (
-                <span className="error-message">{errors.especie.message}</span>
-              )}
+              {errors.especie && <span className="error-message">{errors.especie.message}</span>}
             </div>
 
             <div className="input-group">
-              <div className="label-container">
-                <User className="icon-small" />
-                <label>Raza *</label>
-              </div>
+              <label>Raza *</label>
               <select
-                {...register("raza", {
-                  required: "Campo obligatorio",
-                })}
+                {...register("raza", { required: "Campo obligatorio" })}
                 className={errors.raza ? 'error' : ''}
               >
-                <option value="">Seleccionar</option>
-                {razasDisponibles.map((raza, idx) => (
-                  <option key={idx} value={raza}>{raza}</option>
+                <option value="">Seleccionar raza</option>
+                {razasDisponibles.map((raza, i) => (
+                  <option key={i} value={raza}>{raza}</option>
                 ))}
               </select>
-              {errors.raza && (
-                <span className="error-message">{errors.raza.message}</span>
-              )}
+              {errors.raza && <span className="error-message">{errors.raza.message}</span>}
             </div>
 
             <div className="input-group">
-              <div className="label-container">
-                <User className="icon-small" />
-                <label>Género *</label>
-              </div>
+              <label>Género *</label>
               <select
                 {...register("genero", { required: "Campo obligatorio" })}
                 className={errors.genero ? 'error' : ''}
               >
-                <option value="">Seleccionar</option>
+                <option value="">Seleccionar género</option>
                 <option value="Macho">Macho</option>
                 <option value="Hembra">Hembra</option>
               </select>
-              {errors.genero && (
-                <span className="error-message">{errors.genero.message}</span>
-              )}
+              {errors.genero && <span className="error-message">{errors.genero.message}</span>}
             </div>
           </fieldset>
         )}
@@ -232,143 +194,105 @@ function RegistroMascota() {
             <legend><AtSign className="icon-legend" /> Datos Adicionales</legend>
 
             <div className="input-group">
-              <div className="label-container">
-                <User className="icon-small" />
-                <label>Color</label>
-              </div>
+              <label>Color</label>
               <input
                 type="text"
                 {...register("color")}
-                className={errors.color ? 'error' : ''}
-                placeholder="Escribe el color de la mascota"
+                placeholder="Color de la mascota"
               />
-              {errors.color && (
-                <span className="error-message">{errors.color.message}</span>
-              )}
             </div>
 
             <div className="input-group">
-              <div className="label-container">
-                <User className="icon-small" />
-                <label>Fecha de Nacimiento</label>
-              </div>
+              <label>Fecha de Nacimiento *</label>
               <input
                 type="date"
-                {...register("fechaNacimiento")}
-                className={errors.fechaNacimiento ? 'error' : ''}
+                {...register("fecha_nac", { required: "Campo obligatorio" })}
+                className={errors.fecha_nac ? 'error' : ''}
               />
-              {errors.fechaNacimiento && (
-                <span className="error-message">{errors.fechaNacimiento.message}</span>
-              )}
+              {errors.fecha_nac && <span className="error-message">{errors.fecha_nac.message}</span>}
             </div>
 
             <div className="input-group">
-              <div className="label-container">
-                <User className="icon-small" />
-                <label>Peso (kg)</label>
-              </div>
+              <label>Peso (kg)</label>
               <input
                 type="number"
                 step="0.01"
                 {...register("peso")}
-                className={errors.peso ? 'error' : ''}
-                placeholder="Escribe el peso de la mascota"
+                placeholder="Peso aproximado"
               />
-              {errors.peso && (
-                <span className="error-message">{errors.peso.message}</span>
-              )}
             </div>
 
             <div className="input-group">
-              <div className="label-container">
-                <User className="icon-small" />
-                <label>Tamaño</label>
-              </div>
-              <input
-                type="text"
-                {...register("tamano")}
-                className={errors.tamano ? 'error' : ''}
-                placeholder="Escribe el tamaño de la mascota"
-              />
-              {errors.tamano && (
-                <span className="error-message">{errors.tamano.message}</span>
-              )}
-            </div>
-
-            <div className="input-group">
-              <div className="label-container">
-                <User className="icon-small" />
-                <label>Estado Reproductivo</label>
-              </div>
+              <label>Tamaño *</label>
               <select
-                {...register("estadoReproductivo")}
-                className={errors.estadoReproductivo ? 'error' : ''}
+                {...register("tamano", { required: "Campo obligatorio" })}
+                className={errors.tamano ? 'error' : ''}
               >
-                <option value="">Seleccionar</option>
-                <option value="Castrado">Castrado</option>
-                <option value="No Castrado">No Castrado</option>
+                <option value="">Seleccionar tamaño</option>
+                <option value="Pequeño">Pequeño</option>
+                <option value="Mediano">Mediano</option>
+                <option value="Grande">Grande</option>
               </select>
-              {errors.estadoReproductivo && (
-                <span className="error-message">{errors.estadoReproductivo.message}</span>
-              )}
+              {errors.tamano && <span className="error-message">{errors.tamano.message}</span>}
+            </div>
+
+            <div className="input-group">
+              <label>Estado Reproductivo *</label>
+              <select
+                {...register("estado_reproductivo", { required: "Campo obligatorio" })}
+                className={errors.estado_reproductivo ? 'error' : ''}
+              >
+                <option value="">Seleccionar estado</option>
+                <option value="Intacto">Intacto</option>
+                <option value="Esterilizado">Esterilizado</option>
+                <option value="Castrado">Castrado</option>
+              </select>
+              {errors.estado_reproductivo && <span className="error-message">{errors.estado_reproductivo.message}</span>}
             </div>
           </fieldset>
         )}
 
         {step === 3 && (
           <fieldset className="form-section">
-            <legend><Lock className="icon-legend" /> Seguridad</legend>
+            <legend><Lock className="icon-legend" /> Seguridad y Observaciones</legend>
 
             <div className="input-group">
-              <div className="label-container">
-                <Lock className="icon-small" />
-                <label>Vacunado</label>
-              </div>
+              <label>Vacunado *</label>
               <select
-                {...register("vacunado")}
+                {...register("vacunado", { required: "Campo obligatorio" })}
                 className={errors.vacunado ? 'error' : ''}
               >
-                <option value="">Seleccionar</option>
+                <option value="">Seleccionar opción</option>
                 <option value="Sí">Sí</option>
                 <option value="No">No</option>
               </select>
-              {errors.vacunado && (
-                <span className="error-message">{errors.vacunado.message}</span>
-              )}
+              {errors.vacunado && <span className="error-message">{errors.vacunado.message}</span>}
             </div>
 
             <div className="input-group">
-              <div className="label-container">
-                <Lock className="icon-small" />
-                <label>Observaciones</label>
-              </div>
+              <label>Observaciones</label>
               <textarea
                 {...register("observaciones")}
-                rows={4}
-                placeholder="Escribe cualquier observación adicional"
-              />
-              {errors.observaciones && (
-                <span className="error-message">{errors.observaciones.message}</span>
-              )}
+                placeholder="Comentarios adicionales"
+                rows="3"
+              ></textarea>
             </div>
           </fieldset>
         )}
 
         <div className="form-navigation">
           {step > 1 && (
-            <button type="button" className="nav-btn prev-btn" onClick={prevStep}>
+            <button type="button" className="btn-prev" onClick={prevStep}>
               <ChevronLeft /> Anterior
             </button>
           )}
           {step < 3 && (
-            <button type="button" className="nav-btn next-btn" onClick={nextStep}>
+            <button type="button" className="btn-next" onClick={nextStep}>
               Siguiente <ChevronRight />
             </button>
           )}
           {step === 3 && (
-            <button type="submit" className="btn-submit">
-              Registrar
-            </button>
+            <button type="submit" className="btn-submit">Registrar</button>
           )}
         </div>
       </form>
@@ -377,3 +301,4 @@ function RegistroMascota() {
 }
 
 export default RegistroMascota;
+

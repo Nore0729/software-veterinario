@@ -20,50 +20,51 @@ const Actualizarpro = () => {
   useEffect(() => {
     const email = localStorage.getItem('email');
     if (email) {
-      axios.get(`http://localhost:3000/propietarios/${email}`)
+      axios.get(`http://localhost:3000/api/propietarios/${email}`)
         .then(res => {
           const {
-            tipoDocumento,
-            documento,
+            tipo_Doc,
+            doc,
             nombre,
-            fechaNacimiento,
-            telefono,
+            fecha_Nac,
+            tel,
             email,
             direccion,
-            fechaRegistro,
+            fecha_Regis,
           } = res.data;
 
           setDatos({
-            tipoDocumento,
-            documento,
-            nombre,
-            fechaNacimiento,
-            telefono,
-            email,
-            direccion,
-            fechaRegistro,
+            tipoDocumento: tipo_Doc || '',
+            documento: doc || '',
+            nombre: nombre || '',
+            fechaNacimiento: fecha_Nac || '',
+            telefono: tel || '',
+            email: email || '',
+            direccion: direccion || '',
+            fechaRegistro: fecha_Regis || '',
             password: '',
           });
         })
         .catch(err => {
           console.error('Error al cargar datos:', err);
+          alert('Error al cargar los datos del propietario');
         });
     }
   }, []);
 
-  const handleChange = e => {
+  const handleChange = (e) => {
     setDatos({
       ...datos,
       [e.target.name]: e.target.value,
     });
   };
 
-  const validarPassword = password => {
+  const validarPassword = (password) => {
     const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/;
     return regex.test(password);
   };
 
-  const handleSubmit = e => {
+  const handleSubmit = (e) => {
     e.preventDefault();
 
     if (!validarPassword(datos.password)) {
@@ -74,7 +75,7 @@ const Actualizarpro = () => {
     const emailOriginal = localStorage.getItem('email');
 
     const datosActualizar = {
-      telefono: datos.telefono,
+      tel: datos.telefono,
       email: datos.email,
       direccion: datos.direccion,
       password: datos.password,
@@ -83,11 +84,9 @@ const Actualizarpro = () => {
     axios.put(`http://localhost:3000/api/propietarios/${emailOriginal}`, datosActualizar)
       .then(() => {
         alert('Datos actualizados correctamente');
-
         if (emailOriginal !== datos.email) {
           localStorage.setItem('email', datos.email);
         }
-
         navigate('/Datospro');
       })
       .catch(err => {
@@ -129,7 +128,7 @@ const Actualizarpro = () => {
         <input
           type="date"
           name="fechaNacimiento"
-          value={datos.fechaNacimiento?.split('T')[0] || ''}
+          value={datos.fechaNacimiento ? datos.fechaNacimiento.split('T')[0] : ''}
           readOnly
         />
 
@@ -164,7 +163,7 @@ const Actualizarpro = () => {
         <input
           type="text"
           name="fechaRegistro"
-          value={new Date(datos.fechaRegistro).toLocaleString()}
+          value={datos.fechaRegistro ? new Date(datos.fechaRegistro).toLocaleString() : ''}
           readOnly
         />
 
@@ -185,4 +184,3 @@ const Actualizarpro = () => {
 };
 
 export default Actualizarpro;
-

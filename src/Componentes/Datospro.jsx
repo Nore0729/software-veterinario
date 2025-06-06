@@ -8,13 +8,14 @@ const Datospro = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const email = localStorage.getItem('email');
-    if (email) {
-      axios.get(`http://localhost:3000/propietarios/${email}`)
-        .then(response => setDatos(response.data))
-        .catch(error => console.error('Error al obtener datos del propietario:', error));
-    }
-  }, []);
+  const email = localStorage.getItem('email');
+  if (email) {
+    axios.get(`http://localhost:3000/api/propietarios/${email}`) 
+      .then(response => setDatos(response.data))
+      .catch(error => console.error('Error al obtener datos del propietario:', error));
+  }
+}, []);
+
 
   if (!datos) {
     return <div>Cargando datos...</div>;

@@ -1,3 +1,59 @@
+/* ===========================
+   0) Estilos nuevos para Topbar
+   =========================== */
+
+/* Contenedor fijo en la parte superior */
+.topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;                         /* Altura de la topbar, ajusta si quieres otro tamaño */
+  background-color: #73acf3;            /* Mismo color base que tu sidebar */
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 200;                         /* Para que quede por encima de sidebar y main-content */
+}
+
+.topbar-left {
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+}
+
+.btn-logout-top {
+  background: transparent;
+  border: none;
+  color: white;
+  font-weight: 600;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.btn-logout-top:hover {
+  opacity: 0.8;
+}
+
+.icon-logout-top {
+  font-size: 1.1rem;
+}
+
+/* ===========================
+   1) Tu CSS original, sin cambios exc. los comentados
+   =========================== */
+
 /* Estructura Principal */
 .user-dashboard {
   display: flex;
@@ -5,12 +61,15 @@
   font-family: 'Arial', sans-serif;
   background-color: #e0e7f1;
   position: relative;
+
+  /* → Sólo agregamos esto para empujar todo hacia abajo 60px */
+  padding-top: 60px;
 }
 
 /* Barra lateral */
 .sidebar {
   width: 60px;
-  height: 100vh;
+  height: 100vh;          /* ← Cambiamos a: calc(100vh - 60px) para que no quede debajo de la topbar */
   background: #73acf3;
   color: white;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -18,11 +77,19 @@
   position: fixed;
   z-index: 100;
   border-right: 2px solid rgba(255, 255, 255, 0.1);
+
+  /* ↓ Añadimos esto para que inicie justo debajo de la topbar */
+  top: 60px;
+  height: calc(100vh - 60px);
 }
 
 .sidebar.expanded {
   width: 280px;
   box-shadow: 2px 0 15px rgba(0, 0, 0, 0.2);
+
+  /* ↓ También para la versión expandida */
+  top: 60px;
+  height: calc(100vh - 60px);
 }
 
 /* Perfil de usuario */
@@ -156,6 +223,7 @@
   padding-left: 310px;
 }
 
+/* Resto de tus estilos (tarjetas, listas, responsive, etc.) */
 /* Tarjetas de información */
 .dashboard-cards {
   display: grid;
@@ -286,17 +354,31 @@
   .dashboard-cards {
     grid-template-columns: 1fr;
   }
+
+  /* Ajustamos top y height también en móvil */
+  .sidebar {
+    top: 60px;
+    height: calc(100vh - 60px);
+  }
+  .sidebar.expanded {
+    top: 60px;
+    height: calc(100vh - 60px);
+  }
 }
 
 @media (max-width: 576px) {
   .sidebar {
     transform: translateX(-100%);
+    top: 60px;
+    height: calc(100vh - 60px);
   }
   
   .sidebar.expanded {
     transform: translateX(0);
     width: 80%;
     box-shadow: 0 0 0 100vw rgba(0, 0, 0, 0.5);
+    top: 60px;
+    height: calc(100vh - 60px);
   }
   
   .main-content {
