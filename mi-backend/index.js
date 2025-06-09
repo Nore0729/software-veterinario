@@ -163,8 +163,8 @@ app.post('/api/registro-mascota', (req, res) => {
 
   const query = `
     INSERT INTO mascotas (
-      documento, nombre, especie, raza, genero, color,
-      fechaNacimiento, peso, tamano, estadoReproductivo, vacunado, observaciones
+      doc_pro, nombre, especie, raza, genero, color,
+      fecha_nac, peso, tamano, estado_reproductivo, vacunado, observaciones
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
