@@ -31,7 +31,7 @@ function RegistroMascota() {
   const requiredFields = {
     1: ['doc_pro', 'nombre', 'especie', 'raza', 'genero'],
     2: ['fecha_nac', 'tamano', 'estado_reproductivo'],
-    3: ['vacunado'] // observaciones no es obligatorio
+    3: ['vacunado']
   };
 
   const especieSeleccionada = watch("especie");
@@ -45,7 +45,6 @@ function RegistroMascota() {
   }, [especieSeleccionada]);
 
   useEffect(() => {
-    // Actualiza el progreso según campos llenos de la etapa actual
     const values = watch();
     let filledFields = 0;
     requiredFields[step].forEach(field => {
@@ -195,11 +194,7 @@ function RegistroMascota() {
 
             <div className="input-group">
               <label>Color</label>
-              <input
-                type="text"
-                {...register("color")}
-                placeholder="Color de la mascota"
-              />
+              <input type="text" {...register("color")} placeholder="Color de la mascota" />
             </div>
 
             <div className="input-group">
@@ -214,12 +209,7 @@ function RegistroMascota() {
 
             <div className="input-group">
               <label>Peso (kg)</label>
-              <input
-                type="number"
-                step="0.01"
-                {...register("peso")}
-                placeholder="Peso aproximado"
-              />
+              <input type="number" step="0.01" {...register("peso")} placeholder="Peso aproximado" />
             </div>
 
             <div className="input-group">
@@ -271,23 +261,19 @@ function RegistroMascota() {
 
             <div className="input-group">
               <label>Observaciones</label>
-              <textarea
-                {...register("observaciones")}
-                placeholder="Comentarios adicionales"
-                rows="3"
-              ></textarea>
+              <textarea {...register("observaciones")} placeholder="Comentarios adicionales" rows="3"></textarea>
             </div>
           </fieldset>
         )}
 
         <div className="form-navigation">
           {step > 1 && (
-            <button type="button" className="btn-prev" onClick={prevStep}>
+            <button type="button" className="nav-btn prev-btn" onClick={prevStep}>
               <ChevronLeft /> Anterior
             </button>
           )}
           {step < 3 && (
-            <button type="button" className="btn-next" onClick={nextStep}>
+            <button type="button" className="nav-btn prev-btn" onClick={nextStep}>
               Siguiente <ChevronRight />
             </button>
           )}
@@ -301,4 +287,3 @@ function RegistroMascota() {
 }
 
 export default RegistroMascota;
-

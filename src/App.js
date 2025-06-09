@@ -8,7 +8,7 @@ import Privado from "./services/privado"; // Guard para Admin y Veterinario
 import UserLayout from "./layout/UserLayout"; // Layout para usuarios generales
 
 // Módulos de Rutas
-import PublicRoutes from "./routes/publicas.rutas.js";
+import PublicRoutes from "./routes/publicas.rutas.js"; 
 import AdminRoutes from "./routes/admin.rutas.js";
 import UserSpecificRoutes from "./routes/usuario.rutas.js";
 import VeterinarioRoutes from "./routes/veterinario.rutas.js";
