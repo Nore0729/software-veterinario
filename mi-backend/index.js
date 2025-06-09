@@ -139,66 +139,60 @@ app.listen(port, () => {
 });
 
 
-// Registrar mascota
+// registro de la mascota 
 app.post('/api/registro-mascota', (req, res) => {
   const {
-    doc_pro,
+    documento,
     nombre,
     especie,
     raza,
     genero,
     color,
-    fecha_nac,
+    fechaNacimiento,
     peso,
     tamano,
-    estado_reproductivo,
+    estadoReproductivo,
     vacunado,
     observaciones
   } = req.body;
 
-  // Verificar si el propietario existe
-  const checkQuery = 'SELECT doc FROM usuarios WHERE doc = ?';
-  db.query(checkQuery, [doc_pro], (err, results) => {
-    if (err) {
-      console.error('Error al verificar propietario:', err);
-      return res.status(500).json({ error: 'Error al verificar propietario' });
-    }
+  // Validar campos obligatorios
+  if (!documento || !nombre) {
+    return res.status(400).send('Documento del propietario y nombre de la mascota son obligatorios');
+  }
 
-    if (results.length === 0) {
-      return res.status(400).json({ error: 'El propietario no está registrado' });
-    }
+  const query = `
+    INSERT INTO mascotas (
+      documento, nombre, especie, raza, genero, color,
+      fechaNacimiento, peso, tamano, estadoReproductivo, vacunado, observaciones
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `;
 
-    const insertQuery = `
-      INSERT INTO mascotas (
-        doc_pro, nombre, especie, raza, genero, color, fecha_nac, peso,
-        tamano, estado_reproductivo, vacunado, observaciones
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `;
-
-    db.query(insertQuery, [
-      doc_pro,
+  db.query(
+    query,
+    [
+      documento,
       nombre,
-      especie,
-      raza,
-      genero,
+      especie || null,
+      raza || null,
+      genero || null,
       color || null,
-      fecha_nac,
+      fechaNacimiento || null,
       peso || null,
-      tamano,
-      estado_reproductivo,
-      vacunado ? 1 : 0,
+      tamano || null,
+      estadoReproductivo || null,
+      vacunado === true || vacunado === "true" ? 1 : 0,
       observaciones || null
-    ], (insertErr) => {
-      if (insertErr) {
-        console.error('Error al registrar mascota:', insertErr);
-        return res.status(500).json({ error: 'Error al registrar mascota' });
+    ],
+    (err, results) => {
+      if (err) {
+        console.error('Error al registrar la mascota:', err);
+        return res.status(500).send('Hubo un problema al registrar la mascota');
       }
-
-      res.status(201).json({ message: 'Mascota registrada con éxito' });
-    });
-  });
+      res.status(201).send('Mascota registrada exitosamente');
+    }
+  );
 });
-
 
 // Listar mascotas de un propietario
 app.get('/api/mascotas/:doc_pro', (req, res) => {
