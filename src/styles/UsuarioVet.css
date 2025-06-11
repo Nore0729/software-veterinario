@@ -1,0 +1,730 @@
+/* ========== CONTENEDOR PRINCIPAL ========== */
+.pet-profile-container {
+  min-height: 100vh;
+  padding: 24px;
+  background: linear-gradient(135deg, #f0fdff 0%, #e0f7fa 100%);
+  font-family: "Segoe UI", sans-serif;
+  overflow-x: hidden;
+}
+
+/* ========== HEADER ========== */
+.pet-profile-header {
+  margin-bottom: 32px;
+}
+
+.header-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+@media (min-width: 768px) {
+  .header-content {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.back-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(4px);
+  color: #06b6d4;
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid rgba(6, 182, 212, 0.2);
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  width: fit-content;
+}
+
+.back-button:hover {
+  background: rgba(6, 182, 212, 0.1);
+  border-color: #06b6d4;
+}
+
+.back-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.header-title {
+  flex: 1;
+}
+
+.pet-profile-title {
+  font-size: 32px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #0f766e, #06b6d4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 8px;
+}
+
+.pet-profile-subtitle {
+  font-size: 18px;
+  color: #0f766e;
+  line-height: 1.6;
+}
+
+.pending-indicator {
+  color: #f59e0b;
+  font-weight: 600;
+}
+
+.edit-profile-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #06b6d4, #0891b2);
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(6, 182, 212, 0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.edit-profile-button:hover {
+  box-shadow: 0 8px 25px rgba(6, 182, 212, 0.3);
+}
+
+.edit-icon {
+  width: 16px;
+  height: 16px;
+}
+
+/* ========== TARJETA DE INFORMACIÓN DE MASCOTA ========== */
+.pet-info-card {
+  background-color: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(4px);
+  border-radius: 16px;
+  border: 1px solid rgba(6, 182, 212, 0.1);
+  box-shadow: 0 4px 20px rgba(6, 182, 212, 0.08);
+  margin-bottom: 32px;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.pet-info-content {
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+@media (min-width: 1024px) {
+  .pet-info-content {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+}
+
+.pet-photo-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+@media (min-width: 768px) {
+  .pet-photo-section {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
+.pet-photo-container {
+  position: relative;
+}
+
+.pet-photo {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid rgba(6, 182, 212, 0.2);
+  transition: all 0.3s ease;
+}
+
+.photo-edit-button {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #06b6d4, #0891b2);
+  border: none;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 10px rgba(6, 182, 212, 0.3);
+  transition: all 0.3s ease;
+}
+
+.photo-edit-button:hover {
+  transform: scale(1.1);
+}
+
+.camera-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.pet-basic-info {
+  text-align: center;
+}
+
+@media (min-width: 768px) {
+  .pet-basic-info {
+    text-align: left;
+    margin-left: 24px;
+  }
+}
+
+.pet-name {
+  font-size: 28px;
+  font-weight: 700;
+  color: #0f766e;
+  margin-bottom: 8px;
+}
+
+.pet-breed {
+  font-size: 18px;
+  color: #0891b2;
+  margin-bottom: 16px;
+}
+
+.pet-stats {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+}
+
+@media (min-width: 768px) {
+  .pet-stats {
+    justify-content: flex-start;
+  }
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: #0f766e;
+  background: rgba(6, 182, 212, 0.1);
+  padding: 8px 12px;
+  border-radius: 20px;
+}
+
+.stat-icon {
+  width: 16px;
+  height: 16px;
+  color: #06b6d4;
+}
+
+.owner-info-section {
+  flex: 1;
+}
+
+.section-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #0f766e;
+  margin-bottom: 16px;
+}
+
+.owner-details {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.owner-detail {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 16px;
+  color: #0f766e;
+}
+
+.detail-icon {
+  width: 20px;
+  height: 20px;
+  color: #06b6d4;
+}
+
+/* ========== TABS ========== */
+.tabs-container {
+  background-color: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(4px);
+  border-radius: 16px;
+  border: 1px solid rgba(6, 182, 212, 0.1);
+  box-shadow: 0 4px 20px rgba(6, 182, 212, 0.08);
+  overflow: hidden;
+}
+
+.tabs-header {
+  display: flex;
+  background: linear-gradient(135deg, #06b6d4, #0891b2);
+  overflow-x: auto;
+}
+
+.tab-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 24px;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  border-bottom: 3px solid transparent;
+}
+
+.tab-button:hover {
+  color: white;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.tab-button.active {
+  color: white;
+  background: rgba(255, 255, 255, 0.15);
+  border-bottom-color: white;
+}
+
+.tab-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.tabs-content {
+  padding: 32px;
+}
+
+.tab-content {
+  min-height: 400px;
+}
+
+/* ========== OVERVIEW TAB ========== */
+.overview-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+@media (min-width: 1024px) {
+  .overview-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.overview-card {
+  background: rgba(6, 182, 212, 0.05);
+  border-radius: 12px;
+  padding: 24px;
+  border: 1px solid rgba(6, 182, 212, 0.1);
+}
+
+.notes-card {
+  grid-column: 1 / -1;
+}
+
+.card-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #0f766e;
+  margin-bottom: 16px;
+}
+
+.appointment-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(6, 182, 212, 0.1);
+}
+
+.appointment-item:last-child {
+  border-bottom: none;
+}
+
+.appointment-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.appointment-date {
+  font-weight: 600;
+  color: #0f766e;
+}
+
+.appointment-service {
+  font-size: 14px;
+  color: #0891b2;
+}
+
+.basic-info-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+@media (min-width: 768px) {
+  .basic-info-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+}
+
+.info-label {
+  font-weight: 500;
+  color: #0891b2;
+}
+
+.info-value {
+  font-weight: 600;
+  color: #0f766e;
+}
+
+.note-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(6, 182, 212, 0.1);
+}
+
+.note-item:last-child {
+  border-bottom: none;
+}
+
+.note-icon {
+  width: 16px;
+  height: 16px;
+  color: #f59e0b;
+  margin-top: 2px;
+}
+
+.no-data {
+  color: #0891b2;
+  font-style: italic;
+  text-align: center;
+  padding: 20px 0;
+}
+
+/* ========== APPOINTMENTS TAB ========== */
+.appointments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.appointment-card {
+  background: rgba(6, 182, 212, 0.05);
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid rgba(6, 182, 212, 0.1);
+  transition: all 0.3s ease;
+}
+
+.appointment-card:hover {
+  background: rgba(6, 182, 212, 0.08);
+  transform: translateY(-2px);
+}
+
+.appointment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.appointment-date-time {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #0f766e;
+  font-weight: 500;
+}
+
+.appointment-icon {
+  width: 16px;
+  height: 16px;
+  color: #06b6d4;
+}
+
+.appointment-body h5 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #0f766e;
+  margin-bottom: 8px;
+}
+
+.appointment-vet {
+  font-size: 14px;
+  color: #0891b2;
+  margin-bottom: 8px;
+}
+
+.appointment-notes {
+  font-size: 14px;
+  color: #0f766e;
+  background: rgba(6, 182, 212, 0.1);
+  padding: 8px 12px;
+  border-radius: 6px;
+  margin-top: 8px;
+}
+
+/* ========== MEDICAL HISTORY TAB ========== */
+.medical-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.medical-record {
+  display: flex;
+  gap: 16px;
+  background: rgba(6, 182, 212, 0.05);
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid rgba(6, 182, 212, 0.1);
+  transition: all 0.3s ease;
+}
+
+.medical-record:hover {
+  background: rgba(6, 182, 212, 0.08);
+  transform: translateY(-2px);
+}
+
+.record-icon-container {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #06b6d4, #0891b2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.record-icon {
+  width: 24px;
+  height: 24px;
+  color: white;
+}
+
+.record-content {
+  flex: 1;
+}
+
+.record-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.record-type {
+  font-size: 16px;
+  font-weight: 600;
+  color: #0f766e;
+}
+
+.record-date {
+  font-size: 14px;
+  color: #0891b2;
+  font-weight: 500;
+}
+
+.record-description {
+  font-size: 14px;
+  color: #0f766e;
+  margin-bottom: 4px;
+}
+
+.record-vet {
+  font-size: 12px;
+  color: #0891b2;
+  font-style: italic;
+}
+
+/* ========== VACCINATIONS TAB ========== */
+.vaccinations-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+@media (min-width: 768px) {
+  .vaccinations-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .vaccinations-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.vaccination-card {
+  background: rgba(6, 182, 212, 0.05);
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid rgba(6, 182, 212, 0.1);
+  transition: all 0.3s ease;
+}
+
+.vaccination-card:hover {
+  background: rgba(6, 182, 212, 0.08);
+  transform: translateY(-2px);
+}
+
+.vaccination-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.vaccination-icon {
+  width: 24px;
+  height: 24px;
+  color: #06b6d4;
+}
+
+.vaccination-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #0f766e;
+}
+
+.vaccination-dates {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.date-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.date-label {
+  font-size: 14px;
+  color: #0891b2;
+}
+
+.date-value {
+  font-size: 14px;
+  font-weight: 500;
+  color: #0f766e;
+}
+
+.next-due {
+  color: #f59e0b;
+  font-weight: 600;
+}
+
+/* ========== STATUS BADGES ========== */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  border-radius: 50px;
+  font-size: 12px;
+  font-weight: 600;
+  color: white;
+}
+
+.status-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.status-completed {
+  background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.status-pending {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+
+.status-cancelled {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+.status-default {
+  background: linear-gradient(135deg, #6b7280, #4b5563);
+}
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 768px) {
+  .pet-profile-container {
+    padding: 16px;
+  }
+
+  .pet-profile-title {
+    font-size: 24px;
+  }
+
+  .pet-profile-subtitle {
+    font-size: 16px;
+  }
+
+  .pet-info-content {
+    padding: 20px;
+  }
+
+  .tabs-content {
+    padding: 20px;
+  }
+
+  .tab-button {
+    padding: 12px 16px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .tabs-header {
+    flex-wrap: wrap;
+  }
+
+  .appointment-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .record-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+}
