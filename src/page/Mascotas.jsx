@@ -16,7 +16,8 @@ function RegistroMascota() {
     handleSubmit, 
     formState: { errors },
     watch,
-    trigger
+    trigger,
+    setValue
   } = useForm({ mode: 'onChange' });
 
   const requiredFields = {
@@ -48,7 +49,6 @@ function RegistroMascota() {
   const prevStep = () => setStep(step - 1);
 
   const onSubmit = async (data) => {
-    // Convertir vacunado a booleano
     data.vacunado = data.vacunado === "Sí" ? true : false;
 
     try {
@@ -90,7 +90,7 @@ function RegistroMascota() {
         {step === 1 && (
           <fieldset className="form-section">
             <legend><User className="icon-legend" /> Información General</legend>
-            
+
             <div className="input-group">
               <div className="label-container">
                 <User className="icon-small" />
@@ -98,19 +98,19 @@ function RegistroMascota() {
               </div>
               <input
                 type="text"
+                maxLength={10}
+                onInput={(e) => {
+                  e.target.value = e.target.value.replace(/\D/g, '').slice(0, 10);
+                }}
                 {...register("documento", {
                   required: "Campo obligatorio",
                   pattern: {
                     value: /^[0-9]+$/,
                     message: "Solo números permitidos"
                   },
-                  minLength: {
-                    value: 6,
-                    message: "Mínimo 6 caracteres"
-                  },
                   maxLength: {
-                    value: 15,
-                    message: "Máximo 15 caracteres"
+                    value: 10,
+                    message: "Máximo 10 caracteres"
                   }
                 })}
                 className={errors.documento ? 'error' : ''}
@@ -121,67 +121,43 @@ function RegistroMascota() {
               )}
             </div>
 
-            <div className="input-group">
-              <div className="label-container">
-                <User className="icon-small" />
-                <label>Nombre de la Mascota *</label>
+            {["nombre", "especie", "raza"].map((field) => (
+              <div key={field} className="input-group">
+                <div className="label-container">
+                  <User className="icon-small" />
+                  <label>{field.charAt(0).toUpperCase() + field.slice(1)} *</label>
+                </div>
+                <input
+                  type="text"
+                  maxLength={50}
+                  onInput={(e) => {
+                    const value = e.target.value.toUpperCase().replace(/[^A-ZÁÉÍÓÚÑ ]/g, '').slice(0, 50);
+                    e.target.value = value;
+                    setValue(field, value);
+                  }}
+                  {...register(field, {
+                    required: "Campo obligatorio",
+                    pattern: {
+                      value: /^[A-ZÁÉÍÓÚÑ ]+$/,
+                      message: "Solo letras mayúsculas permitidas"
+                    },
+                    minLength: {
+                      value: 3,
+                      message: "Mínimo 3 caracteres"
+                    },
+                    maxLength: {
+                      value: 50,
+                      message: "Máximo 50 caracteres"
+                    }
+                  })}
+                  className={errors[field] ? 'error' : ''}
+                  placeholder={`Escribe el ${field}`}
+                />
+                {errors[field] && (
+                  <span className="error-message">{errors[field].message}</span>
+                )}
               </div>
-              <input
-                type="text"
-                {...register("nombre", {
-                  required: "Campo obligatorio",
-                  pattern: {
-                    value: /^[A-Za-zÁÉÍÓÚáéíóúñÑ ]+$/,
-                    message: "Solo letras permitidas"
-                  },
-                  minLength: {
-                    value: 3,
-                    message: "Mínimo 3 caracteres"
-                  }
-                })}
-                className={errors.nombre ? 'error' : ''}
-                placeholder="Escribe el nombre de la mascota"
-              />
-              {errors.nombre && (
-                <span className="error-message">{errors.nombre.message}</span>
-              )}
-            </div>
-
-            <div className="input-group">
-              <div className="label-container">
-                <User className="icon-small" />
-                <label>Especie *</label>
-              </div>
-              <input
-                type="text"
-                {...register("especie", {
-                  required: "Campo obligatorio",
-                })}
-                className={errors.especie ? 'error' : ''}
-                placeholder="Escribe la especie de la mascota"
-              />
-              {errors.especie && (
-                <span className="error-message">{errors.especie.message}</span>
-              )}
-            </div>
-
-            <div className="input-group">
-              <div className="label-container">
-                <User className="icon-small" />
-                <label>Raza *</label>
-              </div>
-              <input
-                type="text"
-                {...register("raza", {
-                  required: "Campo obligatorio",
-                })}
-                className={errors.raza ? 'error' : ''}
-                placeholder="Escribe la raza de la mascota"
-              />
-              {errors.raza && (
-                <span className="error-message">{errors.raza.message}</span>
-              )}
-            </div>
+            ))}
 
             <div className="input-group">
               <div className="label-container">
@@ -214,7 +190,27 @@ function RegistroMascota() {
               </div>
               <input
                 type="text"
-                {...register("color")}
+                maxLength={30}
+                onInput={(e) => {
+                  const value = e.target.value.toUpperCase().replace(/[^A-ZÁÉÍÓÚÑ ]/g, '');
+                  e.target.value = value;
+                  setValue("color", value);
+                }}
+                {...register("color", {
+                  required: "Campo obligatorio",
+                  pattern: {
+                    value: /^[A-ZÁÉÍÓÚÑ ]+$/,
+                    message: "Solo letras mayúsculas permitidas"
+                  },
+                  minLength: {
+                    value: 3,
+                    message: "Mínimo 3 caracteres"
+                  },
+                  maxLength: {
+                    value: 30,
+                    message: "Máximo 30 caracteres"
+                  }
+                })}
                 className={errors.color ? 'error' : ''}
                 placeholder="Escribe el color de la mascota"
               />
@@ -239,50 +235,73 @@ function RegistroMascota() {
             </div>
 
             <div className="input-group">
-              <div className="label-container">
-                <User className="icon-small" />
-                <label>Peso (kg)</label>
-              </div>
-              <input
-                type="number"
-                step="0.01"
-                {...register("peso")}
-                className={errors.peso ? 'error' : ''}
-                placeholder="Escribe el peso de la mascota"
-              />
-              {errors.peso && (
-                <span className="error-message">{errors.peso.message}</span>
-              )}
+            <div className="label-container">
+              <User className="icon-small" />
+              <label>Peso (kg)</label>
             </div>
+            <input
+              type="text"
+              inputMode="decimal"
+              maxLength={3}
+              onInput={(e) => {
+                let value = e.target.value.replace(/[^0-9.]/g, ''); 
+                const parts = value.split('.');
+                if (parts.length > 2) {
+                  value = parts[0] + '.' + parts[1]; 
+                }
+                if (value.length > 3) {
+                  value = value.slice(0, 3);
+                }
+                e.target.value = value;
+              }}
+              {...register("peso", {
+                required: "Campo obligatorio",
+                pattern: {
+                  value: /^[0-9]{1,3}(\.[0-9]?)?$/,
+                  message: "Máximo 3 números y 1 decimal"
+                }
+              })}
+              className={errors.peso ? 'error' : ''}
+              placeholder="Ej: 12.5"
+            />
+            {errors.peso && (
+              <span className="error-message">{errors.peso.message}</span>
+            )}
+          </div>
+
+
+          <div className="input-group">
+          <div className="label-container">
+            <User className="icon-small" />
+            <label>Tamaño</label>
+          </div>
+          <select
+            {...register("tamano", { required: "Campo obligatorio" })}
+            className={errors.tamano ? 'error' : ''}
+          >
+            <option value="">Seleccionar</option>
+            <option value="Pequeño">Pequeño</option>
+            <option value="Mediano">Mediano</option>
+            <option value="Grande">Grande</option>
+          </select>
+          {errors.tamano && (
+            <span className="error-message">{errors.tamano.message}</span>
+          )}
+        </div>
+
 
             <div className="input-group">
               <div className="label-container">
                 <User className="icon-small" />
-                <label>Tamaño</label>
-              </div>
-              <input
-                type="text"
-                {...register("tamano")}
-                className={errors.tamano ? 'error' : ''}
-                placeholder="Escribe el tamaño de la mascota"
-              />
-              {errors.tamano && (
-                <span className="error-message">{errors.tamano.message}</span>
-              )}
-            </div>
-
-            <div className="input-group">
-              <div className="label-container">
-                <User className="icon-small" />
-                <label>Estado Reproductivo</label>
+                <label>Esterlizado</label>
               </div>
               <select
                 {...register("estadoReproductivo")}
                 className={errors.estadoReproductivo ? 'error' : ''}
               >
                 <option value="">Seleccionar</option>
-                <option value="Castrado">Castrado</option>
-                <option value="No Castrado">No Castrado</option>
+                <option value="Castrado">Sí</option>
+                <option value="No Castrado">No </option>
               </select>
               {errors.estadoReproductivo && (
                 <span className="error-message">{errors.estadoReproductivo.message}</span>
@@ -301,7 +320,7 @@ function RegistroMascota() {
                 <label>Vacunado</label>
               </div>
               <select
-                {...register("vacunado")}
+                {...register("vacunado", { required: "Campo obligatorio" })}
                 className={errors.vacunado ? 'error' : ''}
               >
                 <option value="">Seleccionar</option>
@@ -319,7 +338,14 @@ function RegistroMascota() {
                 <label>Observaciones</label>
               </div>
               <textarea
-                {...register("observaciones")}
+                {...register("observaciones", {
+                  required: "Campo obligatorio",
+                  onChange: (e) => {
+                    const value = e.target.value;
+                    const capitalized = value.charAt(0).toUpperCase() + value.slice(1);
+                    setValue("observaciones", capitalized);
+                  }
+                })}
                 rows={4}
                 placeholder="Escribe cualquier observación adicional"
               />
@@ -332,12 +358,12 @@ function RegistroMascota() {
 
         <div className="form-navigation">
           {step > 1 && (
-            <button type="button" className="btn-prev" onClick={prevStep}>
+            <button type="button" className="nav-btn prev-btn" onClick={prevStep}>
               <ChevronLeft /> Anterior
             </button>
           )}
           {step < 3 && (
-            <button type="button" className="btn-next" onClick={nextStep}>
+            <button type="button" className="nav-btn prev-btn" onClick={nextStep}>
               Siguiente <ChevronRight />
             </button>
           )}
@@ -348,10 +374,6 @@ function RegistroMascota() {
           )}
         </div>
       </form>
-
-      <footer className="form-footer">
-        <Link to="/MascotasBienvenida">Volver a Bienvenida</Link>
-      </footer>
     </div>
   );
 }
