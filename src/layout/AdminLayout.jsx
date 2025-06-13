@@ -5,10 +5,11 @@ import "../styles/Administrador/AdminLayout.css"
 function AdminLayout({ children }) {
   return (
     <div className="admin-layout-container">
-      <MenuAdmin />
-      <div className="admin-content-wrapper">
-        {children}
-      </div>
+      <MenuAdmin>
+        <div className="admin-content-wrapper">
+          {children}
+        </div>
+      </MenuAdmin>
     </div>
   );
 }

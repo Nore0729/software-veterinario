@@ -1,437 +1,494 @@
-
-.logo-petlovers img {
-  width: 120px;  /* Ajusta el tamaño según sea necesario */
-  height: auto;  /* Mantiene la proporción original */
+/* Variables CSS únicas para admin dashboard */
+:root {
+  --admin-primary-color: #1e3a8a;
+  --admin-primary-hover: #1e40af;
+  --admin-primary-light: #3b82f6;
+  --admin-secondary-color: #64748b;
+  --admin-background-color: #f8fafc;
+  --admin-card-background: #ffffff;
+  --admin-border-color: #e2e8f0;
+  --admin-text-primary: #1e293b;
+  --admin-text-secondary: #64748b;
+  --admin-success-color: #10b981;
+  --admin-error-color: #ef4444;
+  --admin-warning-color: #f59e0b;
+  --admin-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --admin-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --admin-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --admin-border-radius: 12px;
+  --admin-border-radius-sm: 8px;
+  --admin-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --admin-sidebar-width: 280px;
+  --admin-header-height: 70px;
 }
 
+/* Container principal único */
+.admin-dashboard-container {
+  min-height: 100vh;
+  background: var(--admin-background-color);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  position: relative;
+}
 
-.admin-logo-container {
+/* Header Superior Azul */
+.admin-dashboard-header {
+  background: linear-gradient(135deg, var(--admin-primary-color) 0%, var(--admin-primary-hover) 100%);
+  color: white;
+  height: var(--admin-header-height);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: var(--admin-shadow-lg);
+  width: 100%;
+}
+
+.admin-dashboard-header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%;
+  padding: 0 2rem;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+/* Header Left */
+.admin-dashboard-header-left {
   display: flex;
   align-items: center;
   gap: 1rem;
 }
 
-.menu-toggle {
-  background: none;
+/* Header Right */
+.admin-dashboard-header-right {
+  display: flex;
+  align-items: center;
+}
+
+/* Logo */
+.admin-dashboard-logo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.admin-dashboard-logo img {
+  height: 45px;
+  width: auto;
+  border-radius: var(--admin-border-radius-sm);
+  box-shadow: var(--admin-shadow-md);
+  transition: var(--admin-transition);
+}
+
+.admin-dashboard-logo img:hover {
+  transform: scale(1.05);
+}
+
+/* Botón de menú móvil */
+.admin-dashboard-mobile-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
   border: none;
   cursor: pointer;
-  color: #4b5563;
-  padding: 0.5rem;
-  border-radius: 0.375rem;
-  transition: background-color 0.2s;
+  padding: 8px;
+  border-radius: var(--admin-border-radius-sm);
+  color: white;
+  transition: var(--admin-transition);
 }
 
+.admin-dashboard-mobile-toggle:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
 
-.admin-user-section {
+/* Sección de perfil en el header */
+.admin-dashboard-profile-section {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 1rem;
 }
 
-.admin-avatar-wrapper {
+.admin-dashboard-profile-info {
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  border-radius: var(--admin-border-radius-sm);
+  transition: var(--admin-transition);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-.admin-user-info {
+.admin-dashboard-profile-info:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+.admin-dashboard-profile-avatar {
+  width: 36px;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.admin-dashboard-profile-details {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
 }
 
-.admin-doctor-name {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #111827;
-}
-
-.sidebar-header h1 {
-  font-size: 1.125rem;
+.admin-dashboard-profile-name {
   font-weight: 600;
-  color: #111827;
+  color: white;
+  font-size: 0.9rem;
+  line-height: 1.2;
 }
 
-.admin-sidebar ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+.admin-dashboard-profile-role {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.2;
 }
 
-.admin-sidebar li {
-  margin: 0.25rem 0;
+.admin-dashboard-profile-chevron {
+  color: rgba(255, 255, 255, 0.8);
+  transition: var(--admin-transition);
 }
 
-.admin-sidebar li a {
-  display: flex;
-  align-items: center;
-  padding: 0.75rem 1.25rem;
-  color: #4b5563;
-  text-decoration: none;
-  transition: all 0.2s;
-  border-radius: 0.375rem;
-  margin: 0 0.5rem;
-}
-
-
-.nav-icon {
-  margin-right: 0.75rem;
-  flex-shrink: 0;
-}
-
-.admin-sidebar span {
-  white-space: nowrap;
-}
-
-
-.admin-heading {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #243250;
-  margin-bottom: 1.5rem;
-}
-
-.dropdown-menu {
-  position: relative;
-}
-
-.dropdown-toggle {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  position: relative;
-  cursor: pointer;
-}
-
-.dropdown-arrow {
-  position: absolute;
-  right: 15px;
-  transition: transform 0.3s ease;
-}
-
-.dropdown-arrow.open {
+.admin-dashboard-profile-section.admin-dashboard-profile-active .admin-dashboard-profile-chevron {
   transform: rotate(180deg);
 }
 
-.dropdown-content {
-  max-height: 0;
+/* Dropdown del perfil */
+.admin-dashboard-profile-dropdown {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  min-width: 200px;
+  background: var(--admin-card-background);
+  border-radius: var(--admin-border-radius-sm);
+  box-shadow: var(--admin-shadow-lg);
+  border: 1px solid var(--admin-border-color);
   overflow: hidden;
-  transition: max-height 0.3s ease;
-  border-radius: 10px;
-  margin-top: 50px;
-  margin-left: 50px;
-  margin-right: 50px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.3s ease-out;
+  z-index: 1001;
 }
 
-.dropdown-content.show {
-  max-height: 400px;
+.admin-dashboard-profile-dropdown.admin-dashboard-dropdown-show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
 }
 
-
-.dropdown-content li a {
-  padding: 10px 15px;
+.admin-dashboard-dropdown-item {
   display: flex;
   align-items: center;
-  font-size: 0.9em;
-  
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  color: var(--admin-text-primary);
+  text-decoration: none;
+  transition: var(--admin-transition);
+  border: none;
+  background: none;
+  width: 100%;
+  cursor: pointer;
+  font-size: 0.9rem;
 }
 
-.admin-sidebar {
-  position: fixed; /* Cambia de relative a fixed */
-  top: 0;
-  left: 0;
-  height: 100vh;
-  width: 250px; /* Ancho del menú expandido */
-  z-index: 1000;
-  transition: width 0.3s ease, transform 0.3s ease;
-  /* Resto de tus estilos... */
+.admin-dashboard-dropdown-item:hover {
+  background: linear-gradient(135deg, var(--admin-primary-color) 0%, var(--admin-primary-hover) 100%);
+  color: white;
 }
 
-.admin-sidebar.collapsed {
-  width: 60px; /* Ancho del menú colapsado */
+.admin-dashboard-dropdown-divider {
+  height: 1px;
+  background: var(--admin-border-color);
+  margin: 0.5rem 0;
 }
 
-/* Para dispositivos móviles */
-@media (max-width: 768px) {
-  .admin-sidebar {
-    transform: translateX(-100%);
-  }
-  
-  .admin-sidebar.open {
-    transform: translateX(0);
-  }
+.admin-dashboard-logout-btn {
+  color: var(--admin-error-color);
 }
 
-/* También ajusta el header si lo tienes */
-.admin-header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 60px; /* Ajusta según tu diseño */
+.admin-dashboard-logout-btn:hover {
+  background: linear-gradient(135deg, var(--admin-error-color) 0%, #dc2626 100%);
+  color: white;
+}
+
+/* Wrapper principal */
+.admin-dashboard-main-wrapper {
+  display: flex;
+  min-height: calc(100vh - var(--admin-header-height));
+}
+
+/* Sidebar */
+.admin-dashboard-sidebar {
+  width: var(--admin-sidebar-width);
+  background: var(--admin-card-background);
+  border-right: 1px solid var(--admin-border-color);
+  position: sticky;
+  top: var(--admin-header-height);
+  height: calc(100vh - var(--admin-header-height));
+  overflow-y: auto;
   z-index: 999;
-  /* Resto de tus estilos... */
+  transition: var(--admin-transition);
 }
 
-.admin-content-wrapper {
-  margin-top: 70px; 
-}
-
-:root {
-  --primary-color: #3498db7c;
-  --accent-color: #e74c3c;
-  --light-color: #ecf0f1;
-  --success-color: #2ecc71;
-  --warning-color: #f39c12;
-  --info-color: #1abc9c;
-  --sidebar-width: 250px;
-  --sidebar-collapsed-width: 80px;
-  --header-height: 70px;
-  --transition-speed: 0.3s;
-}
-
-.admin-header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: var(--header-height);
-  background-color: white;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.425);
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  padding: 0 20px;
-}
-
-.admin-title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--secondary-color);
-  margin-left: 10px;
-}
-
-.admin-user-section {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
-
-.admin-avatar-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.admin-user-info {
+/* Menú de navegación */
+.admin-dashboard-nav-menu {
+  list-style: none;
+  margin: 0;
+  padding: 1.5rem 0;
+  height: 100%;
+  width: 100%;
   display: flex;
   flex-direction: column;
 }
-.Cerrar-sesion {
-  display: flex;
-  justify-content: flex-end; /* Ajusta la posición si es necesario */
-  margin-right: 20px; /* Espaciado a la derecha */
+
+.admin-dashboard-nav-menu li {
+  margin: 0;
+  width: 100%;
 }
 
-.Cerrar-sesion button {
-  display: flex;
-  border-radius: 15px;
-  align-items: center;
-  color: rgb(0, 0, 0);
-  padding: 10px 20px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: transform 0.2s;
-}
-
-.Cerrar-sesion button:hover {
-  background-color: #ff6251da; /* Rojo más oscuro al pasar el mouse */
-  transform: scale(1.05); /* Efecto de aumento */
-}
-
-.Cerrar-sesion button .nav-icon {
-  margin-right: 8px; /* Separación entre el ícono y el texto */
-}
-
-
-
-.admin-sidebar {
-  position: fixed;
-  top: var(--header-height);
-  left: 0;
-  width: var(--sidebar-width);
-  height: calc(100vh - var(--header-height));
-  background-color: var(--secondary-color);
-  color: white;
-  transition: all var(--transition-speed);
-  overflow-y: auto;
-  z-index: 90;
-}
-
-.admin-sidebar.open {
-  left: 0;
-}
-
-.sidebar-header h1 {
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: var(--light-color);
-}
-
-.admin-sidebar ul {
-  list-style: none;
-  padding: 10px 0;
-}
-
-.admin-sidebar li {
-  position: relative;
-}
-
-.admin-sidebar li a {
+.admin-dashboard-nav-link {
   display: flex;
   align-items: center;
-  padding: 12px 20px;
-  color: var(--light-color);
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  color: var(--admin-text-secondary);
   text-decoration: none;
-  transition: all var(--transition-speed);
-  gap: 10px;
-}
-
-.admin-sidebar li a:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
-.admin-sidebar li a .nav-icon {
-  min-width: 24px;
-}
-
-/* Menú desplegable */
-.dropdown-menu {
+  font-weight: 500;
+  transition: var(--admin-transition);
   position: relative;
+  width: 100%;
+  box-sizing: border-box;
+  font-size: 0.95rem;
 }
 
-.dropdown-toggle::after {
+.admin-dashboard-nav-link:hover {
+  background: #e2e8f0;
+  color: var(--admin-primary-color);
+}
+
+.admin-dashboard-nav-link.admin-dashboard-nav-active {
+  background: #e0f2fe;
+  color: var(--admin-primary-color);
+  border-right: 3px solid var(--admin-primary-color);
+  font-weight: 600;
+}
+
+.admin-dashboard-nav-link.admin-dashboard-nav-active::before {
   content: '';
   position: absolute;
-  right: 20px;
-  top: 50%;
-  transform: translateY(-50%);
-  border: 5px solid transparent;
-  border-top-color: var(--light-color);
-  transition: transform var(--transition-speed);
-}
-
-.dropdown-menu.active .dropdown-toggle::after {
-  transform: translateY(-50%) rotate(180deg);
-}
-
-.dropdown-content.show {
-  max-height: 500px;
-}
-
-.dropdown-content li a {
-  padding-left: 50px;
-}
-
-
-/* Responsive */
-@media (max-width: 992px) {
-  .admin-sidebar {
-    left: calc(-1 * var(--sidebar-width));
-  }
-  
-  .admin-main {
-    margin-left: 0;
-  }
-  
-  .sidebar-backdrop {
-    display: block;
-  }
-}
-
-/* Variables de color */
-:root {
-  --primary-color: #3498db;
-  --secondary-color: #2c3e50;
-  --accent-color: #e74c3c;
-  --light-color: #ecf0f1;
-  --dark-color: #34495e;
-  --success-color: #2ecc71;
-  --warning-color: #f39c12;
-  --info-color: #1abc9c;
-  --sidebar-width: 250px;
-  --sidebar-collapsed-width: 80px;
-  --header-height: 70px;
-  --transition-speed: 0.3s;
-}
-
-
-
-/* Contenedor principal */
-.admin-container {
-  display: flex;
-  min-height: 100vh;
-  position: relative;
-}
-
-.admin-header-content {
-  display: flex;
-  width: 100%;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.admin-logo-container {
-  display: flex;
-  align-items: center;
-}
-
-.admin-title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--secondary-color);
-  margin-left: 10px;
-}
-
-.admin-user-section {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
-
-.admin-avatar-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.Cerrar-sesion {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  cursor: pointer;
-  padding: 8px 15px;
-  border-radius: 5px;
-  color: var(--accent-color);
-  transition: all var(--transition-speed);
-}
-
-
-.admin-sidebar.open {
   left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: var(--admin-primary-color);
 }
 
-
-.sidebar-header h1 {
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: var(--light-color);
+.admin-dashboard-nav-icon {
+  color: var(--admin-text-secondary);
+  transition: var(--admin-transition);
+  flex-shrink: 0;
+  width: 20px;
+  text-align: center;
 }
 
-.admin-sidebar ul {
-  list-style: none;
-  padding: 10px 0;
+.admin-dashboard-nav-link:hover .admin-dashboard-nav-icon,
+.admin-dashboard-nav-link.admin-dashboard-nav-active .admin-dashboard-nav-icon {
+  color: var(--admin-primary-color);
 }
 
-.admin-sidebar li {
+/* Dropdown menu MEJORADO */
+.admin-dashboard-dropdown-menu {
   position: relative;
+  width: 100%;
+}
+
+.admin-dashboard-dropdown-toggle {
+  justify-content: space-between;
+  width: 100%;
+}
+
+.admin-dashboard-dropdown-chevron {
+  color: var(--admin-text-secondary);
+  transition: var(--admin-transition);
+  margin-left: auto;
+  font-size: 0.8rem;
+}
+
+.admin-dashboard-dropdown-menu.admin-dashboard-dropdown-active .admin-dashboard-dropdown-chevron {
+  transform: rotate(180deg);
+}
+
+.admin-dashboard-dropdown-menu:hover .admin-dashboard-dropdown-toggle .admin-dashboard-dropdown-chevron {
+  color: var(--admin-primary-color);
+}
+
+/* Contenido del dropdown MEJORADO */
+.admin-dashboard-dropdown-content {
+  max-height: 0;
+  overflow: hidden;
+  background: var(--admin-card-background);
+  transition: max-height 0.3s ease-out;
+  width: 100%;
+  border: 1px solid var(--admin-border-color);
+  border-top: none;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.admin-dashboard-dropdown-content.admin-dashboard-dropdown-content-show {
+  max-height: 300px;
+  border-top: 1px solid var(--admin-border-color);
+}
+
+.admin-dashboard-dropdown-content li {
+  width: 100%;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.admin-dashboard-dropdown-content li:last-child {
+  border-bottom: none;
+}
+
+.admin-dashboard-submenu-link {
+  display: block;
+  padding: 0.875rem 1.5rem 0.875rem 3rem;
+  font-size: 0.9rem;
+  color: var(--admin-text-primary);
+  text-decoration: none;
+  transition: var(--admin-transition);
+  position: relative;
+  background: #fafbfc;
+}
+
+.admin-dashboard-submenu-link::before {
+  content: '•';
+  position: absolute;
+  left: 2rem;
+  color: var(--admin-primary-light);
+  font-weight: bold;
+}
+
+.admin-dashboard-submenu-link:hover {
+  background: linear-gradient(135deg, var(--admin-primary-light) 0%, var(--admin-primary-color) 100%);
+  color: white;
+  padding-left: 3.5rem;
+}
+
+.admin-dashboard-submenu-link:hover::before {
+  color: white;
+}
+
+/* Contenido principal */
+.admin-dashboard-main-content {
+  flex: 1;
+  background: #f1f5f9;
+  min-height: calc(100vh - var(--admin-header-height));
+  overflow-y: auto;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .admin-dashboard-mobile-toggle {
+    display: flex;
+  }
+  
+  .admin-dashboard-sidebar {
+    position: fixed;
+    left: -100%;
+    top: var(--admin-header-height);
+    width: var(--admin-sidebar-width);
+    z-index: 999;
+    transition: left 0.3s ease-out;
+  }
+  
+  .admin-dashboard-sidebar.admin-dashboard-sidebar-open {
+    left: 0;
+  }
+  
+  .admin-dashboard-main-content {
+    width: 100%;
+  }
+  
+  .admin-dashboard-header-content {
+    padding: 0 1rem;
+  }
+  
+  .admin-dashboard-profile-name,
+  .admin-dashboard-profile-role {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --admin-header-height: 60px;
+    --admin-sidebar-width: 100%;
+  }
+  
+  .admin-dashboard-logo img {
+    height: 35px;
+  }
+  
+  .admin-dashboard-profile-info {
+    padding: 0.25rem 0.5rem;
+  }
+  
+  .admin-dashboard-profile-avatar {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+/* Backdrop para móvil */
+.admin-dashboard-sidebar-backdrop {
+  position: fixed;
+  top: var(--admin-header-height);
+  left: 0;
+  width: 100%;
+  height: calc(100vh - var(--admin-header-height));
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 998;
+  opacity: 0;
+  animation: adminFadeIn 0.3s ease-out forwards;
+}
+
+@keyframes adminFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Scrollbar personalizado */
+.admin-dashboard-sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.admin-dashboard-sidebar::-webkit-scrollbar-track {
+  background: var(--admin-background-color);
+  border-radius: var(--admin-border-radius-sm);
+}
+
+.admin-dashboard-sidebar::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, var(--admin-primary-color) 0%, var(--admin-primary-hover) 100%);
+  border-radius: var(--admin-border-radius-sm);
+}
+
+.admin-dashboard-sidebar::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, var(--admin-primary-hover) 0%, var(--admin-primary-color) 100%);
 }
