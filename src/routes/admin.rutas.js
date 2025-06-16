@@ -9,6 +9,7 @@ import MenuAdmin from '../page/admin/MenuAdmin';
 import Admin from '../page/admin/Admin';
 import Clientes from '../page/admin/Clientes';
 import Roles from '../page/admin/Roles';
+import Veterinarios from '../page/admin/Veterinarios'
 import ServiciosAdmin from '../page/admin/ServiciosAdmin';
 
 const AdminRoutes = () => (
@@ -19,6 +20,7 @@ const AdminRoutes = () => (
     <Route path="/Admin" element={<Admin />} />
     <Route path="/Clientes" element={<Clientes />} />
     <Route path="/Roles" element={<Roles />} />
+    <Route path="/Veterinarios" element={<Veterinarios />} />
     <Route path="/ServiciosAdmin" element={<ServiciosAdmin />} />
   </>
 );

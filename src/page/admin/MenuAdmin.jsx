@@ -44,9 +44,6 @@ function MenuAdmin({ children }) {
             <button className="admin-dashboard-mobile-toggle" onClick={toggleSidebar}>
               <Menu size={24} />
             </button>
-            <div className="admin-dashboard-logo">
-              <img src="https://raw.githubusercontent.com/Nore0729/Img-soft-veterinario/refs/heads/main/GuzPet.png" alt="logo-petlovers" />
-            </div>
           </div>
           
           {/* Solo Perfil en el header - SIN notificaciones */}

@@ -34,7 +34,6 @@ const PublicRoutes = () => (
     <Route path="/Pacientes" element={<Pacientes />} />
     <Route path="/Consultas" element={<Consultas />} />
     <Route path="/HistorialMedico" element={<HistorialMedico />} />
-    <Route path="/Veterinarios" element={<Veterinarios />} /> {/* Ruta pública usando componente de Admin */}
     <Route path="/AyudaU" element={<AyudaU />} />
   </>
 );

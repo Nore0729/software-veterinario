@@ -1,44 +1,57 @@
-import AdminLayout from "../../layout/AdminLayout"
+import AdminLayout from "../../layout/AdminLayout";
 import '../../styles/Administrador/InicioAdmin.css';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
   faUserPlus,
-  faUsers, 
-  faUserTie, 
-  faUserShield, 
+  faUsers,
+  faUserTie,
+  faUserShield,
   faChartLine,
   faCalendarAlt,
   faBell,
   faEnvelope
-} from '@fortawesome/free-solid-svg-icons'
-import { useNavigate } from "react-router-dom" 
+} from '@fortawesome/free-solid-svg-icons';
+import { useNavigate } from "react-router-dom";
 import React, { useState, useEffect } from 'react';
 
-
 function DashboardAdmin() {
-   const navigate = useNavigate()
+  const navigate = useNavigate();
+  const [usuariosRegistrados, setUsuariosRegistrados] = useState(0);
+  const [adminName, setAdminName] = useState('');
+
   const stats = {
-    usuarios: 100,
+    usuarios: usuariosRegistrados,
     clientes: 58,
     veterinarios: 2,
     administradores: 1,
     citasHoy: 10,
     notificaciones: 5,
     mensajes: 3
-  }
-
-  const handleNuevoUsuarioClick = () => {
-    navigate("/FormularioUsu") 
-  }
-  const [adminName, setAdminName] = useState('')
+  };
 
   useEffect(() => {
-    // Recuperar el nombre del administrador desde localStorage
+    // Obtener nombre del admin
     const nombre = localStorage.getItem('nombre');
     if (nombre) {
-      setAdminName(nombre); // Establecer el nombre del admin en el estado
+      setAdminName(nombre);
     }
+
+    // Obtener número de usuarios desde la API
+    fetch('http://localhost:3000/api/usuarios_registrados')
+      .then(res => res.json())
+      .then(data => {
+        if (data && data[0]?.total_usuarios !== undefined) {
+          setUsuariosRegistrados(data[0].total_usuarios);
+        }
+      })
+      .catch(err => {
+        console.error("Error al cargar usuarios registrados:", err);
+      });
   }, []);
+
+  const handleNuevoUsuarioClick = () => {
+    navigate("/FormularioUsu");
+  };
 
   return (
     <AdminLayout>
@@ -106,6 +119,7 @@ function DashboardAdmin() {
             </div>
           </div>
         </div>
+
         <section className="quick-actions">
           <h2>Acciones Rápidas</h2>
           <div className="action-buttons">
@@ -115,6 +129,7 @@ function DashboardAdmin() {
             </button>
           </div>
         </section>
+
         <div className="dashboard-bottom">
           <div className="appointments-card">
             <h2>
@@ -126,7 +141,6 @@ function DashboardAdmin() {
               <button>Ver todas</button>
             </div>
             <div className="appointments-list">
-          
               <p>Lista de citas programadas para hoy...</p>
             </div>
           </div>
@@ -143,7 +157,7 @@ function DashboardAdmin() {
         </div>
       </div>
     </AdminLayout>
-  )
+  );
 }
 
-export default DashboardAdmin
+export default DashboardAdmin;

@@ -429,6 +429,54 @@ app.get("/api/obtener_roles", async (req, res) => {
   }
 });
 
+// api para actualizar todos los roles de la base de datos
+app.put("/api/actualizar_rol/:id", async (req, res) => {
+  const id = req.params.id;
+  const { nom_rol, descripcion } = req.body;
+
+  if (!nom_rol) {
+    return res.status(400).json({ message: "El nombre del rol es obligatorio" });
+  }
+
+  try {
+    const query = "UPDATE roles SET nom_rol = ?, descripcion = ? WHERE id = ?";
+    db.query(query, [nom_rol, descripcion, id], (err, result) => {
+      if (err) {
+        console.error("Error al actualizar el rol:", err);
+        return res.status(500).json({ message: "Error al actualizar el rol" });
+      }
+
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ message: "Rol no encontrado" });
+      }
+
+      res.status(200).json({ message: "Rol actualizado correctamente" });
+    });
+  } catch (error) {
+    return res.status(500).json({ message: "Error del servidor" });
+  }
+});
+
+
+
+
+// api traer todos los usuarios registrados desde la base de datos // api para obtener todos los roles de la base de datos
+app.get("/api/usuarios_registrados", async (req, res) => {
+  try {
+    const query = "SELECT COUNT(*) AS total_usuarios FROM usuarios;";
+    db.query(query, (err, results) => {
+      if (err) {
+        console.error("Error al obtener la cantidad de usuarioss:", err);
+        return res.status(500).json({ message: "Hubo un problema al obtener los usuarios" });
+      }
+      res.status(200).json(results);
+    });
+  } catch (error) {
+    return res.status(500).json({ message: "Error del servidor" });
+  }
+});
+
+
 
 // Api de servicios desde administrador 
 
