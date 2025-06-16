@@ -20,7 +20,7 @@ import {
   Edit,
   Eye,
 } from "lucide-react"
-import "../styles/CitasVet.css"
+import "../styles/UsuarioVet.css"
 
 const OwnersList = () => {
   // Datos de ejemplo de propietarios y sus mascotas
