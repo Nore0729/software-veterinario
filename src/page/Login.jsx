@@ -162,7 +162,7 @@ export const Login = () => {
       </div>
 
       <div className="login-box login-form-side">
-        <h2>🐾 Patitas Felices</h2>
+        <h2>🐾 Pets-Lovers</h2>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label>Correo electrónico:</label>
