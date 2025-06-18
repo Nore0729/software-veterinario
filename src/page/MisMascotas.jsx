@@ -14,6 +14,7 @@ const MisMascotas = () => {
       const fetchMascotas = async () => {
         try {
           const res = await axios.get(`http://localhost:3000/api/mis-mascotas/${storedDoc}`);
+          console.log(res.data)
           setMascotas(res.data);
         } catch (err) {
           console.error('Error al cargar mascotas:', err);
@@ -38,7 +39,7 @@ const MisMascotas = () => {
         <p>No tienes mascotas registradaaas.</p>
       ) : (
         <ul>
-          {mascotas.map((mascota) => (
+          {mascotas?.map((mascota) => (
             <li key={mascota.id}>
               <strong>{mascota.nombre}</strong> - {mascota.especie}, {mascota.raza}
             </li>

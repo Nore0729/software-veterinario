@@ -2,6 +2,7 @@ const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
 const bcrypt = require('bcrypt');
+const { routerApi } = require('./server/server');
 
 const app = express();
 const port = 3000;
@@ -124,6 +125,7 @@ app.post('/api/login', (req, res) => {
       return res.status(200).json({
         message: 'Login exitoso',
         nombre: user.nombre,
+        doc: user.doc,
         email: user.email,
         rol: 'propietario',
       });
@@ -539,3 +541,5 @@ app.delete("/api/servicios/:id", (req, res) => {
     res.json({ message: "Servicio eliminado", id });
   });
 });
+
+routerApi(app)

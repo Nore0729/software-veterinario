@@ -18,7 +18,7 @@ const UserWelcome = ({ userName }) => {
   useEffect(() => {
     const nombre = localStorage.getItem('nombre') || userName || 'Usuario';
     const email = localStorage.getItem('email') || 'usuario@email.com';
-    const doc = localStorage.getItem('doc');
+    const doc = localStorage.getItem('doc_pro');
 
     setUserData({ nombre, email });
 

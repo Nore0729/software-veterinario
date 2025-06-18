@@ -30,16 +30,16 @@ export const Login = () => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e.preventDefault()
 
     if (!email || !password) {
       setErrorGeneral('Por favor completa ambos campos');
-      return;
+      return
     }
 
     if (emailError) {
       setErrorGeneral('Por favor corrige el correo electrónico');
-      return;
+      return
     }
 
     const usuariosMock = [
@@ -81,7 +81,7 @@ export const Login = () => {
         password,
       });
 
-      const { nombre, email: userEmail, rol } = response.data;
+      const { nombre, email: userEmail, rol, doc } = response.data;
 
       if (!nombre || !userEmail) {
         throw new Error('Datos de usuario incompletos desde backend');
@@ -89,6 +89,7 @@ export const Login = () => {
 
       localStorage.setItem('nombre', nombre);
       localStorage.setItem('email', userEmail);
+      localStorage.setItem('doc_pro', doc);
       localStorage.setItem('rol', rol || ''); // Guarda rol si existe
 
       setErrorGeneral('');

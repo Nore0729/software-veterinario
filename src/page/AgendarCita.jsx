@@ -80,8 +80,8 @@ const AgendarCita = () => {
   const cargarCitasExistentes = async () => {
     try {
       const doc = localStorage.getItem("doc")
-      if (doc) {
-        const response = await fetch(`/api/citas-existentes/${doc}`)
+      if (doc) { 
+        const response = await fetch(`http://localhost:3000/api/citas-existentes/${doc}`)
         const data = await response.json()
         setCitasExistentes(data)
       }

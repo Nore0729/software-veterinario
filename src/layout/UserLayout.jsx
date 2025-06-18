@@ -30,14 +30,16 @@ const UserLayout = () => {
   useEffect(() => {
     const nombre = localStorage.getItem("nombre") || "Usuario"
     const email = localStorage.getItem("email") || "usuario@email.com"
-    const doc = localStorage.getItem("doc")
+    const doc = localStorage.getItem("doc_pro")
 
     setUserData({ nombre, email })
 
     if (doc) {
       fetch(`/api/mis-mascotas/${doc}`)
         .then((res) => res.json())
-        .then((data) => setMascotas(data))
+        .then((data) => {
+          setMascotas(data)
+        })
         .catch((err) => console.error("Error cargando mascotas:", err))
     }
   }, [])
