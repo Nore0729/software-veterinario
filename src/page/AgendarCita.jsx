@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react"
 import { FaCalendarPlus, FaPaw, FaClock, FaStethoscope, FaStickyNote, FaCheck } from "react-icons/fa"
-import { PostData } from '../Utils/request'
+import axios from "axios"
+// import { PostData } from '../Utils/request'
 import "../styles/User.css"
 
 const AgendarCita = () => {
@@ -52,22 +53,29 @@ const AgendarCita = () => {
   ]
 
   useEffect(() => {
-    cargarMascotas()
     cargarCitasExistentes()
   }, [])
 
-  const cargarMascotas = async () => {
-    try {
-      const doc = localStorage.getItem("doc")
-      if (doc) {
-        const response = await fetch(`/api/mis-mascotas/${doc}`)
-        const data = await response.json()
-        setMascotas(data)
-      }
-    } catch (error) {
-      console.error("Error al cargar mascotas:", error)
+  useEffect(() => {
+    const storedDoc = localStorage.getItem('doc_pro');
+    
+    if (storedDoc) {
+      const fetchMascotas = async () => {
+        try {
+          const res = await axios.get(`http://localhost:3000/api/mis-mascotas/${storedDoc}`);
+          setMascotas(res.data);
+        } catch (err) {
+          console.error('Error al cargar mascotas:', err);
+        } finally {
+          setLoading(false);
+        }
+      };
+      
+      fetchMascotas();
+    } else {
+      setLoading(false); // Si no hay doc, detenemos el loading
     }
-  }
+  }, []);
 
   const cargarCitasExistentes = async () => {
     try {
