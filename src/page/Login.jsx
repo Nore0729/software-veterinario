@@ -202,7 +202,7 @@ export const Login = () => {
           <Link to="/Propietarios">Registrar</Link>
         </div>
       </div>
-    </div>
+    </div>  
   );
 };
 

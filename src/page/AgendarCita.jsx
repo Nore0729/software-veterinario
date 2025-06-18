@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { FaCalendarPlus, FaPaw, FaClock, FaStethoscope, FaStickyNote, FaCheck } from "react-icons/fa"
+import { PostData } from '../Utils/request'
 import "../styles/User.css"
 
 const AgendarCita = () => {
