@@ -1,4 +1,3 @@
-// src/components/UserLayout.jsx
 import { Outlet, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { 
@@ -17,10 +16,21 @@ const UserLayout = () => {
     email: '',
   });
 
+  const [mascotas, setMascotas] = useState([]);
+
   useEffect(() => {
     const nombre = localStorage.getItem('nombre') || 'Usuario';
     const email = localStorage.getItem('email') || 'usuario@email.com';
+    const doc = localStorage.getItem('doc'); // ← aquí está el cambio
+
     setUserData({ nombre, email });
+
+    if (doc) {
+      fetch(`/api/mis-mascotas/${doc}`)
+        .then(res => res.json())
+        .then(data => setMascotas(data))
+        .catch(err => console.error("Error cargando mascotas:", err));
+    }
   }, []);
 
   const handleLogout = () => {
@@ -45,10 +55,10 @@ const UserLayout = () => {
     {
       title: "Mis Mascotas",
       icon: <FaPaw />,
-      subItems: [
-        { label: "Firulais", path: "/mascota/firulais" },
-        { label: "Michi", path: "/mascota/michi" }
-      ]
+      subItems: mascotas.map(m => ({
+        label: m.nombre,
+        path: `/mascota/${m.nombre.toLowerCase()}`
+      }))
     },
     {
       title: "Configuración",
@@ -63,7 +73,6 @@ const UserLayout = () => {
 
   return (
     <>
-      {/* Topbar con botón de Cerrar sesión */}
       <div className="topbar">
         <div className="topbar-left">
           <span>Bienvenido, {userData.nombre}</span>
@@ -134,7 +143,7 @@ const UserLayout = () => {
         </div>
 
         <div className="main-content">
-          <Outlet /> {/* Aquí se renderizan las subrutas */}
+          <Outlet />
         </div>
       </div>
     </>

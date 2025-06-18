@@ -194,6 +194,26 @@ app.post('/api/registro-mascota', (req, res) => {
   );
 });
 
+// mascotas logueadas
+app.get('/api/mis-mascotas/:doc', async (req, res) => {
+  const { doc } = req.params;
+  console.log('Buscando mascotas para el doc:', doc); // <-- Agregado
+
+  try {
+    const [result] = await db.query(`
+      SELECT * FROM mascotas WHERE doc_pro = ?
+    `, [doc]);
+
+    res.json(result);
+  } catch (err) {
+    console.error('Error al obtener mascotas:', err);
+    res.status(500).json({ error: 'Error al obtener mascotas' });
+  }
+});
+
+
+
+
 // Listar mascotas de un propietario
 app.get('/api/mascotas/:doc_pro', (req, res) => {
   const { doc_pro } = req.params;

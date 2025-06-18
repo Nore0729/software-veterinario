@@ -1,58 +1,39 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import {FaPaw, FaCalendarAlt, FaChevronRight, FaHome, FaClipboard, FaBell, FaCog} from 'react-icons/fa';
-import '../styles/User.css'
+import {
+  FaPaw, FaCalendarAlt, FaClipboard, FaHome, FaCog
+} from 'react-icons/fa';
+import '../styles/User.css';
 
 const UserWelcome = ({ userName }) => {
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
+
   const [userData, setUserData] = useState({
     nombre: '',
-    email: '',
+    email: ''
   });
+
+  const [mascotas, setMascotas] = useState([]);
 
   useEffect(() => {
     const nombre = localStorage.getItem('nombre') || userName || 'Usuario';
     const email = localStorage.getItem('email') || 'usuario@email.com';
+    const doc = localStorage.getItem('doc');
+
     setUserData({ nombre, email });
+
+    if (doc) {
+      fetch(`/api/mis-mascotas/${doc}`)
+        .then(res => res.json())
+        .then(data => setMascotas(data))
+        .catch(err => console.error("Error al cargar mascotas:", err));
+    }
   }, [userName]);
 
   const handleLogout = () => {
     localStorage.clear();
     navigate('/login');
   };
-
-  const menuItems = [
-    {
-      title: "Inicio",
-      icon: <FaHome />,
-      path: "/UserWelcome"
-    },
-    {
-      title: "Mis Citas",
-      icon: <FaCalendarAlt />,
-      subItems: [
-        { label: "Próximas citas", path: "/citas-proximas" },
-        { label: "Historial", path: "/historial-citas", icon: <FaClipboard /> }
-      ]
-    },
-    {
-      title: "Mis Mascotas",
-      icon: <FaPaw />,
-      subItems: [
-        { label: "Firulais", path: "/mascota/firulais" },
-        { label: "Michi", path: "/mascota/michi" }
-      ]
-    },
-    {
-      title: "Configuración",
-      icon: <FaCog />,
-      subItems: [
-        { label: "Mi Cuenta", path: "/Datospro" },
-        { label: "Ayuda", path: "/Ayudapro" },
-        { label:"Actualizar Datos", patch: "/Actualizarpro"}
-      ]
-    }
-  ];
 
   return (
     <div className="main-content">
@@ -62,20 +43,22 @@ const UserWelcome = ({ userName }) => {
         <div className="info-card">
           <h2><FaPaw /> Tus Mascotas</h2>
           <div className="pet-list">
-            <div className="pet-item">
-              <img src="/placeholder-dog.jpg" alt="Firulais" />
-              <div>
-                <h3>Firulais</h3>
-                <p>Próxima cita: 15 Nov 2023</p>
-              </div>
-            </div>
-            <div className="pet-item">
-              <img src="/placeholder-cat.jpg" alt="Michi" />
-              <div>
-                <h3>Michi</h3>
-                <p>Vacuna pendiente</p>
-              </div>
-            </div>
+            {mascotas.length > 0 ? (
+              mascotas.map((mascota, index) => (
+                <div className="pet-item" key={index}>
+                  <img
+                    src={mascota.imagen_url || "/placeholder-pet.jpg"}
+                    alt={mascota.nombre}
+                  />
+                  <div>
+                    <h3>{mascota.nombre}</h3>
+                    <p>Edad: {mascota.edad || 'Desconocida'}</p>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p>No tienes mascotas registradas.</p>
+            )}
           </div>
           <Link to="/mascotas" className="view-all">Ver todas →</Link>
         </div>
