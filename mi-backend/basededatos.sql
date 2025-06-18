@@ -99,6 +99,54 @@ CREATE TABLE servicios (
     estado ENUM('Activo', 'Inactivo') DEFAULT 'Activo'
 );
 
+--****************************************************
+--*procedimiento almacenado para registrar servicios *
+--****************************************************
+DELIMITER $$
+
+CREATE PROCEDURE insertar_servicio(
+    IN p_nombre VARCHAR(100),
+    IN p_descripcion TEXT,
+    IN p_precio DECIMAL(10,2),
+    IN p_duracion_estimada INT,
+    IN p_estado ENUM('Activo', 'Inactivo')
+)
+BEGIN
+    INSERT INTO servicios (nombre, descripcion, precio, duracion_estimada, estado)
+    VALUES (p_nombre, p_descripcion, p_precio, p_duracion_estimada, p_estado);
+END $$
+
+DELIMITER ;
+
+--****************************************************
+--*procedimiento almacenado para actualizar servicios *
+--****************************************************
+
+DELIMITER $$
+
+CREATE PROCEDURE ActualizarServicio(
+    IN p_id INT,
+    IN p_nombre VARCHAR(100),
+    IN p_descripcion TEXT,
+    IN p_precio DECIMAL(10,2),
+    IN p_duracion_estimada INT,
+    IN p_estado ENUM('Activo', 'Inactivo')
+)
+BEGIN
+    UPDATE servicios
+    SET
+        nombre = p_nombre,
+        descripcion = p_descripcion,
+        precio = p_precio,
+        duracion_estimada = p_duracion_estimada,
+        estado = p_estado
+    WHERE id = p_id;
+END $$
+
+DELIMITER ;
+
+
+
 
 CREATE TABLE citas ( 
     id INT AUTO_INCREMENT PRIMARY KEY,
