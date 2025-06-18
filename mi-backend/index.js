@@ -477,10 +477,27 @@ app.put("/api/actualizar_rol/:id", async (req, res) => {
   }
 });
 
+//***********************/
+// Api para eliminar rol*/
+//***********************/
+app.delete("/api/roles/:id", (req, res) => {
+  const { id } = req.params;
+  
+  const query = "DELETE FROM Roles WHERE id = ?";
+  db.query(query, [id], (err, result) => {
+    if (err) return res.status(500).json({ error: err.message });
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: "rol no encontrado" });
+    }
+    res.json({ message: "rol eliminado", id });
+  });
+});
 
 
+//*********************************************************************************/
+// api traer todos los usuarios registrados desde la base de datos para el dasboard*/
+//******************************************************************************* */
 
-// api traer todos los usuarios registrados desde la base de datos // api para obtener todos los roles de la base de datos
 app.get("/api/usuarios_registrados", async (req, res) => {
   try {
     const query = "SELECT COUNT(*) AS total_usuarios FROM usuarios;";
@@ -497,9 +514,9 @@ app.get("/api/usuarios_registrados", async (req, res) => {
 });
 
 
-
-// Api de servicios desde administrador 
-
+//************************************************/
+// Api de registrar servicios desde administrador*/
+//********************************************** */
 app.post("/api/servicios", async (req, res) => {
   const { nombre, descripcion, precio,  duracion_estimada } = req.body;
   if (!nombre || !descripcion || !precio || !duracion_estimada) {
@@ -523,6 +540,58 @@ app.post("/api/servicios", async (req, res) => {
     return res.status(500).json({ message: "Error del servidor"})
   }
 })
+
+
+
+//**************************************************************/
+// traer todo los servicios registrados desde la base de datos */
+//************************************************************ */
+
+app.get("/api/obtener_servicios", async (req, res) => {
+  try {
+    const query = "SELECT id, nombre, descripcion, precio, duracion_estimada, estado FROM servicios";
+    db.query(query, (err, results) => {
+      if (err) {
+        console.error("Error al obtener los servicios:", err);
+        return res.status(500).json({ message: "Hubo un problema al obtener los servicios" });
+      }
+      res.status(200).json(results);
+    });
+  } catch (error) {
+    return res.status(500).json({ message: "Error del servidor" });
+  }
+});
+
+
+// api para actualizar servicios 
+
+// app.put("/api/servicios/:id", (req, res) => {
+//   const { id } = req.params;
+//   const { nombre, descripcion, precio, duracion_estimada, estado } = req.body;
+//   if (!nombre || !descripcion || !precio || !duracion_estimada || !estado) {
+//     return res.status(400).json({ error: "Todos los campos son obligatorios" });
+//   }
+//   const query = `
+//     UPDATE servicios 
+//     SET nombre = ?, descripcion = ?, precio = ?, duracion_estimada = ?, estado = ? 
+//     WHERE id = ?
+//   `;
+//   // Ejecutar la consulta SQL
+//   db.query(query, [nombre, descripcion, precio, duracion_estimada, estado, id], (err, result) => {
+//     if (err) {
+//       return res.status(500).json({ error: err.message });
+//     }
+//     if (result.affectedRows === 0) {
+//       return res.status(404).json({ error: "Servicio no encontrado" });
+//     }
+//     res.json({ message: "Servicio actualizado exitosamente", id });
+//   });
+// }); ctrl ]}
+
+
+//*******************************/
+// Api para eliminar servicio  */
+//*************************** */
 
 // Api para eliminar servicio 
 app.delete("/api/servicios/:id", (req, res) => {

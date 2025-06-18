@@ -1,7 +1,6 @@
 
 CREATE DATABASE  veterinaria;
 USE veterinaria;
-drop database veterinaria;
 
 CREATE TABLE usuarios (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -16,6 +15,8 @@ CREATE TABLE usuarios (
    fecha_Regis TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
  select*from usuarios; 
+ SELECT COUNT(*) AS total_usuarios FROM usuarios;
+
 
 CREATE TABLE propietarios (
     id_prop INT PRIMARY KEY,
@@ -98,7 +99,8 @@ CREATE TABLE servicios (
     duracion_estimada INT COMMENT 'Duración en minutos',
     estado ENUM('Activo', 'Inactivo') DEFAULT 'Activo'
 );
-
+use veterinaria; 
+select * from servicios; 
 --****************************************************
 --*procedimiento almacenado para registrar servicios *
 --****************************************************
@@ -124,6 +126,7 @@ DELIMITER ;
 
 DELIMITER $$
 
+
 CREATE PROCEDURE ActualizarServicio(
     IN p_id INT,
     IN p_nombre VARCHAR(100),
@@ -145,7 +148,15 @@ END $$
 
 DELIMITER ;
 
-
+--****************************************************
+--*procedimiento almacenado para borrar servicios *
+--****************************************************
+DELIMITER $$
+CREATE PROCEDURE borrar_servicio(IN servicio_id INT)
+BEGIN
+    DELETE FROM servicios WHERE id = servicio_id;
+END$$
+DELIMITER ;
 
 
 CREATE TABLE citas ( 
