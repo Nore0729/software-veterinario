@@ -195,21 +195,23 @@ app.post('/api/registro-mascota', (req, res) => {
 });
 
 // mascotas logueadas
-app.get('/api/mis-mascotas/:doc', async (req, res) => {
-  const { doc } = req.params;
-  console.log('Buscando mascotas para el doc:', doc); // <-- Agregado
+app.get('/api/mis-mascotas/:doc_pro', (req, res) => {
+  const { doc_pro } = req.params;
+  console.log('Buscando mascotas para el doc:', doc_pro);
+ 
 
-  try {
-    const [result] = await db.query(`
-      SELECT * FROM mascotas WHERE doc_pro = ?
-    `, [doc]);
+  const query = 'SELECT * FROM mascotas WHERE doc_pro = ?';
 
-    res.json(result);
-  } catch (err) {
-    console.error('Error al obtener mascotas:', err);
-    res.status(500).json({ error: 'Error al obtener mascotas' });
-  }
+  db.query(query, [doc_pro], (err, results) => {
+    if (err) {
+      console.error('Error al obtener mascotas:', err);
+      return res.status(500).json({ message: 'Hubo un problema al obtener las mascotas' });
+    }
+    res.status(200).json(results);
+  });
 });
+
+
 
 
 
