@@ -65,10 +65,10 @@ const UserLayout = () => {
     {
       title: "Mis Mascotas",
       icon: <FaPaw />,
-      subItems: mascotas.map((m) => ({
-        label: m.nombre,
-        path: `/mascota/${m.nombre.toLowerCase()}`,
-      })),
+      subItems: mascotas.map(m => ({
+       label: m.nombre,
+       path: `/mascota/${m.nombre.toLowerCase()}`
+       }))
     },
     {
       title: "Configuración",
@@ -85,7 +85,7 @@ const UserLayout = () => {
     <>
       <div className="topbar">
         <div className="topbar-left">
-          <span>Bienvenido, {userData.nombre}</span>
+          <span>Bienvenid@, {userData.nombre}</span>
         </div>
         <div className="topbar-right">
           <button className="btn-logout-top" onClick={handleLogout}>

@@ -46,13 +46,10 @@ const UserWelcome = ({ userName }) => {
             {mascotas.length > 0 ? (
               mascotas.map((mascota, index) => (
                 <div className="pet-item" key={index}>
-                  <img
-                    src={mascota.imagen_url || "/placeholder-pet.jpg"}
-                    alt={mascota.nombre}
-                  />
                   <div>
                     <h3>{mascota.nombre}</h3>
-                    <p>Edad: {mascota.edad || 'Desconocida'}</p>
+                    <p>Especie: {mascota.especie|| 'Desconocida'}</p>
+                    <p>Raza: {mascota.raza|| 'Desconocida'}</p>
                   </div>
                 </div>
               ))
@@ -60,20 +57,12 @@ const UserWelcome = ({ userName }) => {
               <p>No tienes mascotas registradas.</p>
             )}
           </div>
-          <Link to="/mascotas" className="view-all">Ver todas →</Link>
         </div>
 
         <div className="info-card">
           <h2><FaCalendarAlt /> Próximas Citas</h2>
           <ul className="appointment-list">
-            <li>
-              <strong>15 Nov 2023 - 10:30 AM</strong>
-              <p>Control anual - Dr. Pérez</p>
-            </li>
-            <li>
-              <strong>20 Nov 2023 - 04:15 PM</strong>
-              <p>Vacunación - Dra. Lopez</p>
-            </li>
+           
           </ul>
           <Link to="/citas" className="view-all">Ver calendario →</Link>
         </div>
