@@ -1,46 +1,22 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { PlusCircle, Edit, Trash2, Search, X } from "lucide-react";
 import "../../styles/Administrador/ServiciosAdmin.css"
 import AdminLayout from "../../layout/AdminLayout";
 
 function ServiciosAdmin() {
-  // Estado para los servicios
-  const [servicios, setServicios] = useState([
-    { id: 1, nombre: "Consulta general", descripcion: "Revisión médica básica", precio: 50, duracion: 30 },
-    { id: 2, nombre: "Vacunación", descripcion: "Aplicación de vacunas", precio: 80, duracion: 20 },
-    { id: 3, nombre: "Cirugía menor", descripcion: "Intervenciones quirúrgicas simples", precio: 200, duracion: 60 },
-  ]);
-
-  // Estado para el formulario
+  // Estados para manejar los campos del formulario
   const [formData, setFormData] = useState({
     nombre: "",
     descripcion: "",
     precio: "",
-    duracion: ""
+    duracion: "",
   });
 
-  // Estado para edición
-  const [editando, setEditando] = useState(false);
-  const [idActual, setIdActual] = useState(null);
-  
-  // Estado para búsqueda
-  const [busqueda, setBusqueda] = useState("");
-  const [serviciosFiltrados, setServiciosFiltrados] = useState([]);
+  const [servicios, setServicios] = useState([
+    { id: 1, nombre: "Consulta general", descripcion: "Revisión médica básica", precio: 50, duracion: 30 },
+  ]);
 
-  // Filtrar servicios
-  useEffect(() => {
-    if (busqueda === "") {
-      setServiciosFiltrados(servicios);
-    } else {
-      const filtrados = servicios.filter(servicio =>
-        servicio.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
-        servicio.descripcion.toLowerCase().includes(busqueda.toLowerCase())
-      );
-      setServiciosFiltrados(filtrados);
-    }
-  }, [busqueda, servicios]);
-
-  // Manejar cambios en el formulario
+  // Manejar el cambio de los campos del formulario
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -49,187 +25,166 @@ function ServiciosAdmin() {
     }));
   };
 
-  // Enviar formulario
-  const handleSubmit = (e) => {
+  // Manejar el envío del formulario
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    if (editando) {
-      // Actualizar servicio existente
-      setServicios(servicios.map(servicio =>
-        servicio.id === idActual ? { ...formData, id: idActual } : servicio
-      ));
-    } else {
-      // Agregar nuevo servicio
-      const nuevoId = servicios.length > 0 ? Math.max(...servicios.map(s => s.id)) + 1 : 1;
-      setServicios([...servicios, { ...formData, id: nuevoId }]);
+    const { nombre, descripcion, precio, duracion } = formData;
+
+    // Validar que todos los campos estén llenos
+    if (!nombre || !descripcion || !precio || !duracion) {
+      alert("Todos los campos son obligatorios");
+      return;
     }
-    
-    // Limpiar formulario
-    setFormData({ nombre: "", descripcion: "", precio: "", duracion_estimada: "" });
-    setEditando(false);
-    setIdActual(null);
-  };
 
-  // Editar servicio
-  const handleEditar = (servicio) => {
-    setFormData({
-      nombre: servicio.nombre,
-      descripcion: servicio.descripcion,
-      precio: servicio.precio,
-      duracion_estimada: servicio.duracion_estimada
-    });
-    setEditando(true);
-    setIdActual(servicio.id);
-  };
+    const dataToSend = {
+      nombre,
+      descripcion,
+      precio,
+      duracion_estimada: duracion, // Asegúrate de que la API usa este nombre
+    };
 
-  // Eliminar servicio
-  const handleEliminar = (id) => {
-    if (window.confirm("¿Estás seguro de que deseas eliminar este servicio?")) {
-      setServicios(servicios.filter(servicio => servicio.id !== id));
+    try {
+      // Llamar a la API para agregar el nuevo servicio
+      const res = await fetch("/api/servicios", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(dataToSend),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.message || "Error al registrar el servicio");
+      }
+
+      const result = await res.json();
+      alert(result.message); // Muestra el mensaje de éxito
+
+      // Actualizar la lista de servicios (aquí agregamos el nuevo servicio al estado)
+      setServicios((prevServicios) => [
+        ...prevServicios,
+        { id: prevServicios.length + 1, ...formData },
+      ]);
+
+      // Limpiar el formulario
+      setFormData({ nombre: "", descripcion: "", precio: "", duracion: "" });
+    } catch (error) {
+      console.error("Error al registrar el servicio:", error);
+      alert("Hubo un problema al registrar el servicio");
     }
-  };
-
-  // Cancelar edición
-  const handleCancelar = () => {
-    setFormData({ nombre: "", descripcion: "", precio: "", duracion: "" });
-    setEditando(false);
-    setIdActual(null);
   };
 
   return (
     <AdminLayout>
-    <div className="servicios-admin-container">
-      <h1 className="servicios-titulo">Administración de Servicios Veterinarios</h1>
-      
-      {/* Formulario para agregar/editar servicios */}
-      <div className="servicios-form-container">
-        <h2>{editando ? "Editar Servicio" : "Agregar Nuevo Servicio"}</h2>
-        <form onSubmit={handleSubmit} className="servicios-form">
-          <div className="form-group">
-            <label>Nombre del Servicio</label>
-            <input
-              type="text"
-              name="nombre"
-              value={formData.nombre}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          
-          <div className="form-group">
-            <label>Descripción</label>
-            <textarea
-              name="descripcion"
-              value={formData.descripcion}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          
-          <div className="form-row">
+      <div className="servicios-admin-container">
+        <h1 className="servicios-titulo">Administración de Servicios Veterinarios</h1>
+
+        {/* Formulario para agregar un nuevo servicio */}
+        <div className="servicios-form-container">
+          <h2>Agregar Nuevo Servicio</h2>
+          <form onSubmit={handleSubmit} className="servicios-form">
             <div className="form-group">
-              <label>Precio ($)</label>
+              <label>Nombre del Servicio</label>
               <input
-                type="number"
-                name="precio"
-                value={formData.precio}
+                type="text"
+                name="nombre"
+                value={formData.nombre}
                 onChange={handleChange}
-                min="0"
-                step="0.01"
                 required
               />
             </div>
-            
+
             <div className="form-group">
-              <label>Duración (min)</label>
-              <input
-                type="number"
-                name="duracion_estimada"
-                value={formData.duracion_estimada}
+              <label>Descripción</label>
+              <textarea
+                name="descripcion"
+                value={formData.descripcion}
                 onChange={handleChange}
-                min="5"
                 required
               />
             </div>
-          </div>
-          
-          <div className="form-buttons">
-            <button type="submit" className="btn-primary">
-              {editando ? "Actualizar Servicio" : "Agregar Servicio"}
-            </button>
-            {editando && (
-              <button type="button" onClick={handleCancelar} className="btn-cancelar">
-                Cancelar
-              </button>
-            )}
-          </div>
-        </form>
-      </div>
-      
-      {/* Búsqueda y lista de servicios */}
-      <div className="servicios-list-container">
-        <div className="search-container">
-          <Search className="search-icon" />
-          <input
-            type="text"
-            placeholder="Buscar servicios..."
-            value={busqueda}
-            onChange={(e) => setBusqueda(e.target.value)}
-          />
-          {busqueda && (
-            <X className="clear-search" onClick={() => setBusqueda("")} />
-          )}
+
+            <div className="form-row">
+              <div className="form-group">
+                <label>Precio ($)</label>
+                <input
+                  type="number"
+                  name="precio"
+                  value={formData.precio}
+                  onChange={handleChange}
+                  min="0"
+                  step="0.01"
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Duración (min)</label>
+                <input
+                  type="number"
+                  name="duracion"
+                  value={formData.duracion}
+                  onChange={handleChange}
+                  min="5"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="form-buttons">
+              <button type="submit" className="btn-primary">Agregar Servicio</button>
+            </div>
+          </form>
         </div>
-        
-        <div className="servicios-table-container">
-          <table className="servicios-table">
-            <thead>
-              <tr>
-                <th>Nombre</th>
-                <th>Descripción</th>
-                <th>Precio</th>
-                <th>Duración</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {serviciosFiltrados.length > 0 ? (
-                serviciosFiltrados.map(servicio => (
-                  <tr key={servicio.id}>
-                    <td>{servicio.nombre}</td>
-                    <td>{servicio.descripcion}</td>
-                    <td>${servicio.precio}</td>
-                    <td>{servicio.duracion} min</td>
-                    <td className="actions-cell">
-                      <button 
-                        onClick={() => handleEditar(servicio)} 
-                        className="btn-editar"
-                        title="Editar"
-                      >
-                        <Edit size={16} />
-                      </button>
-                      <button 
-                        onClick={() => handleEliminar(servicio.id)} 
-                        className="btn-eliminar"
-                        title="Eliminar"
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              ) : (
+
+        {/* Búsqueda y lista de servicios */}
+        <div className="servicios-list-container">
+          <div className="search-container">
+            <Search className="search-icon" />
+            <input type="text" placeholder="Buscar servicios..." />
+            <X className="clear-search" />
+          </div>
+
+          <div className="servicios-table-container">
+            <table className="servicios-table">
+              <thead>
                 <tr>
-                  <td colSpan="5" className="no-results">
-                    {busqueda ? "No se encontraron servicios" : "No hay servicios registrados"}
-                  </td>
+                  <th>Nombre</th>
+                  <th>Descripción</th>
+                  <th>Precio</th>
+                  <th>Duración</th>
+                  <th>Acciones</th>
                 </tr>
-              )}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {servicios.length > 0 ? (
+                  servicios.map(servicio => (
+                    <tr key={servicio.id}>
+                      <td>{servicio.nombre}</td>
+                      <td>{servicio.descripcion}</td>
+                      <td>${servicio.precio}</td>
+                      <td>{servicio.duracion} min</td>
+                      <td className="actions-cell">
+                        <button className="btn-editar" title="Editar">
+                          <Edit size={16} />
+                        </button>
+                        <button className="btn-eliminar" title="Eliminar">
+                          <Trash2 size={16} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="5" className="no-results">No hay servicios registrados</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
-    </div>
     </AdminLayout>
   );
 }
