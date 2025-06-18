@@ -8,6 +8,7 @@ import DatosPro from '../page/Datospro';
 import Ayudapro from '../page/ayudapro';
 import Actualizarpro from '../page/Actualizarpro';
 import MisMascotas from '../page/MisMascotas';
+import AgendarCita from "../page/AgendarCita";
 
 const UserSpecificRoutes = () => (
   <>
@@ -16,6 +17,7 @@ const UserSpecificRoutes = () => (
     <Route path="/Ayudapro" element={<Ayudapro />} />
     <Route path="/Actualizarpro" element={<Actualizarpro />} />
     <Route path= "/MisMascotas" element={<MisMascotas/>}/>
+    <Route path="/AgendarCita" element={<AgendarCita />} />
   </>
 );
 

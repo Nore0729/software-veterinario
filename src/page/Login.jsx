@@ -42,7 +42,6 @@ export const Login = () => {
       return;
     }
 
-    // Usuarios mock para fallback (puedes quitar si solo usas backend)
     const usuariosMock = [
       {
         id: 1,
@@ -57,7 +56,7 @@ export const Login = () => {
       {
         id: 2,
         nombre: 'Ana Martínez',
-        email: 'ana.martinez@veterinaria.com',
+        email: 'veterinario@gmail.com',
         password: 'Vet2025@',
         rol: 'veterinario',
         documento: '87654321',
@@ -75,16 +74,13 @@ export const Login = () => {
         nivel_acceso: 'alto'
       }
     ];
-
+  
     try {
-      // Intenta login al backend
       const response = await axios.post('http://localhost:3000/api/login', {
         email,
         password,
       });
 
-      // Ajusta estos campos si tu backend devuelve otros nombres:
-      // Por ejemplo aquí asumo que backend devuelve { nombre, email }
       const { nombre, email: userEmail, rol } = response.data;
 
       if (!nombre || !userEmail) {
@@ -162,7 +158,7 @@ export const Login = () => {
       </div>
 
       <div className="login-box login-form-side">
-        <h2>🐾 Patitas Felices</h2>
+        <h2>🐾 Pets-Lovers</h2>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label>Correo electrónico:</label>

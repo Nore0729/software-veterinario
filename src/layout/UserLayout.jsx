@@ -1,56 +1,66 @@
-import { Outlet, useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
-import { 
-  FaUser, FaPaw, FaCalendarAlt, FaChevronRight, FaHome, 
-  FaClipboard, FaCog, FaSignOutAlt 
-} from 'react-icons/fa';
-import { Link } from 'react-router-dom';
-import '../styles/User.css';
+"use client"
+
+import { Outlet, useNavigate } from "react-router-dom"
+import { useState, useEffect } from "react"
+import {
+  FaUser,
+  FaPaw,
+  FaCalendarAlt,
+  FaChevronRight,
+  FaHome,
+  FaClipboard,
+  FaCog,
+  FaSignOutAlt,
+  FaCalendarPlus,
+} from "react-icons/fa"
+import { Link } from "react-router-dom"
+import "../styles/User.css"
 
 const UserLayout = () => {
-  const [expanded, setExpanded] = useState(false);
-  const navigate = useNavigate();
+  const [expanded, setExpanded] = useState(false)
+  const navigate = useNavigate()
 
   const [userData, setUserData] = useState({
-    nombre: '',
-    email: '',
-  });
+    nombre: "",
+    email: "",
+  })
 
-  const [mascotas, setMascotas] = useState([]);
+  const [mascotas, setMascotas] = useState([])
 
   useEffect(() => {
-    const nombre = localStorage.getItem('nombre') || 'Usuario';
-    const email = localStorage.getItem('email') || 'usuario@email.com';
-    const doc = localStorage.getItem('doc'); // ← aquí está el cambio
+    const nombre = localStorage.getItem("nombre") || "Usuario"
+    const email = localStorage.getItem("email") || "usuario@email.com"
+    const doc = localStorage.getItem("doc")
 
-    setUserData({ nombre, email });
+    setUserData({ nombre, email })
 
     if (doc) {
       fetch(`/api/mis-mascotas/${doc}`)
-        .then(res => res.json())
-        .then(data => setMascotas(data))
-        .catch(err => console.error("Error cargando mascotas:", err));
+        .then((res) => res.json())
+        .then((data) => setMascotas(data))
+        .catch((err) => console.error("Error cargando mascotas:", err))
     }
-  }, []);
+  }, [])
 
   const handleLogout = () => {
-    localStorage.clear();
-    navigate('/login');
-  };
+    localStorage.clear()
+    navigate("/login")
+  }
 
   const menuItems = [
     {
       title: "Inicio",
       icon: <FaHome />,
-      path: "/UserWelcome"
+      path: "/UserWelcome",
     },
     {
       title: "Mis Citas",
       icon: <FaCalendarAlt />,
       subItems: [
+        { label: "Agendar Nueva Cita", path: "/AgendarCita", icon: <FaCalendarPlus /> },
         { label: "Próximas citas", path: "/citas-proximas" },
-        { label: "Historial", path: "/historial-citas", icon: <FaClipboard /> }
-      ]
+        { label: "Historial", path: "/historial-citas", icon: <FaClipboard /> },
+      ],
     },
     {
       title: "Mis Mascotas",
@@ -66,10 +76,10 @@ const UserLayout = () => {
       subItems: [
         { label: "Mi Cuenta", path: "/Datospro" },
         { label: "Ayuda", path: "/Ayudapro" },
-        { label: "Actualizar Datos", path: "/Actualizarpro" }
-      ]
-    }
-  ];
+        { label: "Actualizar Datos", path: "/Actualizarpro" },
+      ],
+    },
+  ]
 
   return (
     <>
@@ -85,8 +95,8 @@ const UserLayout = () => {
       </div>
 
       <div className="user-dashboard">
-        <div 
-          className={`sidebar ${expanded ? 'expanded' : ''}`}
+        <div
+          className={`sidebar ${expanded ? "expanded" : ""}`}
           onMouseEnter={() => setExpanded(true)}
           onMouseLeave={() => setExpanded(false)}
         >
@@ -133,9 +143,11 @@ const UserLayout = () => {
               </div>
             ))}
 
-            <div className="menu-item logout-item" onClick={handleLogout} style={{ cursor: 'pointer' }}>
+            <div className="menu-item logout-item" onClick={handleLogout} style={{ cursor: "pointer" }}>
               <span className="menu-link" title="Cerrar sesión">
-                <span className="menu-icon"><FaUser /></span>
+                <span className="menu-icon">
+                  <FaUser />
+                </span>
                 {expanded && <span className="menu-text">Cerrar sesión</span>}
               </span>
             </div>
@@ -147,7 +159,7 @@ const UserLayout = () => {
         </div>
       </div>
     </>
-  );
-};
+  )
+}
 
-export default UserLayout;
+export default UserLayout
