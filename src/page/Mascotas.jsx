@@ -50,7 +50,7 @@ function RegistroMascota() {
 
   const onSubmit = async (data) => {
     data.vacunado = data.vacunado === "Sí" ? true : false;
-
+    localStorage.setItem('doc_pro', data.doc);
     try {
       const response = await axios.post('http://localhost:3000/api/registro-mascota', data);
       if (response.status === 201) Swal.fire({
@@ -59,7 +59,7 @@ function RegistroMascota() {
         icon: 'success',
         timer: 3000,
         didClose: () => {
-          navigate('/MascotasBienvenida');
+         
         }
       });
 
@@ -169,8 +169,8 @@ function RegistroMascota() {
                 className={errors.genero ? 'error' : ''}
               >
                 <option value="">Seleccionar</option>
-                <option value="Macho">Macho</option>
-                <option value="Hembra">Hembra</option>
+                <option value="Macho">MACHO</option>
+                <option value="Hembra">HEMBRA</option>
               </select>
               {errors.genero && (
                 <span className="error-message">{errors.genero.message}</span>
@@ -280,9 +280,9 @@ function RegistroMascota() {
             className={errors.tamano ? 'error' : ''}
           >
             <option value="">Seleccionar</option>
-            <option value="Pequeño">Pequeño</option>
-            <option value="Mediano">Mediano</option>
-            <option value="Grande">Grande</option>
+            <option value="PEQUEÑO">PEQUEÑO</option>
+            <option value="MEDIANO">MEDIANO</option>
+            <option value="GRANDE">GRANDE</option>
           </select>
           {errors.tamano && (
             <span className="error-message">{errors.tamano.message}</span>

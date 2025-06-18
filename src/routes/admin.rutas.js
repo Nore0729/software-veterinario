@@ -1,5 +1,5 @@
 // src/routes/admin.rutas.js
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Route } from 'react-router-dom';
 
 // Importa tus componentes de Administrador
@@ -12,7 +12,12 @@ import Roles from '../page/admin/Roles';
 import Veterinarios from '../page/admin/Veterinarios'
 import ServiciosAdmin from '../page/admin/ServiciosAdmin';
 
-const AdminRoutes = () => (
+const AdminRoutes = () => {
+  useEffect(() => {
+    localStorage.getItem('rol') === 'administrador'?
+  })
+
+  return (
   <>
     <Route path="/FormularioUsu" element={<FormularioUsu />} />
     <Route path="/InicioAdmin" element={<InicioAdmin />} />
@@ -22,7 +27,7 @@ const AdminRoutes = () => (
     <Route path="/Roles" element={<Roles />} />
     <Route path="/Veterinarios" element={<Veterinarios />} />
     <Route path="/ServiciosAdmin" element={<ServiciosAdmin />} />
-  </>
-);
+  </>)
+};
 
 export default AdminRoutes;

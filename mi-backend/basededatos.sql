@@ -1,18 +1,19 @@
-
+-- Active: 1748032356831@@localhost@3306@veterinaria
+drop database IF EXISTS veterinaria;
 CREATE DATABASE  veterinaria;
 USE veterinaria;
 
 CREATE TABLE usuarios (
     id INT AUTO_INCREMENT PRIMARY KEY,
-   tipo_Doc VARCHAR(10) NOT NULL,
-   doc VARCHAR(15) NOT NULL UNIQUE,
-   nombre VARCHAR(100) NOT NULL,
-   fecha_Nac DATE,
-   tel VARCHAR(15),
-   email VARCHAR(100) NOT NULL UNIQUE,
-   direccion VARCHAR(255),
-   password VARCHAR(255) NOT NULL,
-   fecha_Regis TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    tipo_Doc VARCHAR(10) NOT NULL,
+    doc VARCHAR(15) NOT NULL UNIQUE,
+    nombre VARCHAR(100) NOT NULL,
+    fecha_Nac DATE,
+    tel VARCHAR(15),
+    email VARCHAR(100) NOT NULL UNIQUE,
+    direccion VARCHAR(255),
+    password VARCHAR(255) NOT NULL,
+    fecha_Regis TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
  select*from usuarios; 
  SELECT COUNT(*) AS total_usuarios FROM usuarios;
