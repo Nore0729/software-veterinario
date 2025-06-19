@@ -14,7 +14,7 @@ app.use(cors());
 const db = mysql.createConnection({
   host: 'localhost',
   user: 'root',
-  password: '',
+  password: '12345678',
   database: 'veterinaria',
   port: '3306',
 });

@@ -2,7 +2,7 @@
 const express = require('express')
 
 // Imports 
-const citas = require('../'
+const citas = require('../api/citas'
     
 )
 
