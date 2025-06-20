@@ -22,20 +22,48 @@
   --admin-layout-header-height: 70px;
 }
 
-/* Container principal del layout único */
-.admin-layout-container {
+/* ================================================== */
+/* --- AJUSTES PARA EL LAYOUT PRINCIPAL (HEADER + BODY) --- */
+/* ================================================== */
+
+/* Contenedor de TODA la aplicación (nuevo) */
+.admin-app-container {
+  display: flex;
+  flex-direction: column; /* Apila los hijos (header y body) verticalmente */
   min-height: 100vh;
   background: var(--admin-layout-background-color);
-  position: relative;
 }
 
-/* Wrapper del contenido único */
+/* Contenedor del cuerpo (menú + contenido) */
+.admin-layout-body {
+  display: flex; /* <-- El flexbox para poner menú y contenido en fila vive aquí */
+  flex-grow: 1;  /* Asegura que ocupe el resto de la altura disponible */
+}
+
+/* --- ESTILOS PARA EL NUEVO MENÚ LATERAL --- */
+/* Asegúrate que tu componente MenuAdmin tenga la clase 'menu-admin-container' */
+.menu-admin-container { 
+  flex-shrink: 0; /* Evita que el menú se encoja si no hay espacio */
+  width: var(--admin-layout-sidebar-width); /* ¡Usa la variable que ya definiste (280px)! */
+  background: var(--admin-layout-card-background);
+  box-shadow: var(--admin-layout-shadow-lg);
+  z-index: 10;
+  /* Puedes añadir más estilos para tu menú aquí, como padding, etc. */
+}
+
+/* Wrapper del contenido único (con ajuste de flex-grow) */
 .admin-content-wrapper {
+  flex-grow: 1; /* <-- Hace que el contenido se estire para ocupar el resto del espacio. */
   padding: 2rem;
-  min-height: calc(100vh - var(--admin-layout-header-height));
+  overflow-y: auto; /* Permite scroll solo en el contenido si es muy largo */
   animation: adminLayoutFadeIn 0.6s ease-out;
   background: #f1f5f9;
 }
+
+
+/* ================================================== */
+/* --- TUS ESTILOS ORIGINALES (NO NECESITAN CAMBIOS) --- */
+/* ================================================== */
 
 /* Animaciones únicas */
 @keyframes adminLayoutFadeIn {
@@ -68,6 +96,9 @@
   margin-bottom: 2rem;
   text-align: center;
 }
+
+/* ... (El resto de tus estilos para h2, h3, p, a, botones, tablas, etc. se quedan exactamente igual) ... */
+/* ... (Y tus media queries también se quedan igual) ... */
 
 .admin-content-wrapper h2 {
   font-size: 2rem;

@@ -1,4 +1,3 @@
--- Active: 1748032356831@@localhost@3306@veterinaria
 drop database IF EXISTS veterinaria;
 CREATE DATABASE  veterinaria;
 USE veterinaria;
