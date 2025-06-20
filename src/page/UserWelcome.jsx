@@ -19,16 +19,17 @@ const UserWelcome = ({ userName }) => {
     const nombre = localStorage.getItem('nombre') || userName || 'Usuario';
     const email = localStorage.getItem('email') || 'usuario@email.com';
     const doc = localStorage.getItem('doc_pro');
-
+  
     setUserData({ nombre, email });
-
+  
     if (doc) {
-      fetch(`/api/mis-mascotas/${doc}`)
+      fetch(`/api/mascotas/propietario/${doc}`)  // ← CORREGIDA AQUÍ
         .then(res => res.json())
         .then(data => setMascotas(data))
         .catch(err => console.error("Error al cargar mascotas:", err));
     }
   }, [userName]);
+  
 
   const handleLogout = () => {
     localStorage.clear();

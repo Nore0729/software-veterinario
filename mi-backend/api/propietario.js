@@ -3,6 +3,7 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const router = express.Router();
 
+
 module.exports = function(db) {
   // RUTA: POST /api/propietarios/registro
   router.post('/registro', (req, res) => {
@@ -35,15 +36,53 @@ module.exports = function(db) {
   });
 
   // RUTA: GET /api/propietarios/email/:email
-  router.get('/email/:email', (req, res) => {
-    const { email } = req.params;
-    const sql = 'SELECT * FROM usuarios WHERE email = ? AND id IN (SELECT id_prop FROM propietarios)';
-    db.query(sql, [email], (err, result) => {
-      if (err) return res.status(500).json({ error: 'Error al consultar' });
-      if (result.length === 0) return res.status(404).json({ error: 'No se encontró el propietario' });
-      res.json(result[0]);
+  
+    router.get('/email/:email', (req, res) => {
+      const { email } = req.params;
+      const sql = 'SELECT * FROM usuarios WHERE email = ? AND id IN (SELECT id_prop FROM propietarios)';
+      db.query(sql, [email], (err, result) => {
+        if (err) return res.status(500).json({ error: 'Error al consultar' });
+        if (result.length === 0) return res.status(404).json({ error: 'No se encontró el propietario' });
+        res.json(result[0]);
+      });
     });
-  });
+
+
+    router.post('/verificar-password', (req, res) => {
+      const { email, password } = req.body;
+    
+      const sql = 'SELECT password FROM usuarios WHERE email = ?';
+      db.query(sql, [email], (err, result) => {
+        if (err) {
+          return res.status(500).json({ error: 'Error al consultar la base de datos' });
+        }
+    
+        if (result.length === 0) {
+          return res.status(404).json({ error: 'Usuario no encontrado' });
+        }
+    
+        const hashedPassword = result[0].password;
+    
+        // 👇 Agrega aquí los logs para depuración
+        console.log('🔑 Password recibido:', password);
+        console.log('🔐 Hash almacenado en la BD:', hashedPassword);
+    
+        // 👇 Comparación
+        bcrypt.compare(password, hashedPassword, (errCompare, isMatch) => {
+          if (errCompare) {
+            return res.status(500).json({ error: 'Error al comparar contraseñas' });
+          }
+    
+          if (isMatch) {
+            res.json({ success: true });
+          } else {
+            res.status(401).json({ error: 'Contraseña incorrecta' });
+          }
+        });
+      });
+    });
+    
+
 
   return router;
 };

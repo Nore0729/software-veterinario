@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import Swal from 'sweetalert2';
 import '../styles/Datospro.css';
 
 const Actualizarpro = () => {
@@ -13,27 +14,23 @@ const Actualizarpro = () => {
     email: '',
     direccion: '',
     fechaRegistro: '',
-    password: '',
+    contraseñaActual: '',
   });
+
   const navigate = useNavigate();
 
   useEffect(() => {
     const email = localStorage.getItem('email');
     if (email) {
-      axios.get(`http://localhost:3000/api/propietarios/${email}`)
+      axios.get(`/api/propietarios/email/${email}`)
         .then(res => {
           const {
-            tipo_Doc,
-            doc,
-            nombre,
-            fecha_Nac,
-            tel,
-            email,
-            direccion,
-            fecha_Regis,
+            tipo_Doc, doc, nombre, fecha_Nac,
+            tel, email, direccion, fecha_Regis,
           } = res.data;
 
-          setDatos({
+          setDatos(prev => ({
+            ...prev,
             tipoDocumento: tipo_Doc || '',
             documento: doc || '',
             nombre: nombre || '',
@@ -42,139 +39,97 @@ const Actualizarpro = () => {
             email: email || '',
             direccion: direccion || '',
             fechaRegistro: fecha_Regis || '',
-            password: '',
-          });
+          }));
         })
         .catch(err => {
           console.error('Error al cargar datos:', err);
-          alert('Error al cargar los datos del propietario');
+          Swal.fire('Error', 'No se pudieron cargar los datos del propietario', 'error');
         });
     }
   }, []);
 
   const handleChange = (e) => {
-    setDatos({
-      ...datos,
-      [e.target.name]: e.target.value,
-    });
+    setDatos({ ...datos, [e.target.name]: e.target.value });
   };
 
-  const validarPassword = (password) => {
-    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/;
-    return regex.test(password);
-  };
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!validarPassword(datos.password)) {
-      alert('La contraseña debe contener al menos una mayúscula, una minúscula, un número y un símbolo.');
-      return;
-    }
 
     const emailOriginal = localStorage.getItem('email');
 
-    const datosActualizar = {
-      tel: datos.telefono,
-      email: datos.email,
-      direccion: datos.direccion,
-      password: datos.password,
-    };
-
-    axios.put(`http://localhost:3000/api/propietarios/${emailOriginal}`, datosActualizar)
-      .then(() => {
-        alert('Datos actualizados correctamente');
-        if (emailOriginal !== datos.email) {
-          localStorage.setItem('email', datos.email);
-        }
-        navigate('/Datospro');
-      })
-      .catch(err => {
-        alert('Error al actualizar datos');
-        console.error(err);
+    try {
+      const response = await axios.post('/api/propietarios/verificar-password', {
+        email: emailOriginal,
+        password: datos.contraseñaActual,
       });
+
+      if (response.data.success) {
+        // Contraseña correcta, actualizamos solo los datos (sin cambiar password)
+        const datosActualizar = {
+          tel: datos.telefono,
+          email: datos.email,
+          direccion: datos.direccion,
+        };
+
+        await axios.put(`/api/propietarios/${emailOriginal}`, datosActualizar);
+
+        Swal.fire('Éxito', 'Datos actualizados correctamente', 'success')
+          .then(() => {
+            if (emailOriginal !== datos.email) {
+              localStorage.setItem('email', datos.email);
+            }
+            navigate('/Datospro');
+          });
+      }
+    } catch (error) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Contraseña incorrecta',
+        text: 'Debes recuperar tu contraseña para actualizar tus datos',
+        confirmButtonText: 'Ir a recuperar',
+        confirmButtonColor: '#2196f3',
+      }).then(() => {
+        navigate('/recuperarcontraseña');
+      });
+    }
   };
 
   return (
     <div className="datospro-container">
       <h2>Actualizar datos</h2>
       <form className="datospro-form" onSubmit={handleSubmit}>
-
         <label>Tipo de Documento:</label>
-        <input
-          type="text"
-          name="tipoDocumento"
-          value={datos.tipoDocumento}
-          readOnly
-        />
+        <input type="text" name="tipoDocumento" value={datos.tipoDocumento} readOnly />
 
         <label>Documento:</label>
-        <input
-          type="text"
-          name="documento"
-          value={datos.documento}
-          readOnly
-        />
+        <input type="text" name="documento" value={datos.documento} readOnly />
 
         <label>Nombre:</label>
-        <input
-          type="text"
-          name="nombre"
-          value={datos.nombre}
-          readOnly
-        />
+        <input type="text" name="nombre" value={datos.nombre} readOnly />
 
         <label>Fecha de Nacimiento:</label>
-        <input
-          type="date"
-          name="fechaNacimiento"
-          value={datos.fechaNacimiento ? datos.fechaNacimiento.split('T')[0] : ''}
-          readOnly
-        />
+        <input type="date" name="fechaNacimiento" value={datos.fechaNacimiento?.split('T')[0]} readOnly />
 
         <label>Teléfono:</label>
-        <input
-          type="text"
-          name="telefono"
-          value={datos.telefono}
-          onChange={handleChange}
-          required
-        />
+        <input type="text" name="telefono" value={datos.telefono} onChange={handleChange} required />
 
         <label>Email:</label>
-        <input
-          type="email"
-          name="email"
-          value={datos.email}
-          onChange={handleChange}
-          required
-        />
+        <input type="email" name="email" value={datos.email} onChange={handleChange} required />
 
         <label>Dirección:</label>
-        <input
-          type="text"
-          name="direccion"
-          value={datos.direccion}
-          onChange={handleChange}
-          required
-        />
+        <input type="text" name="direccion" value={datos.direccion} onChange={handleChange} required />
 
         <label>Fecha de Registro:</label>
-        <input
-          type="text"
-          name="fechaRegistro"
-          value={datos.fechaRegistro ? new Date(datos.fechaRegistro).toLocaleString() : ''}
-          readOnly
-        />
+        <input type="text" name="fechaRegistro" value={new Date(datos.fechaRegistro).toLocaleString()} readOnly />
 
-        <label>Contraseña:</label>
+        <label>Contraseña actual:</label>
         <input
           type="password"
-          name="password"
-          value={datos.password}
+          name="contraseñaActual"
+          value={datos.contraseñaActual}
           onChange={handleChange}
-          placeholder="Contraseña"
           required
+          placeholder="Ingresa tu contraseña para confirmar"
         />
 
         <button className="btn-actualizar" type="submit">Guardar cambios</button>

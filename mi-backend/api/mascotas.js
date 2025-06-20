@@ -1,34 +1,85 @@
-// routes/mascotas.js
 const express = require('express');
 const router = express.Router();
 
+/**
+ * Esta función exporta un router de Express con las rutas relacionadas a las mascotas.
+ * @param {object} db - La conexión a la base de datos que se usará para las consultas.
+ * @returns {object} El router de Express configurado.
+ */
 module.exports = function(db) {
-  // RUTA: POST /api/mascotas/registro
-  router.post('/registro', (req, res) => {
-    const { documento, nombre, especie, raza, genero, color, fechaNacimiento, peso, tamano, estadoReproductivo, vacunado, observaciones } = req.body;
-    if (!documento || !nombre) return res.status(400).send('Documento del propietario y nombre de la mascota son obligatorios');
+    /**
+     * @route POST /api/mascotas/registro
+     * @description Registra una nueva mascota en la base de datos.
+     */
+    router.post('/registro', (req, res) => {
+        const {
+            doc_pro,
+            nombre,
+            especie,
+            raza,
+            genero,
+            color,
+            fecha_nac,
+            peso,
+            tamano,
+            estado_reproductivo,
+            vacunado,
+            observaciones
+        } = req.body;
 
-    const query = `INSERT INTO mascotas (doc_pro, nombre, especie, raza, genero, color, fecha_nac, peso, tamano, estado_reproductivo, vacunado, observaciones) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-    const params = [documento, nombre, especie, raza, genero, color, fechaNacimiento, peso, tamano, estadoReproductivo, vacunado === true || vacunado === "true" ? 1 : 0, observaciones];
+        // Validación de campos obligatorios según la estructura de la tabla
+        if (!doc_pro || !nombre || !especie || !raza || !genero || !fecha_nac || !tamano || !estado_reproductivo) {
+            return res.status(400).json({ error: 'Faltan campos obligatorios para registrar la mascota.' });
+        }
 
-    db.query(query, params, (err) => {
-      if (err) return res.status(500).send('Hubo un problema al registrar la mascota');
-      res.status(201).send('Mascota registrada exitosamente');
+        const query = `
+            INSERT INTO mascotas (
+                doc_pro, nombre, especie, raza, genero, color, fecha_nac, 
+                peso, tamano, estado_reproductivo, vacunado, observaciones
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `;
+
+        const params = [
+            doc_pro, nombre, especie, raza, genero, color, fecha_nac, peso,
+            tamano, estado_reproductivo,
+            vacunado === true || vacunado === 'true' ? 1 : 0,
+            observaciones
+        ];
+
+        db.query(query, params, (err, result) => {
+            if (err) {
+                console.error('Error al registrar la mascota:', err);
+                return res.status(500).json({ error: 'Hubo un problema en el servidor al registrar la mascota.' });
+            }
+            res.status(201).json({
+                message: 'Mascota registrada exitosamente',
+                mascotaId: result.insertId
+            });
+        });
     });
-  });
 
-  // RUTA: GET /api/mascotas/propietario/:doc_pro
-  // Unifica las dos rutas que tenías para obtener mascotas por documento
-  router.get('/propietario/:doc_pro', (req, res) => {
-    const { doc_pro } = req.params;
-    if (!doc_pro) return res.status(400).json({ error: 'Documento del propietario es obligatorio' });
-    
-    const query = 'SELECT * FROM mascotas WHERE doc_pro = ?';
-    db.query(query, [doc_pro], (err, results) => {
-      if (err) return res.status(500).json({ error: 'Error en el servidor al obtener las mascotas' });
-      res.json(results);
+    /**
+     * @route GET /api/mascotas/propietario/:doc_pro
+     * @description Obtiene todas las mascotas asociadas a un documento de propietario.
+     */
+    router.get('/propietario/:doc_pro', (req, res) => {
+        const { doc_pro } = req.params;
+
+        if (!doc_pro) {
+            return res.status(400).json({ error: 'El documento del propietario es obligatorio.' });
+        }
+
+        const query = 'SELECT * FROM mascotas WHERE doc_pro = ?';
+
+        db.query(query, [doc_pro], (err, results) => {
+            if (err) {
+                console.error('Error al buscar mascotas:', err);
+                return res.status(500).json({ error: 'Error en el servidor al obtener las mascotas.' });
+            }
+            res.json(results);
+        });
     });
-  });
-  
-  return router;
+
+    return router;
 };
+

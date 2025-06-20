@@ -49,6 +49,16 @@ function RecuperarContraseña() {
     setCanResendCode(false);
     setResendTimer(60);
 
+    Swal.fire({
+      title: 'Enviando...',
+      text: 'Estamos enviando el código a tu correo',
+      allowOutsideClick: false,
+      showConfirmButton: false,
+      didOpen: () => {
+        Swal.showLoading();
+      }
+    });
+
     emailjs
       .send(
         'service_am5uvvi',
@@ -56,24 +66,30 @@ function RecuperarContraseña() {
         { email: data.email, passcode: code },
         'owZFiKlvc_X1nVtQ3'
       )
-      .then(
-        () => {
-          Swal.fire({
-            title: 'Código enviado',
-            text: 'Hemos enviado un código de verificación a tu correo electrónico',
-            icon: 'success',
-            confirmButtonColor: '#2196f3'
-          });
-          setStep(2);
-          reset();
-        },
-        () => Swal.fire('Error', 'No se pudo enviar el correo', 'error')
-      );
+      .then(() => {
+        Swal.close();
+        Swal.fire({
+          title: '<strong style="color:#2196f3;">Código Enviado</strong>',
+          html: `
+            <p>Revisa tu correo electrónico para continuar</p>
+            <h2 style="font-size: 2rem; margin: 0.5rem 0; color: #2196f3;">✔</h2>
+          `,
+          showConfirmButton: false,
+          timer: 2500,
+          background: '#fff',
+          icon: 'success'
+        });
+        setStep(2);
+        reset();
+      })
+      .catch(() => {
+        Swal.fire('Error', 'No se pudo enviar el correo', 'error');
+      });
   };
 
   const handleResendCode = () => {
     if (!canResendCode) return;
-    
+
     const code = generateVerificationCode();
     setVerificationCode(code);
     setCanResendCode(false);
@@ -85,18 +101,35 @@ function RecuperarContraseña() {
       { email, passcode: code },
       'owZFiKlvc_X1nVtQ3'
     ).then(
-      () => Swal.fire('Éxito', 'Nuevo código enviado al correo', 'success'),
+      () => Swal.fire({
+        title: '<strong style="color:#2196f3;">Código Reenviado</strong>',
+        html: '<p>Nuevo código enviado a tu correo</p><h2 style="font-size: 2rem; margin: 0.5rem 0; color: #2196f3;">🔁</h2>',
+        showConfirmButton: false,
+        timer: 2500,
+        background: '#fff',
+        icon: 'success'
+      }),
       () => Swal.fire('Error', 'No se pudo enviar el correo', 'error')
     );
   };
 
   const handleVerifyCode = (data) => {
-    if (data.code === verificationCode) {
+    const enteredCode = Object.keys(data)
+      .filter(key => key.startsWith('code'))
+      .map(key => data[key])
+      .join('');
+
+    if (enteredCode === verificationCode) {
       Swal.fire({
-        title: 'Código verificado',
-        text: 'Ahora puedes establecer tu nueva contraseña',
-        icon: 'success',
-        confirmButtonColor: '#2196f3'
+        title: '<strong style="color:#2196f3;">Código Verificado</strong>',
+        html: `
+          <p>Ahora puedes establecer tu nueva contraseña</p>
+          <h2 style="font-size: 2rem; margin: 0.5rem 0; color: #2196f3;">🔓</h2>
+        `,
+        showConfirmButton: false,
+        timer: 2500,
+        background: '#fff',
+        icon: 'success'
       });
       setStep(3);
       reset();
@@ -107,7 +140,7 @@ function RecuperarContraseña() {
 
   const handleResetPassword = async (data) => {
     try {
-      const response = await fetch('http://localhost:3001/api/reset-password', {
+      const response = await fetch('/api/auth/reset-password', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -119,10 +152,15 @@ function RecuperarContraseña() {
 
       if (response.ok) {
         Swal.fire({
-          title: '¡Contraseña actualizada!',
-          text: 'Tu contraseña ha sido restablecida correctamente',
-          icon: 'success',
-          confirmButtonColor: '#4caf50'
+          title: '<strong style="color:#4caf50;">¡Contraseña Actualizada!</strong>',
+          html: `
+            <p>Tu contraseña ha sido restablecida correctamente</p>
+            <h2 style="font-size: 2rem; margin: 0.5rem 0; color: #4caf50;">✅</h2>
+          `,
+          showConfirmButton: false,
+          timer: 2500,
+          background: '#fff',
+          icon: 'success'
         }).then(() => {
           navigate('/login');
         });
@@ -148,15 +186,15 @@ function RecuperarContraseña() {
       <div className="der-side">
         <div className="login-form">
           <h1 className="form-title">Recuperar Contraseña</h1>
-          
+
           <div className="steps-container">
             <div className="steps-indicator">
               <div className="step-connector"></div>
               {getStepLabels().map((stepItem) => (
                 <div key={stepItem.number} className="step-circle-wrapper">
-                  <div 
+                  <div
                     className={`step-circle ${
-                      step > stepItem.number ? 'completed' : 
+                      step > stepItem.number ? 'completed' :
                       step === stepItem.number ? 'active' : ''
                     }`}
                   >
@@ -168,6 +206,7 @@ function RecuperarContraseña() {
             </div>
           </div>
 
+          {/* Paso 1: Ingresar email */}
           {step === 1 && (
             <>
               <p className="form-subtitle">
@@ -178,7 +217,7 @@ function RecuperarContraseña() {
                   Correo electrónico
                   <input
                     type="email"
-                    {...register('email', { 
+                    {...register('email', {
                       required: 'El correo electrónico es requerido',
                       pattern: {
                         value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
@@ -196,6 +235,7 @@ function RecuperarContraseña() {
             </>
           )}
 
+          {/* Paso 2: Verificar código */}
           {step === 2 && (
             <>
               <p className="form-subtitle">
@@ -204,18 +244,17 @@ function RecuperarContraseña() {
               <form onSubmit={handleSubmit(handleVerifyCode)}>
                 <label>
                   Código de verificación
-                  <input
-                    type="text"
-                    {...register('code', { 
-                      required: 'El código es requerido',
-                      minLength: {
-                        value: 6,
-                        message: 'El código debe tener 6 caracteres'
-                      }
-                    })}
-                    className={errors.code ? 'input-error' : ''}
-                  />
-                  {errors.code && <span className="error-message">{errors.code.message}</span>}
+                  <div className="code-inputs">
+                    {[...Array(6)].map((_, i) => (
+                      <input
+                        key={i}
+                        type="text"
+                        maxLength={1}
+                        {...register(`code${i}`, { required: true })}
+                        className="code-input small-text"
+                      />
+                    ))}
+                  </div>
                 </label>
                 <button type="submit" className="btn-primary">
                   Verificar código
@@ -235,6 +274,7 @@ function RecuperarContraseña() {
             </>
           )}
 
+          {/* Paso 3: Nueva contraseña */}
           {step === 3 && (
             <>
               <p className="form-subtitle">
@@ -306,3 +346,4 @@ function RecuperarContraseña() {
 }
 
 export default RecuperarContraseña;
+

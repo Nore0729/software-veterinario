@@ -4,17 +4,15 @@ import axios from 'axios';
 const MisMascotas = () => {
   const [mascotas, setMascotas] = useState([]);
   const [loading, setLoading] = useState(true);
-  
-  
-  console.log("alalalalla")
+
   useEffect(() => {
     const storedDoc = localStorage.getItem('doc_pro');
-    
+
     if (storedDoc) {
       const fetchMascotas = async () => {
         try {
-          const res = await axios.get(`http://localhost:3000/api/mis-mascotas/${storedDoc}`);
-          console.log(res.data)
+          const res = await axios.get(`/api/mascotas/propietario/${storedDoc}`);
+          console.log('Mascotas recibidas:', res.data);
           setMascotas(res.data);
         } catch (err) {
           console.error('Error al cargar mascotas:', err);
@@ -22,24 +20,23 @@ const MisMascotas = () => {
           setLoading(false);
         }
       };
-      
+
       fetchMascotas();
     } else {
-      setLoading(false); // Si no hay doc, detenemos el loading
+      setLoading(false);
     }
   }, []);
-  
-  
+
   if (loading) return <p>Cargando mascotas...</p>;
-  
+
   return (
     <div>
       <h2>Mis Mascotas</h2>
       {mascotas.length === 0 ? (
-        <p>No tienes mascotas registradaaas.</p>
+        <p>No tienes mascotas registradas.</p>
       ) : (
         <ul>
-          {mascotas?.map((mascota) => (
+          {mascotas.map((mascota) => (
             <li key={mascota.id}>
               <strong>{mascota.nombre}</strong> - {mascota.especie}, {mascota.raza}
             </li>

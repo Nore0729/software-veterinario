@@ -15,7 +15,6 @@ export const Login = () => {
   const [countdown, setCountdown] = useState(60);
   const navigate = useNavigate();
 
-  // Efecto para manejar el contador de bloqueo
   useEffect(() => {
     let timer;
     if (isBlocked && countdown > 0) {
@@ -47,15 +46,11 @@ export const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (isBlocked) {
-      return;
-    }
-
+    if (isBlocked) return;
     if (!email || !password) {
       setErrorGeneral('Por favor completa ambos campos');
       return;
     }
-
     if (emailError) {
       setErrorGeneral('Por favor corrige el correo electrónico');
       return;
@@ -93,9 +88,9 @@ export const Login = () => {
         nivel_acceso: 'alto'
       }
     ];
-  
+
     try {
-      const response = await axios.post('http://localhost:3000/api/login', {
+      const response = await axios.post('/api/auth/login', {
         email,
         password,
       });
@@ -121,57 +116,48 @@ export const Login = () => {
 
     } catch (err) {
       console.error('Error en login backend:', err);
+      const user = usuariosMock.find(
+        (usuario) => usuario.email === email && usuario.password === password
+      );
 
-      // Fallback a usuarios mock si backend falla
-      try {
-        const user = usuariosMock.find(
-          (usuario) => usuario.email === email && usuario.password === password
-        );
-
-        if (!user) {
-          const attempts = failedAttempts + 1;
-          setFailedAttempts(attempts);
-          
-          if (attempts >= 3) {
-            setIsBlocked(true);
-            setCountdown(60);
-          } else {
-            setErrorGeneral(`Credenciales incorrectas. Intentos restantes: ${3 - attempts}`);
-          }
-          return;
+      if (!user) {
+        const attempts = failedAttempts + 1;
+        setFailedAttempts(attempts);
+        if (attempts >= 3) {
+          setIsBlocked(true);
+          setCountdown(60);
+        } else {
+          setErrorGeneral(`Credenciales incorrectas. Intentos restantes: ${3 - attempts}`);
         }
+        return;
+      }
 
-        localStorage.setItem('userData', JSON.stringify(user));
-        localStorage.setItem('nombre', user.nombre);
-        localStorage.setItem('email', user.email);
-        localStorage.setItem('rol', user.rol);
+      localStorage.setItem('userData', JSON.stringify(user));
+      localStorage.setItem('nombre', user.nombre);
+      localStorage.setItem('email', user.email);
+      localStorage.setItem('rol', user.rol);
 
-        setErrorGeneral('');
-        setFailedAttempts(0);
+      setErrorGeneral('');
+      setFailedAttempts(0);
 
-        switch (user.rol) {
-          case 'propietario':
-            navigate('/UserWelcome');
-            break;
-          case 'veterinario':
-            navigate('/VeterinarioPer');
-            break;
-          case 'administrador':
-            navigate('/InicioAdmin');
-            break;
-          default:
-            navigate('/UserWelcome');
-        }
-      } catch (error) {
-        console.error('Error en login con rol (mock):', error);
-        setErrorGeneral('Error al autenticar el rol');
+      switch (user.rol) {
+        case 'propietario':
+          navigate('/UserWelcome');
+          break;
+        case 'veterinario':
+          navigate('/VeterinarioPer');
+          break;
+        case 'administrador':
+          navigate('/InicioAdmin');
+          break;
+        default:
+          navigate('/UserWelcome');
       }
     }
   };
 
   return (
     <div className={`login-container ${isBlocked ? 'blurred-background' : ''}`}>
-      {/* Modal de cuenta regresiva */}
       {isBlocked && (
         <div className="countdown-overlay">
           <div className="countdown-modal">

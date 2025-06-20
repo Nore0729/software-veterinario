@@ -28,21 +28,22 @@ const UserLayout = () => {
   const [mascotas, setMascotas] = useState([])
 
   useEffect(() => {
-    const nombre = localStorage.getItem("nombre") || "Usuario"
-    const email = localStorage.getItem("email") || "usuario@email.com"
-    const doc = localStorage.getItem("doc_pro")
-
-    setUserData({ nombre, email })
-
+    const nombre = localStorage.getItem("nombre") || "Usuario";
+    const email = localStorage.getItem("email") || "usuario@email.com";
+    const doc = localStorage.getItem("doc_pro");
+  
+    setUserData({ nombre, email });
+  
     if (doc) {
-      fetch(`/api/mis-mascotas/${doc}`)
+      fetch(`/api/mascotas/propietario/${doc}`)  // ← CORREGIDA AQUÍ
         .then((res) => res.json())
         .then((data) => {
-          setMascotas(data)
+          setMascotas(data);
         })
-        .catch((err) => console.error("Error cargando mascotas:", err))
+        .catch((err) => console.error("Error cargando mascotas:", err));
     }
-  }, [])
+  }, []);
+  
 
   const handleLogout = () => {
     localStorage.clear()

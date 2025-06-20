@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import Swal from 'sweetalert2';
 import '../styles/Datospro.css';
 
 const Datospro = () => {
@@ -8,17 +9,31 @@ const Datospro = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-  const email = localStorage.getItem('email');
-  if (email) {
-    axios.get(`http://localhost:3000/api/propietarios/${email}`) 
-      .then(response => setDatos(response.data))
-      .catch(error => console.error('Error al obtener datos del propietario:', error));
-  }
-}, []);
-
+    const email = localStorage.getItem('email');
+    if (email) {
+      axios.get(`/api/propietarios/email/${email}`)
+        .then(response => setDatos(response.data))
+        .catch(error => {
+          console.error('Error al obtener datos del propietario:', error);
+          Swal.fire({
+            icon: 'error',
+            title: 'No se encontraron datos',
+            text: 'No se pudo obtener la información del propietario con ese correo',
+            confirmButtonColor: '#2196f3'
+          });
+        });
+    } else {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Email no encontrado',
+        text: 'Por favor, inicia sesión para ver tus datos',
+        confirmButtonColor: '#2196f3'
+      });
+    }
+  }, []);
 
   if (!datos) {
-    return <div>Cargando datos...</div>;
+    return <div className="cargando">Cargando datos...</div>;
   }
 
   const handleActualizar = (e) => {

@@ -50,19 +50,30 @@ function RegistroMascota() {
 
   const onSubmit = async (data) => {
     data.vacunado = data.vacunado === "Sí" ? true : false;
-    localStorage.setItem('doc_pro', data.doc);
-    try {
-      const response = await axios.post('http://localhost:3000/api/registro-mascota', data);
-      if (response.status === 201) Swal.fire({
-        title: '<strong>Registro exitoso!</strong>',
-        html: `<i>La mascota <strong>${data.nombre}</strong> fue registrada</i>`,
-        icon: 'success',
-        timer: 3000,
-        didClose: () => {
-         
-        }
-      });
 
+    // Renombrar campos para que coincidan con la base de datos
+    data.doc_pro = data.documento;
+    data.fecha_nac = data.fechaNacimiento;
+    data.estado_reproductivo = data.estadoReproductivo;
+
+    // Eliminar los campos originales que no existen en la DB
+    delete data.documento;
+    delete data.fechaNacimiento;
+    delete data.estadoReproductivo;
+
+    try {
+      const response = await axios.post('/api/mascotas/registro', data);
+      if (response.status === 201) {
+        Swal.fire({
+          title: '<strong>Registro exitoso!</strong>',
+          html: `<i>La mascota <strong>${data.nombre}</strong> fue registrada</i>`,
+          icon: 'success',
+          timer: 3000,
+          didClose: () => {
+            // navigate('/ruta-opcional');
+          }
+        });
+      }
     } catch (error) {
       Swal.fire({
         title: '<strong>Error!</strong>',
@@ -226,7 +237,9 @@ function RegistroMascota() {
               </div>
               <input
                 type="date"
-                {...register("fechaNacimiento")}
+                {...register("fechaNacimiento", {
+                  required: "Campo obligatorio"
+                })}
                 className={errors.fechaNacimiento ? 'error' : ''}
               />
               {errors.fechaNacimiento && (
@@ -235,73 +248,72 @@ function RegistroMascota() {
             </div>
 
             <div className="input-group">
-            <div className="label-container">
-              <User className="icon-small" />
-              <label>Peso (kg)</label>
+              <div className="label-container">
+                <User className="icon-small" />
+                <label>Peso (kg)</label>
+              </div>
+              <input
+                type="text"
+                inputMode="decimal"
+                maxLength={3}
+                onInput={(e) => {
+                  let value = e.target.value.replace(/[^0-9.]/g, ''); 
+                  const parts = value.split('.');
+                  if (parts.length > 2) {
+                    value = parts[0] + '.' + parts[1]; 
+                  }
+                  if (value.length > 3) {
+                    value = value.slice(0, 3);
+                  }
+                  e.target.value = value;
+                }}
+                {...register("peso", {
+                  required: "Campo obligatorio",
+                  pattern: {
+                    value: /^[0-9]{1,3}(\.[0-9]?)?$/,
+                    message: "Máximo 3 números y 1 decimal"
+                  }
+                })}
+                className={errors.peso ? 'error' : ''}
+                placeholder="Ej: 12.5"
+              />
+              {errors.peso && (
+                <span className="error-message">{errors.peso.message}</span>
+              )}
             </div>
-            <input
-              type="text"
-              inputMode="decimal"
-              maxLength={3}
-              onInput={(e) => {
-                let value = e.target.value.replace(/[^0-9.]/g, ''); 
-                const parts = value.split('.');
-                if (parts.length > 2) {
-                  value = parts[0] + '.' + parts[1]; 
-                }
-                if (value.length > 3) {
-                  value = value.slice(0, 3);
-                }
-                e.target.value = value;
-              }}
-              {...register("peso", {
-                required: "Campo obligatorio",
-                pattern: {
-                  value: /^[0-9]{1,3}(\.[0-9]?)?$/,
-                  message: "Máximo 3 números y 1 decimal"
-                }
-              })}
-              className={errors.peso ? 'error' : ''}
-              placeholder="Ej: 12.5"
-            />
-            {errors.peso && (
-              <span className="error-message">{errors.peso.message}</span>
-            )}
-          </div>
-
-
-          <div className="input-group">
-          <div className="label-container">
-            <User className="icon-small" />
-            <label>Tamaño</label>
-          </div>
-          <select
-            {...register("tamano", { required: "Campo obligatorio" })}
-            className={errors.tamano ? 'error' : ''}
-          >
-            <option value="">Seleccionar</option>
-            <option value="PEQUEÑO">PEQUEÑO</option>
-            <option value="MEDIANO">MEDIANO</option>
-            <option value="GRANDE">GRANDE</option>
-          </select>
-          {errors.tamano && (
-            <span className="error-message">{errors.tamano.message}</span>
-          )}
-        </div>
-
 
             <div className="input-group">
               <div className="label-container">
                 <User className="icon-small" />
-                <label>Esterlizado</label>
+                <label>Tamaño</label>
               </div>
               <select
-                {...register("estadoReproductivo")}
+                {...register("tamano", { required: "Campo obligatorio" })}
+                className={errors.tamano ? 'error' : ''}
+              >
+                <option value="">Seleccionar</option>
+                <option value="Pequeño">PEQUEÑO</option>
+                <option value="Mediano">MEDIANO</option>
+                <option value="Grande">GRANDE</option>
+              </select>
+              {errors.tamano && (
+                <span className="error-message">{errors.tamano.message}</span>
+              )}
+            </div>
+
+            <div className="input-group">
+              <div className="label-container">
+                <User className="icon-small" />
+                <label>Esterilizado</label>
+              </div>
+              <select
+                {...register("estadoReproductivo", { required: "Campo obligatorio" })}
                 className={errors.estadoReproductivo ? 'error' : ''}
               >
                 <option value="">Seleccionar</option>
-                <option value="Castrado">Sí</option>
-                <option value="No Castrado">No </option>
+                <option value="Intacto">Intacto</option>
+                <option value="Esterilizado">Esterilizado</option>
+                <option value="Castrado">Castrado</option>
               </select>
               {errors.estadoReproductivo && (
                 <span className="error-message">{errors.estadoReproductivo.message}</span>
@@ -313,7 +325,7 @@ function RegistroMascota() {
         {step === 3 && (
           <fieldset className="form-section">
             <legend><Lock className="icon-legend" /> Seguridad</legend>
-            
+
             <div className="input-group">
               <div className="label-container">
                 <Lock className="icon-small" />
@@ -379,3 +391,4 @@ function RegistroMascota() {
 }
 
 export default RegistroMascota;
+
