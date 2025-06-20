@@ -155,7 +155,7 @@ function RegistroPropietario() {
       password: data.password
     };
     try {
-      const response = await axios.post("http://localhost:3000/api/registro-propietario", requestData)
+        const response = await axios.post("/api/propietarios/registro", requestData)
       if (response.status === 201)
         Swal.fire({
           title: "<strong>Registro exitoso!</strong>",
