@@ -387,3 +387,84 @@ textarea:focus {
 button, input, textarea, select {
   transition: var(--transition);
 }
+
+/* --- NUEVOS ESTILOS PARA LA SECCIÓN DE ASIGNAR ROLES --- */
+
+.header-botones {
+  display: flex;
+  gap: 1rem; /* Espacio entre los botones */
+}
+
+.btn-asignar-rol {
+  background-color: #2263b9; /* Un color azul distintivo */
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background-color 0.3s;
+}
+
+.btn-asignar-rol:hover {
+  background-color: #2673a7;
+}
+
+.seccion-asignar-roles {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background-color: #fdfdfd;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.header-asignar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid #69a7d1;
+  padding-bottom: 1rem;
+}
+
+.header-asignar h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #255d9c;
+}
+
+.header-asignar .btn-cancelar:hover {
+  background-color: #2b70a5;
+}
+
+.tabla-asignar-usuarios {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+.tabla-asignar-usuarios th,
+.tabla-asignar-usuarios td {
+  border: 1px solid #ddd;
+  padding: 12px;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.tabla-asignar-usuarios th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  color: #5688b9;
+}
+
+.tabla-asignar-usuarios tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.tabla-asignar-usuarios tbody tr:hover {
+  background-color: #f1f1f1;
+}

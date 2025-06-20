@@ -1,171 +1,147 @@
-import AdminLayout from "../../layout/AdminLayout"
-import { useState } from "react"
-import { useNavigate } from "react-router-dom"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faSave, faTimes, faCalendarAlt, faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons"
-import "../../styles/Administrador//FormUsu.css"
+import AdminLayout from "../../layout/AdminLayout";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSave, faTimes, faCalendarAlt, faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import "../../styles/Administrador//FormUsu.css";
 
 export default function RegistroUsu() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    tipo_Doc: "CC", // Cambiado de tipoDocumento
-    doc: "", // Cambiado de documento
+    tipo_Doc: "CC",
+    doc: "",
     nombre: "",
-    fecha_Nac: "", // Cambiado de fechaNacimiento
-    tel: "", // Cambiado de telefono
+    fecha_Nac: "",
+    tel: "",
     email: "",
     direccion: "",
     password: "",
     showPassword: false,
-  })
+  });
 
-  const [errors, setErrors] = useState({})
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e) => {
-    const { name, value } = e.target
-
-    // Procesamiento específico por campo
-    let processedValue = value
+    const { name, value } = e.target;
+    let processedValue = value;
 
     switch (name) {
       case "doc":
-        // Solo números, máximo 15 caracteres (según BD)
-        processedValue = value.replace(/\D/g, "").slice(0, 15)
-        break
+        processedValue = value.replace(/\D/g, "").slice(0, 15);
+        break;
       case "nombre":
-        // Solo letras y espacios, máximo 100 caracteres, convertir a mayúsculas
         processedValue = value
           .replace(/[^A-Za-zÁÉÍÓÚáéíóúñÑ ]/g, "")
           .slice(0, 100)
-          .toUpperCase()
-        break
+          .toUpperCase();
+        break;
       case "tel":
-        // Solo números, máximo 15 caracteres (según BD)
-        processedValue = value.replace(/\D/g, "").slice(0, 15)
-        break
+        processedValue = value.replace(/\D/g, "").slice(0, 15);
+        break;
       case "email":
-        // Convertir a minúsculas, máximo 100 caracteres
-        processedValue = value.toLowerCase().slice(0, 100)
-        break
+        processedValue = value.toLowerCase().slice(0, 100);
+        break;
       case "direccion":
-        // Máximo 255 caracteres, convertir a mayúsculas
-        processedValue = value.slice(0, 255).toUpperCase()
-        break
+        processedValue = value.slice(0, 255).toUpperCase();
+        break;
       case "password":
-        // Máximo 255 caracteres
-        processedValue = value.slice(0, 255)
-        break
+        processedValue = value.slice(0, 255);
+        break;
+      default:
+        break;
     }
 
     setFormData({
       ...formData,
       [name]: processedValue,
-    })
+    });
 
-    // Limpiar error cuando el usuario escribe
     if (errors[name]) {
       setErrors({
         ...errors,
         [name]: null,
-      })
+      });
     }
-  }
+  };
 
   const togglePasswordVisibility = () => {
     setFormData({
       ...formData,
       showPassword: !formData.showPassword,
-    })
-  }
+    });
+  };
 
   const validateForm = () => {
-    const newErrors = {}
+    const newErrors = {};
 
-    // Validación tipo_Doc
     if (!["CC", "CE", "PA"].includes(formData.tipo_Doc)) {
-      newErrors.tipo_Doc = "Seleccione un tipo de documento válido"
+      newErrors.tipo_Doc = "Seleccione un tipo de documento válido";
     }
-
-    // Validación doc (6-15 dígitos según BD)
     if (!formData.doc) {
-      newErrors.doc = "El número de documento es obligatorio"
+      newErrors.doc = "El número de documento es obligatorio";
     } else if (formData.doc.length < 6) {
-      newErrors.doc = "El documento debe tener al menos 6 dígitos"
-    } else if (formData.doc.length > 15) {
-      newErrors.doc = "El documento no puede tener más de 15 dígitos"
+      newErrors.doc = "El documento debe tener al menos 6 dígitos";
     }
-
-    // Validación nombre (mínimo 5 caracteres, máximo 100)
     if (!formData.nombre) {
-      newErrors.nombre = "El nombre es obligatorio"
+      newErrors.nombre = "El nombre es obligatorio";
     } else if (formData.nombre.trim().length < 5) {
-      newErrors.nombre = "El nombre debe tener al menos 5 caracteres"
+      newErrors.nombre = "El nombre debe tener al menos 5 caracteres";
     }
-
-    // Validación fecha_Nac (mayor de edad)
     if (!formData.fecha_Nac) {
-      newErrors.fecha_Nac = "La fecha de nacimiento es obligatoria"
+      newErrors.fecha_Nac = "La fecha de nacimiento es obligatoria";
     } else {
-      const birthDate = new Date(formData.fecha_Nac)
-      const today = new Date()
-      let age = today.getFullYear() - birthDate.getFullYear()
-      const monthDiff = today.getMonth() - birthDate.getMonth()
-
+      const birthDate = new Date(formData.fecha_Nac);
+      const today = new Date();
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const monthDiff = today.getMonth() - birthDate.getMonth();
       if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-        age--
+        age--;
       }
-
       if (age < 18) {
-        newErrors.fecha_Nac = "El usuario debe ser mayor de 18 años"
+        newErrors.fecha_Nac = "El usuario debe ser mayor de 18 años";
       }
     }
-
-    // Validación tel (mínimo 10 dígitos, máximo 15)
     if (!formData.tel) {
-      newErrors.tel = "El teléfono es obligatorio"
+      newErrors.tel = "El teléfono es obligatorio";
     } else if (formData.tel.length < 10) {
-      newErrors.tel = "El teléfono debe tener al menos 10 dígitos"
+      newErrors.tel = "El teléfono debe tener al menos 10 dígitos";
     }
-
-    // Validación email (formato correcto, máximo 100 caracteres)
     if (!formData.email) {
-      newErrors.email = "El correo electrónico es obligatorio"
+      newErrors.email = "El correo electrónico es obligatorio";
     } else if (!/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/.test(formData.email)) {
-      newErrors.email = "Ingrese un correo electrónico válido"
+      newErrors.email = "Ingrese un correo electrónico válido";
     }
-
-    // Validación direccion (mínimo 10 caracteres, máximo 255)
     if (!formData.direccion) {
-      newErrors.direccion = "La dirección es obligatoria"
+      newErrors.direccion = "La dirección es obligatoria";
     } else if (formData.direccion.trim().length < 10) {
-      newErrors.direccion = "La dirección debe tener al menos 10 caracteres"
+      newErrors.direccion = "La dirección debe tener al menos 10 caracteres";
     }
-
-    // Validación password (mínimo 8 caracteres, con complejidad)
     if (!formData.password) {
-      newErrors.password = "La contraseña es obligatoria"
+      newErrors.password = "La contraseña es obligatoria";
     } else if (formData.password.length < 8) {
-      newErrors.password = "La contraseña debe tener al menos 8 caracteres"
+      newErrors.password = "La contraseña debe tener al menos 8 caracteres";
     } else {
-      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/
+      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/;
       if (!passwordRegex.test(formData.password)) {
-        newErrors.password = "La contraseña debe contener mayúscula, minúscula, número y símbolo"
+        newErrors.password = "La contraseña debe contener mayúscula, minúscula, número y símbolo";
       }
     }
 
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
+  // --- FUNCIÓN handleSubmit CORREGIDA Y MEJORADA ---
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    if (!validateForm()) return
-
-    setIsSubmitting(true)
-
+    e.preventDefault();
+    if (!validateForm()) return;
+  
+    setIsSubmitting(true);
+    // Limpia errores de envíos anteriores para no confundir al usuario
+    setErrors((prev) => ({ ...prev, submit: null }));
+  
     try {
-      // Preparar datos con los nombres correctos para la BD
       const dataToSend = {
         tipo_Doc: formData.tipo_Doc,
         doc: formData.doc,
@@ -175,25 +151,27 @@ export default function RegistroUsu() {
         email: formData.email,
         direccion: formData.direccion,
         password: formData.password,
-      }
-
-      const res = await fetch("/api/usuarios", {  
+      };
+  
+      const res = await fetch("http://localhost:3000/api/admin/usuarios", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(dataToSend),
-      })
-
+      });
+  
+      const result = await res.json();
+  
       if (!res.ok) {
-        const errorData = await res.json().catch(() => ({}))
-        throw new Error(errorData.message || "Error al registrar el usuarios")
+        // Lanza un error con el mensaje del backend si la respuesta no es exitosa
+        throw new Error(result.message || "Error al registrar el usuario");
       }
-
-      const result = await res.json()
-      alert("Usuario registrado exitosamente")
-
-      // Limpiar formulario después del registro exitoso
+  
+      // Si todo sale bien
+      alert(result.message || "Usuario registrado exitosamente");
+  
+      // Limpia el formulario
       setFormData({
         tipo_Doc: "CC",
         doc: "",
@@ -204,19 +182,22 @@ export default function RegistroUsu() {
         direccion: "",
         password: "",
         showPassword: false,
-      })
-
-      navigate("/InicioAdmin")
+      });
+  
+      // Redirige al usuario
+      navigate("/InicioAdmin");
+  
     } catch (error) {
-      console.error("Error al registrar usuario:", error)
-      setErrors({
-        ...errors,
-        submit: error.message || "Error al registrar el usuario",
-      })
+      console.error("Error en handleSubmit:", error);
+      // Muestra el error específico del backend en el formulario
+      setErrors((prev) => ({
+        ...prev,
+        submit: error.message || "No se pudo conectar con el servidor",
+      }));
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   return (
     <AdminLayout>
@@ -224,6 +205,7 @@ export default function RegistroUsu() {
         <h2 className="titulo-formulario">Registro de usuarios</h2>
 
         <form onSubmit={handleSubmit} className="formulario-registro">
+          {/* Muestra el error de envío si existe */}
           {errors.submit && <div className="error-message">{errors.submit}</div>}
 
           <div className="form-row">
@@ -269,7 +251,6 @@ export default function RegistroUsu() {
               className="form-control"
               placeholder="Ej: JUAN PÉREZ GARCÍA"
               required
-              minLength="5"
             />
             {errors.nombre && <span className="error-text">{errors.nombre}</span>}
           </div>
@@ -332,7 +313,6 @@ export default function RegistroUsu() {
               className="form-control"
               placeholder="Ej: CALLE 100 # 10-20"
               required
-              minLength="10"
             />
             {errors.direccion && <span className="error-text">{errors.direccion}</span>}
           </div>
@@ -348,7 +328,6 @@ export default function RegistroUsu() {
                 className="form-control"
                 placeholder="Mínimo 8 caracteres"
                 required
-                minLength="8"
               />
               <FontAwesomeIcon
                 icon={formData.showPassword ? faEyeSlash : faEye}
@@ -372,5 +351,5 @@ export default function RegistroUsu() {
         </form>
       </div>
     </AdminLayout>
-  )
+  );
 }

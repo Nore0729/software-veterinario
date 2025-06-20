@@ -19,8 +19,8 @@ function DashboardAdmin() {
   const [usuariosRegistrados, setUsuariosRegistrados] = useState(0);
   const [adminName, setAdminName] = useState('');
 
+  // Los demás datos se mantienen estáticos por ahora
   const stats = {
-    usuarios: usuariosRegistrados,
     clientes: 58,
     veterinarios: 2,
     administradores: 1,
@@ -30,24 +30,33 @@ function DashboardAdmin() {
   };
 
   useEffect(() => {
-    // Obtener nombre del admin
+    // Obtener nombre del admin desde localStorage
     const nombre = localStorage.getItem('nombre');
     if (nombre) {
       setAdminName(nombre);
     }
 
-    // Obtener número de usuarios desde la API
-    fetch('http://localhost:3000/api/usuarios_registrados')
-      .then(res => res.json())
+    // --- LLAMADA A LA API CORREGIDA ---
+    // Se asegura de que la URL incluya el prefijo del router de admin.
+    fetch('http://localhost:3000/api/admin/usuarios_registrados')
+      .then(res => {
+        if (!res.ok) {
+          throw new Error('La respuesta de la red no fue exitosa');
+        }
+        return res.json();
+      })
       .then(data => {
+        // La respuesta del backend es un array: [ { total_usuarios: 5 } ]
+        // Por eso accedemos a data[0]
         if (data && data[0]?.total_usuarios !== undefined) {
           setUsuariosRegistrados(data[0].total_usuarios);
         }
       })
       .catch(err => {
         console.error("Error al cargar usuarios registrados:", err);
+        // Opcional: podrías poner un estado de error aquí para mostrarlo en la UI
       });
-  }, []);
+  }, []); // El array vacío asegura que se ejecute solo una vez al montar el componente
 
   const handleNuevoUsuarioClick = () => {
     navigate("/FormularioUsu");
@@ -81,7 +90,8 @@ function DashboardAdmin() {
             </div>
             <div className="stat-info">
               <h3>Usuarios registrados</h3>
-              <p className="stat-number">{stats.usuarios}</p>
+              {/* Usamos el estado que se llena con la API */}
+              <p className="stat-number">{usuariosRegistrados}</p>
               <p className="stat-trend positive">↑ 12% este mes</p>
             </div>
           </div>

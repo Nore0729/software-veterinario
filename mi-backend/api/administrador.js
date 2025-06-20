@@ -3,7 +3,7 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const router = express.Router();
 
-module.exports = function(db) {
+module.exports = function (db) {
     // --- GESTIÓN DE ROLES ---
     router.post('/roles', (req, res) => {
         const { nom_rol, descripcion } = req.body;
@@ -53,14 +53,14 @@ module.exports = function(db) {
             res.status(201).json({ message: "Servicio registrado exitosamente" });
         });
     });
-    
+
     router.get('/servicios', (req, res) => {
         db.query("SELECT * FROM servicios", (err, results) => {
             if (err) return res.status(500).json({ message: "Hubo un problema al obtener los servicios" });
             res.status(200).json(results);
         });
     });
-    
+
     router.delete('/servicios/:id', (req, res) => {
         const { id } = req.params;
         db.query("DELETE FROM servicios WHERE id = ?", [id], (err, result) => {
@@ -69,6 +69,102 @@ module.exports = function(db) {
             res.json({ message: "Servicio eliminado", id });
         });
     });
+
+    //*********************************************************************/
+    //********************GESTION DE REGISTRAR USUARIOS********************/
+    //*********************************************************************/
+
+    router.post('/usuarios', async (req, res) => {
+        const { tipo_Doc, doc, nombre, fecha_Nac, tel, email, direccion, password } = req.body;
+        if (!tipo_Doc || !doc || !nombre || !fecha_Nac || !tel || !email || !direccion || !password) {
+            return res.status(400).json({ message: "Todos los campos son obligatorios" });
+        }
+        try {
+            const hashedPassword = await bcrypt.hash(password, 10);
+            const query = `
+                INSERT INTO usuarios
+                (tipo_Doc, doc, nombre, fecha_Nac, tel, email, direccion, password) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+
+            db.query(query, [tipo_Doc, doc, nombre, fecha_Nac, tel, email, direccion, hashedPassword], (err, results) => {
+                if (err) {
+                    console.error("Error al insertar los datos:", err);
+                    return res.status(500).json({ message: "Hubo un problema al registrar al usuario" });
+                }
+                res.status(201).json({ message: "Usuario registrado exitosamente" });
+            });
+        } catch (error) {
+            console.error("Error al encriptar la contraseña:", error);
+            return res.status(500).json({ message: "Error del servidor" });
+        }
+    });
+
+    //****************************************************************************/
+    //**************TRAER LA CANTIDAD DE USUARIO REGISTRADOS**********************/
+    //****************************************************************************/
+
+    router.get("/usuarios_registrados", (req, res) => {
+        const query = "SELECT COUNT(*) AS total_usuarios FROM usuarios;";
+
+        db.query(query, (err, results) => {
+            if (err) {
+                console.error("Error al obtener la cantidad de usuarios:", err);
+                return res.status(500).json({ message: "Hubo un problema al obtener los usuarios" });
+            }
+            res.status(200).json(results);
+        });
+    });
+
+    //**************************************************************************/
+    //****************TRAER USUARIOS REGISTRADOS PARA ASIGNAR ROL************* */
+    //**************************************************************************/
+
+    router.get("/obtener_Usuarios", async (req, res) => {
+        try {
+            const query = "SELECT id, tipo_Doc, doc, nombre, fecha_Nac, tel, email, direccion FROM usuarios";
+            db.query(query, (err, results) => {
+                if (err) {
+                    console.error("Error al obtener la cantidad de usuarios:", err);
+                    return res.status(500).json({ message: "Hubo un problema al obtener los usuarios" });
+                }
+                res.status(200).json(results);
+            });
+        } catch (error) {
+            console.error("Error al obtener los usuarios:", error);
+            res.status(500).json({ message: "Error del servidor al obtener los usuarios" });
+        }
+    });
+
+    //**************************************************************************/
+    //***************************ASIRNAR ROL A USUARIO************************ */
+    //**************************************************************************/
+
+    router.post('/asignar_roles/:usuarioId', async (req, res) => {
+        const { rolesSeleccionados, asignado_por } = req.body; // rolesSeleccionados es un array de ids de roles
+      
+        const usuarioId = req.params.usuarioId;
+      
+        // Verificamos que los rolesSeleccionados no estén vacíos
+        if (!rolesSeleccionados || rolesSeleccionados.length === 0) {
+          return res.status(400).json({ error: 'Se deben seleccionar al menos un rol' });
+        }
+        try {
+          for (const rol_id of rolesSeleccionados) {
+            const query = `
+              INSERT INTO asignacion_roles (usu_id, rol_id, asignado_por)
+              VALUES (?, ?, ?)
+            `;
+            
+            await pool.promise().query(query, [usuarioId, rol_id, asignado_por]);
+          }
+      
+          res.status(200).json({ message: 'Roles asignados correctamente' });
+        } catch (error) {
+          console.error('Error al asignar roles:', error);
+          res.status(500).json({ error: 'Hubo un error al asignar los roles' });
+        }
+      });
+
 
     return router;
 }
