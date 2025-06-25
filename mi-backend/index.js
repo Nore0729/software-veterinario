@@ -1,4 +1,4 @@
-// index.js (Versión Final Organizada y Corregida)
+// index.js
 
 const express = require('express');
 const mysql = require('mysql2');
@@ -10,7 +10,6 @@ const port = 3000;
 app.use(express.json());
 app.use(cors());
 
-// Configuración de la conexión a la base de datos (Usando Pool para mayor estabilidad)
 const db = mysql.createPool({
   host: 'localhost',
   user: 'root',
@@ -22,7 +21,6 @@ const db = mysql.createPool({
   queueLimit: 0
 });
 
-// Verificamos que el pool de conexiones se configure correctamente
 db.getConnection((err, connection) => {
   if (err) {
     console.error('❌ Error fatal al configurar el pool de la base de datos:', err);
@@ -32,25 +30,30 @@ db.getConnection((err, connection) => {
   connection.release();
 });
 
-// --- IMPORTAR Y MONTAR RUTAS (SECCIÓN CORREGIDA) ---
 console.log("Cargando rutas...");
 
-const adminRoutes = require('./api/administrador');       // Ruta para administrador
-const authRoutes = require('./api/auth');                 // Ruta de autenticación (login/registro)
-const mascotaRoutes = require('./api/mascotas');          // Ruta para mascotas
-const propietarioRoutes = require('./api/propietario');   // Ruta para propietarios
-const servicioRoutes = require('./api/servicios');        // Ruta para servicios (nueva)
+// Importaciones de todos los módulos de rutas
+const adminRoutes = require('./api/administrador');
+const authRoutes = require('./api/auth');
+const mascotaRoutes = require('./api/mascotas');
+const propietarioRoutes = require('./api/propietario');
+const servicioRoutes = require('./api/servicios');
+const consultasvetRoutes = require('./api/consultasvet');
+const veterinarioRoutes = require('./api/veterinario'); 
+const citasvetRoutes = require('./api/citasvet');
 
-// Montamos los routers en la aplicación principal
+// Montaje de todos los routers en la aplicación
 app.use('/api/admin', adminRoutes(db));
 app.use('/api/auth', authRoutes(db));
 app.use('/api/mascotas', mascotaRoutes(db));
 app.use('/api/propietarios', propietarioRoutes(db));
-app.use('/api/servicios', servicioRoutes(db));            // Ruta de servicios activada
+app.use('/api/servicios', servicioRoutes(db));
+app.use('/api/consultas', consultasvetRoutes(db));
+app.use('/api/veterinarios', veterinarioRoutes(db));
+app.use('/api/citasvet', citasvetRoutes(db));
 
 console.log("✅ Todas las rutas han sido cargadas.");
 
-// --- INICIO DEL SERVIDOR ---
 app.listen(port, () => {
   console.log(`🚀 Servidor corriendo en http://localhost:${port}`);
 });

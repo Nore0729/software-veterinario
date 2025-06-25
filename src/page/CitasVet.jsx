@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Calendar, Clock, User, Dog, Phone, Mail, Plus, Search, Filter,
-  Edit, Trash2, CheckCircle, XCircle, AlertCircle,
+  Edit, Trash2, CheckCircle, XCircle, AlertCircle, X,
 } from "lucide-react";
 import Swal from 'sweetalert2';
 import "../styles/CitasVet.css";
@@ -16,55 +16,137 @@ const VeterinaryAppointments = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
 
-  useEffect(() => {
-    const fetchAppointments = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch('/api/citasvet');
-        if (!response.ok) {
-          throw new Error('No se pudieron cargar las citas.');
-        }
-        const data = await response.json();
-        setAppointments(data);
-      } catch (error) {
-        console.error("Error al cargar las citas:", error);
-        Swal.fire('Error', 'No se pudieron cargar los datos de las citas.', 'error');
-      } finally {
-        setLoading(false);
-      }
-    };
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [currentAppointment, setCurrentAppointment] = useState(null);
+  const [editFormData, setEditFormData] = useState({});
 
-    fetchAppointments();
-  }, []);
+  const [servicios, setServicios] = useState([]);
+  const [veterinarios, setVeterinarios] = useState([]);
 
-  const handleStatusChange = async (appointmentId, newStatus) => {
-    const originalAppointments = [...appointments];
-    
-    const updatedAppointments = appointments.map(app => 
-        app.id === appointmentId ? { ...app, status: newStatus } : app
-    );
-    setAppointments(updatedAppointments);
-
+  // Función centralizada para cargar todos los datos
+  const fetchAllData = async () => {
     try {
-        const response = await fetch(`/api/citasvet/${appointmentId}/status`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ status: newStatus }),
-        });
+      const [appRes, servRes, vetRes] = await Promise.all([
+        fetch('/api/citasvet'),
+        fetch('/api/servicios'),
+        fetch('/api/veterinarios')
+      ]);
+      
+      if (!appRes.ok || !servRes.ok || !vetRes.ok) throw new Error("Error al cargar datos iniciales");
 
-        if (!response.ok) {
-            Swal.fire('Error', 'No se pudo actualizar el estado en el servidor.', 'error');
-            setAppointments(originalAppointments);
-        }
+      setAppointments(await appRes.json());
+      setServicios(await servRes.json());
+      setVeterinarios(await vetRes.json());
+
     } catch (error) {
-        console.error("Error actualizando estado:", error);
-        Swal.fire('Error', 'Error de conexión al actualizar el estado.', 'error');
-        setAppointments(originalAppointments);
+      console.error("Error al cargar los datos:", error);
+      Swal.fire('Error', 'No se pudieron cargar los datos.', 'error');
+    } finally {
+      setLoading(false);
     }
   };
 
+  // useEffect para la carga inicial
+  useEffect(() => {
+    setLoading(true);
+    fetchAllData();
+  }, []);
+
+  // --- Manejadores para el MODAL DE EDICIÓN ---
+  const handleOpenEditModal = (appointment) => {
+    setCurrentAppointment(appointment);
+    const vetIdEncontrado = veterinarios.find(v => v.nombre === appointment.veterinario)?.vet_id || '';
+    setEditFormData({
+        servicio_id: servicios.find(s => s.nombre === appointment.service)?.id || '',
+        vet_id: vetIdEncontrado,
+        fecha_hora: appointment.date,
+        time: appointment.time,
+        motivo: appointment.notes || ''
+    });
+    setIsEditModalOpen(true);
+  };
+
+  const handleCloseEditModal = () => setIsEditModalOpen(false);
+
+  const handleEditFormChange = (e) => {
+    const { name, value } = e.target;
+    setEditFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleEditFormSubmit = async (e) => {
+    e.preventDefault();
+    if (!currentAppointment) return;
+    try {
+        const response = await fetch(`/api/citasvet/${currentAppointment.id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(editFormData),
+        });
+        if (!response.ok) throw new Error('No se pudo actualizar la cita.');
+        
+        handleCloseEditModal();
+        await Swal.fire({
+            title: '¡Actualizado!',
+            icon: 'success',
+            timer: 1500,
+            showConfirmButton: false
+        });
+        fetchAllData();
+    } catch (error) {
+        console.error("Error al actualizar la cita:", error);
+        Swal.fire('Error', 'No se pudo actualizar la cita.', 'error');
+    }
+  };
+
+  // --- Manejadores para la TARJETA DE CITA ---
+  const handleDeleteAppointment = (appointmentId) => {
+    Swal.fire({
+      title: '¿Estás seguro?',
+      text: "¡No podrás revertir esta acción!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Sí, ¡eliminar!',
+      cancelButtonText: 'Cancelar'
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const response = await fetch(`/api/citasvet/${appointmentId}`, { method: 'DELETE' });
+          if (!response.ok) throw new Error('No se pudo eliminar la cita.');
+          setAppointments(prev => prev.filter(app => app.id !== appointmentId));
+          Swal.fire('¡Eliminado!', 'La cita ha sido eliminada.', 'success');
+        } catch (error) {
+          console.error("Error al eliminar la cita:", error);
+          Swal.fire('Error', 'No se pudo eliminar la cita.', 'error');
+        }
+      }
+    });
+  };
+
+  const handleStatusChange = async (appointmentId, newStatus) => {
+    const originalAppointments = [...appointments];
+    setAppointments(prev => prev.map(app => app.id === appointmentId ? { ...app, status: newStatus } : app));
+    try {
+      const response = await fetch(`/api/citasvet/${appointmentId}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus }),
+      });
+      if (!response.ok) {
+        Swal.fire('Error', 'No se pudo actualizar el estado.', 'error');
+        setAppointments(originalAppointments);
+      }
+    } catch (error) {
+      console.error("Error al actualizar el estado:", error);
+      Swal.fire('Error', 'Error de conexión.', 'error');
+      setAppointments(originalAppointments);
+    }
+  };
+
+  // --- Lógica de renderizado y filtros ---
   const getStatusClass = (status) => {
-    switch (status) {
+    switch (status?.toLowerCase()) {
       case "confirmada": return "status-confirmed";
       case "pendiente": return "status-pending";
       case "completada": return "status-completed";
@@ -74,7 +156,7 @@ const VeterinaryAppointments = () => {
   };
 
   const getStatusIcon = (status) => {
-    switch (status) {
+    switch (status?.toLowerCase()) {
       case "confirmada": return <CheckCircle className="status-icon" />;
       case "pendiente": return <AlertCircle className="status-icon" />;
       case "completada": return <CheckCircle className="status-icon" />;
@@ -85,20 +167,16 @@ const VeterinaryAppointments = () => {
 
   const filteredAppointments = appointments.filter((appointment) => {
     const searchLower = searchTerm.toLowerCase();
-    const statusLower = appointment.status.toLowerCase();
+    const statusLower = appointment.status ? appointment.status.toLowerCase() : '';
     const matchesSearch =
-      appointment.petName.toLowerCase().includes(searchLower) ||
-      appointment.ownerName.toLowerCase().includes(searchLower);
+      (appointment.petName && appointment.petName.toLowerCase().includes(searchLower)) ||
+      (appointment.ownerName && appointment.ownerName.toLowerCase().includes(searchLower));
     const matchesStatus = statusFilter === "all" || statusLower === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
   const containerVariants = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.1 } } };
-  const cardVariants = { hidden: { y: 30, opacity: 0 }, visible: { y: 0, opacity: 1, transition: { ease: "easeOut" } }, hover: { y: -5, scale: 1.02, boxShadow: "0 10px 25px rgba(6, 182, 212, 0.15)" } };
-  const headerVariants = { hidden: { y: -50, opacity: 0 }, visible: { y: 0, opacity: 1, transition: { ease: "easeOut" } } };
-  const filterVariants = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { delay: 0.2 } } };
-  const statsVariants = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { delay: 0.3 } } };
-  const emptyVariants = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } };
+  const cardVariants = { hidden: { y: 20, opacity: 0 }, visible: { y: 0, opacity: 1 } };
 
   if (loading) {
     return (
@@ -110,37 +188,22 @@ const VeterinaryAppointments = () => {
 
   return (
     <motion.div className="appointments-container" variants={containerVariants} initial="hidden" animate="visible">
-      <motion.div className="appointments-header" variants={headerVariants}>
+      <motion.div className="appointments-header">
         <div className="appointments-header-content">
             <div className="appointments-title-container"><h1 className="appointments-title">Gestión de Citas</h1><p className="appointments-subtitle">Administra las citas veterinarias</p></div>
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}><Link to="/citas" className="appointments-new-button"><Plus className="button-icon" />Nueva Cita</Link></motion.div>
+            <Link to="/citas" className="appointments-new-button"><Plus className="button-icon" />Nueva Cita</Link>
         </div>
       </motion.div>
 
-      <motion.div className="appointments-filters" variants={filterVariants}>
+      <motion.div className="appointments-filters">
         <div className="search-container"><Search className="search-icon" /><input type="text" placeholder="Buscar por mascota o propietario..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="search-input"/></div>
         <div className="filter-container"><Filter className="filter-icon" /><select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="filter-select"><option value="all">Todos los estados</option><option value="pendiente">Pendiente</option><option value="confirmada">Confirmada</option><option value="completada">Completada</option><option value="cancelada">Cancelada</option></select></div>
       </motion.div>
-
-      <motion.div className="stats-container" variants={statsVariants}>
-        {[
-          { label: "Total Citas", value: appointments.length, color: "stats-total" },
-          { label: "Confirmadas", value: appointments.filter((a) => a.status === "Confirmada").length, color: "stats-confirmed" },
-          { label: "Pendientes", value: appointments.filter((a) => a.status === "Pendiente" || a.status === "Programada").length, color: "stats-pending" },
-          { label: "Hoy", value: appointments.filter((a) => a.date === new Date().toISOString().split("T")[0]).length, color: "stats-today" },
-        ].map((stat) => (
-          <motion.div key={stat.label} className="stats-card" variants={cardVariants} whileHover="hover">
-            <div className={`stats-icon-container ${stat.color}`}><Calendar className="stats-icon" /></div>
-            <p className="stats-value">{stat.value}</p>
-            <p className="stats-label">{stat.label}</p>
-          </motion.div>
-        ))}
-      </motion.div>
-
+      
       <motion.div className="appointments-list">
         <AnimatePresence>
-          {filteredAppointments.map((appointment, index) => (
-            <motion.div key={appointment.id} className="appointment-card-container" variants={cardVariants} initial="hidden" animate="visible" exit={{ opacity: 0, x: -100 }} whileHover="hover" transition={{ delay: index * 0.1 }}>
+          {filteredAppointments.map((appointment) => (
+            <motion.div key={appointment.id} className="appointment-card-container" variants={cardVariants}>
               <div className="appointment-card">
                 <div className="appointment-content">
                   <div className="appointment-info">
@@ -152,17 +215,10 @@ const VeterinaryAppointments = () => {
                       <div className="appointment-detail"><Mail className="detail-icon" /><span>{appointment.email}</span></div>
                     </div>
                     <div className="appointment-badges">
-                      <div className={`status-badge-container ${getStatusClass(appointment.status.toLowerCase())}`}>
-                        {getStatusIcon(appointment.status.toLowerCase())}
-                        <select 
-                          value={appointment.status} 
-                          className="status-select"
-                          onChange={(e) => handleStatusChange(appointment.id, e.target.value)}
-                        >
-                          <option value="Pendiente">Pendiente</option>
-                          <option value="Confirmada">Confirmada</option>
-                          <option value="Completada">Completada</option>
-                          <option value="Cancelada">Cancelada</option>
+                      <div className={`status-badge-container ${getStatusClass(appointment.status)}`}>
+                        {getStatusIcon(appointment.status)}
+                        <select value={appointment.status} className="status-select" onChange={(e) => handleStatusChange(appointment.id, e.target.value)}>
+                          <option value="Pendiente">Pendiente</option><option value="Confirmada">Confirmada</option><option value="Completada">Completada</option><option value="Cancelada">Cancelada</option>
                         </select>
                       </div>
                       <span className="service-badge">{appointment.service}</span>
@@ -170,8 +226,8 @@ const VeterinaryAppointments = () => {
                     {appointment.notes && (<p className="appointment-notes"><strong>Notas:</strong> {appointment.notes}</p>)}
                   </div>
                   <div className="appointment-actions">
-                    <motion.button className="action-button edit-button" whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}><Edit className="action-icon" /></motion.button>
-                    <motion.button className="action-button delete-button" whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}><Trash2 className="action-icon" /></motion.button>
+                    <motion.button className="action-button edit-button" onClick={() => handleOpenEditModal(appointment)}><Edit size={16} /></motion.button>
+                    <motion.button className="action-button delete-button" onClick={() => handleDeleteAppointment(appointment.id)}><Trash2 size={16} /></motion.button>
                   </div>
                 </div>
               </div>
@@ -180,13 +236,38 @@ const VeterinaryAppointments = () => {
         </AnimatePresence>
       </motion.div>
 
-      {filteredAppointments.length === 0 && (
-        <motion.div className="empty-state" variants={emptyVariants}>
+      {filteredAppointments.length === 0 && !loading && (
+        <motion.div className="empty-state" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
           <div className="empty-icon-container"><Calendar className="empty-icon" /></div>
           <h3 className="empty-title">No hay citas</h3>
-          <p className="empty-message">No se encontraron citas que coincidan con los filtros aplicados.</p>
+          <p className="empty-message">No se encontraron citas. ¡Intenta crear una nueva!</p>
         </motion.div>
       )}
+
+      <AnimatePresence>
+        {isEditModalOpen && (
+          <motion.div className="modal-overlay" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <motion.div className="modal-content" initial={{ y: -50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: -50, opacity: 0 }} onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h2>Editar Cita</h2>
+                <button onClick={handleCloseEditModal} className="btn-cerrar"><X size={24} /></button>
+              </div>
+              <div className="modal-body">
+                {currentAppointment && 
+                  <form onSubmit={handleEditFormSubmit} className="edit-form">
+                    <div className="form-group"><label>Servicio</label><select name="servicio_id" value={editFormData.servicio_id} onChange={handleEditFormChange} required>{servicios.map(s => <option key={s.id} value={s.id}>{s.nombre}</option>)}</select></div>
+                    <div className="form-group"><label>Veterinario</label><select name="vet_id" value={editFormData.vet_id} onChange={handleEditFormChange} required>{veterinarios.map(v => <option key={v.vet_id} value={v.vet_id}>Dr. {v.nombre}</option>)}</select></div>
+                    <div className="form-group"><label>Fecha</label><input type="date" name="fecha_hora" value={editFormData.fecha_hora} onChange={handleEditFormChange} required /></div>
+                    <div className="form-group"><label>Hora</label><input type="time" name="time" value={editFormData.time} onChange={handleEditFormChange} required /></div>
+                    <div className="form-group"><label>Notas</label><textarea name="motivo" value={editFormData.motivo} onChange={handleEditFormChange}></textarea></div>
+                    <div className="modal-footer"><button type="button" className="btn-secundario" onClick={handleCloseEditModal}>Cancelar</button><button type="submit" className="btn-primario">Guardar Cambios</button></div>
+                  </form>
+                }
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };

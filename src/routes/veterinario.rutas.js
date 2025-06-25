@@ -1,4 +1,5 @@
 // src/routes/veterinario.rutas.js
+
 import React from 'react';
 import { Route } from 'react-router-dom';
 
@@ -8,6 +9,7 @@ import VetMascotas from '../page/VetMascotas';
 import ConsultasVet from '../page/ConsultasVet';
 import CitasVet from '../page/CitasVet';
 import UsuarioVet from '../page/UsuarioVet';
+// No es necesario importar 'Citas' aquí porque no tiene una ruta propia en este layout
 
 const VeterinarioRoutes = () => (
   <>

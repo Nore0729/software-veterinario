@@ -71,13 +71,20 @@ const VetConsultas = () => {
 
   useEffect(() => {
     if (modoEdicion && consultaSeleccionada) {
-      const propietarioDoc = listaPropietarios.find(p => p.nombre === consultaSeleccionada.mascota.propietario)?.doc;
-      if (propietarioDoc) {
-        handlePropietarioChange(propietarioDoc).then(() => {
+      // Encontrar el propietario por el nombre para obtener su 'doc'
+      const propietario = listaPropietarios.find(p => p.nombre === consultaSeleccionada.mascota.propietario);
+      
+      if (propietario && propietario.doc) {
+        // Cargar las mascotas de ese propietario
+        handlePropietarioChange(propietario.doc).then(() => {
+            // Una vez cargadas, seleccionamos la mascota correcta
             setNuevaConsulta(prevState => ({ ...prevState, mascota_id: consultaSeleccionada.mascota.id }));
         });
       }
+
       setNuevaConsulta({
+        mascota_id: consultaSeleccionada.mascota.id,
+        vet_id: consultaSeleccionada.vet_id,
         motivo_consulta: consultaSeleccionada.motivo || '',
         diagnostico: consultaSeleccionada.diagnostico || '',
         tratamiento: consultaSeleccionada.tratamiento || '',
@@ -85,7 +92,6 @@ const VetConsultas = () => {
         proxima_cita: consultaSeleccionada.proximaCita || '',
         signos_vitales: consultaSeleccionada.signosVitales || { peso: '', temperatura: '', frecuenciaCardiaca: '', frecuenciaRespiratoria: '' },
         medicamentos: consultaSeleccionada.medicamentos || [],
-        vet_id: consultaSeleccionada.vet_id
       });
     }
   }, [modoEdicion, consultaSeleccionada]);
@@ -93,6 +99,7 @@ const VetConsultas = () => {
   const handlePropietarioChange = async (docPropietario) => {
     setPropietarioSeleccionado(docPropietario);
     setMascotasDelPropietario([]);
+    setNuevaConsulta(prevState => ({ ...prevState, mascota_id: '' })); // Limpiar mascota seleccionada
     if (!docPropietario) return;
     try {
       setCargandoMascotas(true);
@@ -128,8 +135,8 @@ const VetConsultas = () => {
     const datosParaEnviar = {
       ...nuevaConsulta,
       fecha_consulta: fecha_consulta_completa,
-      mascota_id: form.mascota_id.value,
-      vet_id: form.vet_id.value
+      mascota_id: nuevaConsulta.mascota_id,
+      vet_id: nuevaConsulta.vet_id
     };
     const url = modoEdicion ? `/api/consultas/${consultaSeleccionada.id}` : '/api/consultas';
     const method = modoEdicion ? 'PUT' : 'POST';
@@ -199,9 +206,11 @@ const VetConsultas = () => {
   };
 
   const handlePrintConsulta = (consulta) => {
-    const medicamentosArray = Array.isArray(consulta.medicamentos) 
-      ? consulta.medicamentos 
-      : (typeof consulta.medicamentos === 'string' ? JSON.parse(consulta.medicamentos) : []);
+    // ===== INICIO DE LA SECCIÓN CORREGIDA =====
+    // Gracias a la corrección en el backend, 'consulta.medicamentos' ya es un array.
+    // La lógica se simplifica a solo usar el valor o un array vacío por si acaso.
+    const medicamentosArray = consulta.medicamentos || [];
+    // ===== FIN DE LA SECCIÓN CORREGIDA =====
     
     const printContent = `
       <html><head><title>Reporte de Consulta - ${consulta.mascota.nombre}</title><style>
@@ -215,11 +224,11 @@ const VetConsultas = () => {
         .medicamentos-lista .item { padding: 5px; border-bottom: 1px dashed #eee; }
         .footer { text-align: center; margin-top: 50px; font-size: 0.8em; color: #aaa; }
       </style></head><body>
-      <div class="header"><h1>Clínica Veterinaria "Mi Proyecto"</h1><p>Reporte de Consulta Médica</p></div>
+      <div class="header"><h1>Clínica Veterinaria "PetLover's"</h1><p>Reporte de Consulta Médica</p></div>
       <div class="seccion"><h2>Datos de la Consulta</h2><div class="info-grid"><div><strong>Fecha:</strong> ${consulta.fecha}</div><div><strong>Hora:</strong> ${consulta.hora}</div><div><strong>Veterinario:</strong> ${consulta.veterinario}</div></div></div>
       <div class="seccion"><h2>Paciente</h2><div class="info-grid"><div><strong>Nombre:</strong> ${consulta.mascota.nombre}</div><div><strong>Especie:</strong> ${consulta.mascota.especie}</div><div><strong>Raza:</strong> ${consulta.mascota.raza}</div><div><strong>Propietario:</strong> ${consulta.mascota.propietario}</div></div></div>
       <div class="seccion"><h2>Información Médica</h2><p><strong>Motivo de la Consulta:</strong> ${consulta.motivo}</p><p><strong>Diagnóstico:</strong> ${consulta.diagnostico}</p><p><strong>Tratamiento:</strong> ${consulta.tratamiento}</p><p><strong>Observaciones:</strong> ${consulta.observaciones}</p></div>
-      ${medicamentosArray && medicamentosArray.length > 0 ? `<div class="seccion"><h2>Medicamentos Prescritos</h2><div class="medicamentos-lista">${medicamentosArray.map(med => `<div class="item">${med.nombre || 'N/A'} - Dosis: ${med.dosis || 'N/A'}, Frecuencia: ${med.frecuencia || 'N/A'}</div>`).join('')}</div></div>` : ''}
+      ${medicamentosArray.length > 0 ? `<div class="seccion"><h2>Medicamentos Prescritos</h2><div class="medicamentos-lista">${medicamentosArray.map(med => `<div class="item">${med.nombre || 'N/A'} - Dosis: ${med.dosis || 'N/A'}, Frecuencia: ${med.frecuencia || 'N/A'}</div>`).join('')}</div></div>` : ''}
       ${consulta.proximaCita ? `<div class="seccion"><h2>Seguimiento</h2><p><strong>Próxima cita recomendada:</strong> ${consulta.proximaCita}</p></div>` : ''}
       <div class="footer">Este es un reporte generado por el sistema de la Clínica Veterinaria.</div></body></html>
     `;
@@ -297,7 +306,6 @@ const VetConsultas = () => {
       </motion.div>
       <motion.div className="consultas-grid" variants={itemVariants}>
         <AnimatePresence>
-          debugger;
           {consultasFiltradas.map((consulta) => (
             <motion.div key={consulta.id} className="consulta-card" variants={cardVariants} initial="hidden" animate="visible" exit="hidden" whileHover="hover">
               <div className="consulta-header">

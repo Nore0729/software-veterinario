@@ -11,7 +11,6 @@ module.exports = function(db) {
   router.get('/', (req, res) => {
     console.log("📢 [GET /api/consultas] Petición recibida.");
 
-    // SQL actualizado para seleccionar las nuevas columnas
     const sql = `
       SELECT 
         hc.id AS id_historia,
@@ -20,10 +19,10 @@ module.exports = function(db) {
         hc.diagnostico,
         hc.tratamiento,
         hc.observaciones,
-        hc.medicamentos,          -- Columna JSON
-        hc.signos_vitales,        -- Columna JSON
-        hc.proxima_cita,          -- Columna DATE
-        hc.archivos_adjuntos,     -- Columna JSON
+        hc.medicamentos,
+        hc.signos_vitales,
+        hc.proxima_cita,
+        hc.archivos_adjuntos,
         m.id AS id_mascota,
         m.nombre AS nombre_mascota,
         m.especie,
@@ -31,7 +30,8 @@ module.exports = function(db) {
         m.fecha_nac AS fecha_nac_mascota,
         prop.nombre AS nombre_propietario,
         prop.tel AS telefono_propietario,
-        vet_user.nombre AS nombre_veterinario
+        vet_user.nombre AS nombre_veterinario,
+        hc.vet_id
       FROM historias_clinicas hc
       JOIN mascotas m ON hc.mascota_id = m.id
       JOIN usuarios prop ON m.doc_pro = prop.doc
@@ -48,10 +48,34 @@ module.exports = function(db) {
 
       console.log(`✅ [GET /api/consultas] Se encontraron ${results.length} registros.`);
       
-      // Transformamos los resultados para que coincidan con la estructura del frontend
       const consultasFormateadas = results.map(row => {
         const edadAnios = new Date().getFullYear() - new Date(row.fecha_nac_mascota).getFullYear();
         
+        // ===== INICIO DE LA SECCIÓN CORREGIDA =====
+        // Lógica para parsear de forma segura los campos JSON desde la base de datos
+        
+        let medicamentosParseados = [];
+        if (row.medicamentos) {
+            try {
+                const data = JSON.parse(row.medicamentos);
+                if (Array.isArray(data)) {
+                    medicamentosParseados = data;
+                }
+            } catch (e) {
+                console.warn(`Advertencia: El campo 'medicamentos' con ID de historia ${row.id_historia} no es un JSON de array válido.`);
+            }
+        }
+
+        let signosVitalesParseados = {};
+        if (row.signos_vitales) {
+            try {
+                signosVitalesParseados = JSON.parse(row.signos_vitales);
+            } catch (e) {
+                console.warn(`Advertencia: El campo 'signos_vitales' con ID de historia ${row.id_historia} no es un JSON de objeto válido.`);
+            }
+        }
+        // ===== FIN DE LA SECCIÓN CORREGIDA =====
+
         return {
           id: row.id_historia,
           fecha: new Date(row.fecha_consulta).toISOString().split('T')[0],
@@ -66,12 +90,13 @@ module.exports = function(db) {
             telefono: row.telefono_propietario,
           },
           veterinario: `Dr. ${row.nombre_veterinario}`,
+          vet_id: row.vet_id,
           motivo: row.motivo_consulta,
           sintomas: "Revisar motivo",
           diagnostico: row.diagnostico,
           tratamiento: row.tratamiento,
-          medicamentos: row.medicamentos || [],
-          signosVitales: row.signos_vitales || {},
+          medicamentos: medicamentosParseados, // Se usa la variable segura que siempre es un array
+          signosVitales: signosVitalesParseados, // Se usa la variable segura que siempre es un objeto
           observaciones: row.observaciones,
           proximaCita: row.proxima_cita ? new Date(row.proxima_cita).toISOString().split('T')[0] : null,
           estado: "completada",
@@ -83,30 +108,16 @@ module.exports = function(db) {
     });
   });
 
-  // ****************************************************
-  // ***** INICIO DEL NUEVO CÓDIGO PARA CREAR CONSULTAS *****
-  // ****************************************************
-
   // --- Endpoint POST /api/consultas ---
   // Crea una nueva historia clínica (consulta)
   router.post('/', (req, res) => {
     console.log("📢 [POST /api/consultas] Petición para crear consulta recibida.");
 
-    // Extraemos todos los datos del cuerpo de la petición (del formulario)
     const {
-      mascota_id,
-      vet_id,
-      fecha_consulta,
-      motivo_consulta,
-      signos_vitales,
-      diagnostico,
-      tratamiento,
-      medicamentos,
-      observaciones,
-      proxima_cita
+      mascota_id, vet_id, fecha_consulta, motivo_consulta, signos_vitales, 
+      diagnostico, tratamiento, medicamentos, observaciones, proxima_cita
     } = req.body;
 
-    // Validación básica
     if (!mascota_id || !vet_id || !fecha_consulta || !motivo_consulta) {
       return res.status(400).json({ error: "Faltan campos obligatorios (mascota, veterinario, fecha, motivo)." });
     }
@@ -118,18 +129,12 @@ module.exports = function(db) {
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
-    // Los objetos/arrays deben ser convertidos a string JSON para guardarlos en la BD
     const params = [
-      mascota_id,
-      vet_id,
-      fecha_consulta,
-      motivo_consulta,
+      mascota_id, vet_id, fecha_consulta, motivo_consulta,
       JSON.stringify(signos_vitales || {}),
-      diagnostico,
-      tratamiento,
+      diagnostico, tratamiento,
       JSON.stringify(medicamentos || []),
-      observaciones,
-      proxima_cita || null
+      observaciones, proxima_cita || null
     ];
 
     db.query(sql, params, (err, result) => {
@@ -142,11 +147,6 @@ module.exports = function(db) {
     });
   });
 
-  // ****************************************************
-  // ****** FIN DEL NUEVO CÓDIGO PARA CREAR CONSULTAS ******
-  // ****************************************************
- // ... (después del bloque de router.post('/') que ya tienes)
-
   // --- Endpoint PUT /api/consultas/:id ---
   // Actualiza una historia clínica existente
   router.put('/:id', (req, res) => {
@@ -154,50 +154,28 @@ module.exports = function(db) {
     console.log(`📢 [PUT /api/consultas/${consultaId}] Petición para actualizar consulta recibida.`);
 
     const {
-      mascota_id,
-      vet_id,
-      fecha_consulta,
-      motivo_consulta,
-      signos_vitales,
-      diagnostico,
-      tratamiento,
-      medicamentos,
-      observaciones,
-      proxima_cita
+      mascota_id, vet_id, fecha_consulta, motivo_consulta, signos_vitales,
+      diagnostico, tratamiento, medicamentos, observaciones, proxima_cita
     } = req.body;
 
-    // Validación
     if (!mascota_id || !vet_id || !fecha_consulta || !motivo_consulta) {
       return res.status(400).json({ error: "Faltan campos obligatorios." });
     }
 
     const sql = `
       UPDATE historias_clinicas SET
-        mascota_id = ?,
-        vet_id = ?,
-        fecha_consulta = ?,
-        motivo_consulta = ?,
-        signos_vitales = ?,
-        diagnostico = ?,
-        tratamiento = ?,
-        medicamentos = ?,
-        observaciones = ?,
-        proxima_cita = ?
+        mascota_id = ?, vet_id = ?, fecha_consulta = ?, motivo_consulta = ?, signos_vitales = ?,
+        diagnostico = ?, tratamiento = ?, medicamentos = ?, observaciones = ?, proxima_cita = ?
       WHERE id = ?
     `;
 
     const params = [
-      mascota_id,
-      vet_id,
-      fecha_consulta,
-      motivo_consulta,
+      mascota_id, vet_id, fecha_consulta, motivo_consulta,
       JSON.stringify(signos_vitales || {}),
-      diagnostico,
-      tratamiento,
+      diagnostico, tratamiento,
       JSON.stringify(medicamentos || []),
-      observaciones,
-      proxima_cita || null,
-      consultaId // El ID para la cláusula WHERE
+      observaciones, proxima_cita || null,
+      consultaId
     ];
 
     db.query(sql, params, (err, result) => {
@@ -213,7 +191,8 @@ module.exports = function(db) {
     });
   });
 
-
+  // --- Endpoint DELETE /api/consultas/:id ---
+  // Elimina una historia clínica
   router.delete('/:id', (req, res) => {
     const consultaId = req.params.id;
     console.log(`📢 [DELETE /api/consultas/${consultaId}] Petición para eliminar consulta recibida.`);
@@ -225,15 +204,13 @@ module.exports = function(db) {
         console.error("❌ Error al eliminar de la base de datos:", err);
         return res.status(500).json({ error: "Error interno del servidor al eliminar la consulta." });
       }
-
-      // `affectedRows` nos dice si se borró algo. Si es 0, el ID no existía.
       if (result.affectedRows === 0) {
         return res.status(404).json({ error: "No se encontró una consulta con ese ID." });
       }
-
       console.log(`✅ Consulta con ID ${consultaId} eliminada con éxito.`);
       res.status(200).json({ message: "Consulta eliminada exitosamente." });
     });
   });
+
   return router;
 };
