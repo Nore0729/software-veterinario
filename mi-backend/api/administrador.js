@@ -81,15 +81,28 @@ module.exports = function (db) {
         }
     });
 
-    // --- GESTIÓN DE SERVICIOS ---
-    // (Tu código de servicios va aquí... sin cambios)
+    //****************************************************************************/
+    // *************************** GESTIÓN DE SERVICIOS **************************/
+    //****************************************************************************/
+    
     router.post('/servicios', (req, res) => {
-        const { nombre, descripcion, precio, duracion_estimada } = req.body;
-        if (!nombre || !descripcion || !precio || !duracion_estimada) return res.status(400).send("Todos los campos son obligatorios");
-        const query = 'INSERT INTO servicios (nombre, descripcion, precio, duracion_estimada) VALUES (?, ?, ?, ?)';
-        db.query(query, [nombre, descripcion, precio, duracion_estimada], (err) => {
-            if (err) return res.status(500).json({ message: "Hubo un problema al registrar el servicio" });
-            res.status(201).json({ message: "Servicio registrado exitosamente" });
+    const { nombre, descripcion, precio, duracion_estimada } = req.body;
+    
+    if (!nombre || !descripcion || !precio || !duracion_estimada) {
+        return res.status(400).json({ error: "Todos los campos son obligatorios" });
+    }
+
+    const query = 'INSERT INTO servicios (nombre, descripcion, precio, duracion_estimada) VALUES (?, ?, ?, ?)';
+        db.query(query, [nombre, descripcion, precio, duracion_estimada], (err, result) => {
+                if (err) {
+                    console.error(err);
+                    return res.status(500).json({ error: "Error en la base de datos al registrar el servicio" });
+                }
+                res.status(201).json({ 
+                    success: true,
+                    message: "Servicio registrado exitosamente",
+                    id: result.insertId 
+                });
         });
     });
 
@@ -179,30 +192,77 @@ module.exports = function (db) {
     //**************************************************************************/
 
     router.post('/asignar_roles/:usuarioId', async (req, res) => {
-        const { rolesSeleccionados, asignado_por } = req.body; // rolesSeleccionados es un array de ids de roles
-      
-        const usuarioId = req.params.usuarioId;
-      
-        // Verificamos que los rolesSeleccionados no estén vacíos
-        if (!rolesSeleccionados || rolesSeleccionados.length === 0) {
-          return res.status(400).json({ error: 'Se deben seleccionar al menos un rol' });
+    const { rolesSeleccionados, asignado_por } = req.body;
+    const usuarioId = req.params.usuarioId;
+
+    if (!rolesSeleccionados || rolesSeleccionados.length === 0) {
+        return res.status(400).json({ error: 'Debe seleccionar al menos un rol' });
+    }
+
+    try {
+        // Verificar si el usuario existe
+        const [usuario] = await db.promise().query('SELECT * FROM usuarios WHERE id = ?', [usuarioId]);
+        if (!usuario.length) {
+            return res.status(404).json({ error: 'Usuario no encontrado' });
         }
-        try {
-          for (const rol_id of rolesSeleccionados) {
-            const query = `
-              INSERT INTO asignacion_roles (usu_id, rol_id, asignado_por)
-              VALUES (?, ?, ?)
-            `;
-            
-            await pool.promise().query(query, [usuarioId, rol_id, asignado_por]);
-          }
-      
-          res.status(200).json({ message: 'Roles asignados correctamente' });
-        } catch (error) {
-          console.error('Error al asignar roles:', error);
-          res.status(500).json({ error: 'Hubo un error al asignar los roles' });
+
+        // Asignar roles y registrar en tablas específicas
+        for (const rol_id of rolesSeleccionados) {
+            // 1. Insertar en asignacion_rol (evitando duplicados)
+            await db.promise().query(
+                `INSERT IGNORE INTO asignacion_rol (usu_id, rol_id, asignado_por) VALUES (?, ?, ?)`,
+                [usuarioId, rol_id, asignado_por]
+            );
+
+            // 2. Obtener nombre del rol
+            const [rol] = await db.promise().query('SELECT nom_rol FROM roles WHERE id = ?', [rol_id]);
+            const rolNombre = rol[0].nom_rol.toLowerCase();
+
+            // 3. Registrar en tabla específica según el rol
+            switch (rolNombre) {
+                case 'propietario':
+                    await db.promise().query(
+                        'INSERT INTO propietarios (id_prop) VALUES (?)',
+                        [usuarioId]
+                    );
+                    break;
+
+                case 'veterinario':
+                    const { especialidad } = req.body;
+                    await db.promise().query(
+                        'INSERT IGNORE INTO veterinarios (vet_id, especialidad) VALUES (?, ?)',
+                        [usuarioId, especialidad || 'General']
+                    );
+                    break;
+
+                case 'administrador':
+                    const { nivel_acceso } = req.body;
+                    await db.promise().query(
+                        'INSERT IGNORE INTO administradores (admin_id, nivel_acceso) VALUES (?, ?)',
+                        [usuarioId, nivel_acceso || 'medio']
+                    );
+                    break;
+            }
         }
-      });
+
+        res.status(200).json({ message: 'Roles asignados y registros actualizados correctamente' });
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ error: 'Error en el servidor al asignar roles' });
+    }
+});
+
+
+      //**************************************************************************/
+     //**************************TRAER A SOLO LOS USUARIO CLIENTES***************/
+    //**************************************************************************/
+
+    
+
+
+
+
+
 
 
     return router;

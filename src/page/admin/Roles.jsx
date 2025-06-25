@@ -4,11 +4,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faPen, faTrash, faCheck, faTimes, faUserCog, faEdit } from "@fortawesome/free-solid-svg-icons";
 import "../../styles/Administrador/Roles.css";
 
-// La URL base de tu API
+// URL base de la API
 const API_BASE_URL = "http://localhost:3000";
 
 function Roles() {
-  // --- ESTADOS DEL COMPONENTE ---
   const [roles, setRoles] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -25,8 +24,6 @@ function Roles() {
   useEffect(() => {
     cargarRoles();
   }, []);
-
-  // --- FUNCIONES DE API (CRUD) ---
 
   const cargarRoles = async () => {
     setIsLoading(true);
@@ -46,9 +43,7 @@ function Roles() {
   const cargarUsuarios = async () => {
     try {
       const response = await fetch(`${API_BASE_URL}/api/admin/obtener_Usuarios`);
-      if (!response.ok) {
-        throw new Error("No se pudieron cargar los usuarios.");
-      }
+      if (!response.ok) throw new Error("No se pudieron cargar los usuarios.");
       const data = await response.json();
       setUsuarios(data);
     } catch (error) {
@@ -64,13 +59,18 @@ function Roles() {
       return;
     }
     setIsSaving(true);
-    
+
     const url = modoEdicion
       ? `${API_BASE_URL}/api/admin/roles/${rolEditando.id}`
       : `${API_BASE_URL}/api/admin/roles`;
     const method = modoEdicion ? "PUT" : "POST";
+
     try {
-      const response = await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(nuevoRol) });
+      const response = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(nuevoRol),
+      });
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || `Error al ${modoEdicion ? 'actualizar' : 'crear'} el rol`);
       if (modoEdicion) {
@@ -107,7 +107,7 @@ function Roles() {
 
   const handleRolChange = (e) => {
     const { name, value } = e.target;
-    setNuevoRol(prevState => ({ ...prevState, [name]: value }));
+    setNuevoRol(prev => ({ ...prev, [name]: value }));
   };
 
   const handleEditarRol = (rol) => {
@@ -131,12 +131,11 @@ function Roles() {
     setRolEditando(null);
   };
 
-  // --- FUNCIONES DE ASIGNACIÓN DE ROLES ---
   const handleRoleChange = (roleId) => {
-    setRolesSeleccionados((prevState) =>
-      prevState.includes(roleId)
-        ? prevState.filter((id) => id !== roleId)
-        : [...prevState, roleId]
+    setRolesSeleccionados(prev =>
+      prev.includes(roleId)
+        ? prev.filter(id => id !== roleId)
+        : [...prev, roleId]
     );
   };
 
@@ -152,7 +151,10 @@ function Roles() {
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ roles: rolesSeleccionados })
+        body: JSON.stringify({
+          rolesSeleccionados, // ✅ nombre correcto
+          asignado_por: 1      // ✅ reemplaza con el ID real del administrador autenticado
+        })
       });
 
       if (!response.ok) throw new Error("No se pudieron asignar los roles.");
@@ -171,6 +173,8 @@ function Roles() {
   const handleCancelarAsignar = () => {
     setMostrarTablaAsignar(false);
     setUsuarios([]);
+    setRolesSeleccionados([]);
+    setUsuarioSeleccionado(null);
   };
 
   const mostrarNotificacion = (mensaje, tipo) => {
@@ -197,46 +201,35 @@ function Roles() {
                 <FontAwesomeIcon icon={notificacion.tipo === "exito" ? faCheck : faTimes} /> {notificacion.mensaje}
               </div>
             )}
+
             {mostrarTablaAsignar ? (
               <div className="seccion-asignar-roles">
                 <div className="header-asignar">
                   <h2>Asignar Rol a Usuario</h2>
-                  <button onClick={handleCancelarAsignar} className="btn-cancelar">Volver a Roles</button>
+                  <button onClick={handleCancelarAsignar} className="btn-volver">Volver a Roles</button>
                 </div>
-                <p>Seleccione un usuario de la lista para asignarle un rol.</p>
                 <div className="tabla-responsive">
                   <table className="tabla-asignar-usuarios">
                     <thead>
                       <tr>
-                        <th>ID</th>
-                        <th>Tipo Doc.</th>
-                        <th>Documento</th>
-                        <th>Nombre</th>
-                        <th>Email</th>
-                        <th>Acción</th>
+                        <th>ID</th><th>Tipo Doc.</th><th>Documento</th><th>Nombre</th><th>Email</th><th>Acción</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {usuarios.length > 0 ? (
-                        usuarios.map(usuario => (
-                          <tr key={usuario.id}>
-                            <td>{usuario.id}</td>
-                            <td>{usuario.tipo_Doc}</td>
-                            <td>{usuario.doc}</td>
-                            <td>{usuario.nombre}</td>
-                            <td>{usuario.email}</td>
-                            <td className="acciones">
-                              <button className="btn-asignar" title="Asignar Rol" onClick={() => setUsuarioSeleccionado(usuario)}>
-                                <FontAwesomeIcon icon={faEdit} /> Asignar Rol
-                              </button>
-                            </td>
-                          </tr>
-                        ))
-                      ) : (
-                        <tr>
-                          <td colSpan="6" className="sin-datos">No hay usuarios para mostrar.</td>
+                      {usuarios.map(usuario => (
+                        <tr key={usuario.id}>
+                          <td>{usuario.id}</td>
+                          <td>{usuario.tipo_Doc}</td>
+                          <td>{usuario.doc}</td>
+                          <td>{usuario.nombre}</td>
+                          <td>{usuario.email}</td>
+                          <td>
+                            <button className="btn-asignar" onClick={() => setUsuarioSeleccionado(usuario)}>
+                              <FontAwesomeIcon icon={faEdit} /> Asignar Rol
+                            </button>
+                          </td>
                         </tr>
-                      )}
+                      ))}
                     </tbody>
                   </table>
                 </div>
@@ -260,6 +253,15 @@ function Roles() {
                     <button onClick={handleAsignarRoles} className="btn-asignar-roles">
                       Asignar Roles
                     </button>
+                    <button
+                        className="btn-cancelar-asignacion"
+                        onClick={() => {
+                          setUsuarioSeleccionado(null);
+                          setRolesSeleccionados([]);
+                        }}
+                      >
+                        Cancelar
+                    </button>
                   </div>
                 )}
               </div>
@@ -279,42 +281,40 @@ function Roles() {
                   )}
                 </div>
                 {mostrarFormularioRol ? (
-                   <form onSubmit={handleGuardarRol} className="form-rol">
-                   <h3>{modoEdicion ? "Editar Rol" : "Crear Nuevo Rol"}</h3>
-                   <div className="form-group">
-                     <label>Nombre del Rol:</label>
-                     <input type="text" name="nom_rol" value={nuevoRol.nom_rol} onChange={handleRolChange} required />
-                   </div>
-                   <div className="form-group">
-                     <label>Descripción:</label>
-                     <textarea name="descripcion" value={nuevoRol.descripcion} onChange={handleRolChange} required rows="3" />
-                   </div>
-                   <div className="form-buttons">
-                     <button type="submit" className="btn-guardar" disabled={isSaving}>
-                       {isSaving ? 'Guardando...' : (modoEdicion ? 'Actualizar Rol' : 'Crear Rol')}
-                     </button>
-                     <button type="button" className="btn-cancelar" onClick={handleCancelarRol}>
-                       Cancelar
-                     </button>
-                   </div>
-                 </form>
+                  <form onSubmit={handleGuardarRol} className="form-rol">
+                    <h3>{modoEdicion ? "Editar Rol" : "Crear Nuevo Rol"}</h3>
+                    <div className="form-group">
+                      <label>Nombre del Rol:</label>
+                      <input type="text" name="nom_rol" value={nuevoRol.nom_rol} onChange={handleRolChange} required />
+                    </div>
+                    <div className="form-group">
+                      <label>Descripción:</label>
+                      <textarea name="descripcion" value={nuevoRol.descripcion} onChange={handleRolChange} required rows="3" />
+                    </div>
+                    <div className="form-buttons">
+                      <button type="submit" className="btn-guardar" disabled={isSaving}>
+                        {isSaving ? 'Guardando...' : (modoEdicion ? 'Actualizar Rol' : 'Crear Rol')}
+                      </button>
+                      <button type="button" className="btn-cancelar" onClick={handleCancelarRol}>
+                        Cancelar
+                      </button>
+                    </div>
+                  </form>
                 ) : (
                   <table className="tabla-roles">
                     <thead><tr><th>ID</th><th>Nombre</th><th>Descripción</th><th>Acciones</th></tr></thead>
                     <tbody>
-                      {roles.length > 0 ? (
-                        roles.map(rol => (
-                          <tr key={rol.id}>
-                            <td>{rol.id}</td><td>{rol.nom_rol}</td><td>{rol.descripcion}</td>
-                            <td className="acciones">
-                              <button onClick={() => handleEditarRol(rol)} className="btn-editar" title="Editar"><FontAwesomeIcon icon={faPen} /></button>
-                              <button onClick={() => handleEliminarRol(rol.id)} className="btn-eliminar" title="Eliminar"><FontAwesomeIcon icon={faTrash} /></button>
-                            </td>
-                          </tr>
-                        ))
-                      ) : (
-                        <tr><td colSpan="4" className="sin-datos">No hay roles registrados</td></tr>
-                      )}
+                      {roles.map(rol => (
+                        <tr key={rol.id}>
+                          <td>{rol.id}</td>
+                          <td>{rol.nom_rol}</td>
+                          <td>{rol.descripcion}</td>
+                          <td className="acciones">
+                            <button onClick={() => handleEditarRol(rol)} className="btn-editar"><FontAwesomeIcon icon={faPen} /></button>
+                            <button onClick={() => handleEliminarRol(rol.id)} className="btn-eliminar"><FontAwesomeIcon icon={faTrash} /></button>
+                          </td>
+                        </tr>
+                      ))}
                     </tbody>
                   </table>
                 )}

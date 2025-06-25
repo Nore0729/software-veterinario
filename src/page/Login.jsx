@@ -79,7 +79,7 @@ export const Login = () => {
       },
       {
         id: 3,
-        nombre: 'Carlos Gómez',
+        nombre: 'Yenifer Garcia',
         email: 'yenifergb07@gmail.com',
         password: 'YENIfer2021@',
         rol: 'administrador',

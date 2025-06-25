@@ -3,8 +3,9 @@ import { PlusCircle, Edit, Trash2, Search, X } from "lucide-react";
 import "../../styles/Administrador/ServiciosAdmin.css";
 import AdminLayout from "../../layout/AdminLayout";
 
+const API_BASE_URL = "http://localhost:3000";
+
 function ServiciosAdmin() {
-  // Estados para manejar los campos del formulario
   const [formData, setFormData] = useState({
     nombre: "",
     descripcion: "",
@@ -12,52 +13,52 @@ function ServiciosAdmin() {
     duracion: "",
   });
 
-  const [isFormVisible, setIsFormVisible] = useState(true);
-
+  const [isFormVisible, setIsFormVisible] = useState(false);
   const [servicios, setServicios] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
 
   // Cargar los servicios desde la API
-  useEffect(() => {
-    const obtenerServicios = async () => {
-      try {
-        const res = await fetch("/api/obtener_servicios");
-        if (!res.ok) {
-          throw new Error("Error al obtener los servicios");
-        }
-        const data = await res.json();
-        setServicios(data); 
-      } catch (error) {
-        console.error("Error:", error);
-        alert("Hubo un problema al cargar los servicios");
-      }
-    };
+  const cargarServicios = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/servicios`);
+      if (!response.ok) throw new Error("Error al obtener los servicios");
+      const data = await response.json();
+      setServicios(data);
+    } catch (error) {
+      console.error("Error:", error);
+      alert(error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    obtenerServicios();
-  }, []); 
+  useEffect(() => {
+    cargarServicios();
+  }, []);
 
   // Función para eliminar un servicio
   const handleEliminar = async (id) => {
     const confirmacion = window.confirm("¿Estás seguro de que quieres eliminar este servicio?");
-    if (!confirmacion) return; // Si el usuario no confirma, no hacemos nada
+    if (!confirmacion) return;
 
     try {
-      const res = await fetch(`/api/servicios/${id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/servicios/${id}`, {
         method: "DELETE",
       });
 
-      const data = await res.json();
-
-      if (res.ok) {
-        alert(data.message); // Muestra un mensaje de éxito
-
-        // Eliminar el servicio de la lista
-        setServicios(servicios.filter(servicio => servicio.id !== id));
-      } else {
-        alert(data.error || "No se pudo eliminar el servicio");
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || "No se pudo eliminar el servicio");
       }
+
+      const data = await res.json();
+      alert(data.message);
+      cargarServicios(); // Recargar la lista actualizada
     } catch (error) {
       console.error("Error al eliminar el servicio:", error);
-      alert("Hubo un problema al eliminar el servicio");
+      alert(error.message);
     }
   };
 
@@ -72,54 +73,61 @@ function ServiciosAdmin() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const { nombre, descripcion, precio, duracion } = formData;
+    
     if (!nombre || !descripcion || !precio || !duracion) {
       alert("Todos los campos son obligatorios");
       return;
     }
 
-    const dataToSend = {
-      nombre,
-      descripcion,
-      precio,
-      duracion_estimada: duracion,
-    };
-
     try {
-      //la API para agregar el nuevo servicio
-      const res = await fetch("/api/servicios", {
+      const res = await fetch(`${API_BASE_URL}/servicios`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(dataToSend),
+        body: JSON.stringify({
+          nombre,
+          descripcion,
+          precio: parseFloat(precio),
+          duracion_estimada: duracion
+        }),
       });
 
       if (!res.ok) {
-        const errorData = await res.json().catch(() => ({}));
+        const errorData = await res.json();
         throw new Error(errorData.message || "Error al registrar el servicio");
       }
 
       const result = await res.json();
-      alert(result.message); // Muestra el mensaje de éxito
-
-      // Limpiar el formulario después de registrar el servicio
+      alert(result.message);
       setFormData({ nombre: "", descripcion: "", precio: "", duracion: "" });
-
+      setIsFormVisible(false);
+      cargarServicios();
     } catch (error) {
       console.error("Error al registrar el servicio:", error);
-      alert("Hubo un problema al registrar el servicio");
+      alert(error.message);
     }
   };
 
-  // Función para limpiar el formulario (funcionalidad de cancelar)
+  // Función para limpiar el formulario
   const handleCancelar = () => {
     setFormData({ nombre: "", descripcion: "", precio: "", duracion: "" });
-    setIsFormVisible(false); 
+    setIsFormVisible(false);
   };
 
   const handleAgregarServicio = () => {
-    setIsFormVisible(true); 
+    setIsFormVisible(true);
   };
+
+  const handleClearSearch = () => {
+    setSearchTerm("");
+  };
+
+  // Filtrar servicios según el término de búsqueda
+  const filteredServicios = servicios.filter(servicio =>
+    servicio.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    servicio.descripcion.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <AdminLayout>
@@ -131,7 +139,7 @@ function ServiciosAdmin() {
           <button 
             className="btn-primary btn-corto" 
             onClick={handleAgregarServicio} 
-            style={{ width: '160px',height:'68px' ,display: 'block', marginLeft: 'auto', padding: '20px', marginBottom: '20px' }} 
+            style={{ width: '160px', height: '68px', display: 'block', marginLeft: 'auto', padding: '20px', marginBottom: '20px' }} 
           >
             <PlusCircle size={18} /> Agregar Servicio
           </button>
@@ -203,51 +211,64 @@ function ServiciosAdmin() {
         <div className="servicios-list-container">
           <div className="search-container">
             <Search className="search-icon" />
-            <input type="text" placeholder="Buscar servicios..." />
-            <X className="clear-search" />
+            <input 
+              type="text" 
+              placeholder="Buscar servicios..." 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            {searchTerm && (
+              <X className="clear-search" onClick={handleClearSearch} />
+            )}
           </div>
 
-          <div className="servicios-table-container">
-            <table className="servicios-table">
-              <thead>
-                <tr>
-                  <th>Nombre</th>
-                  <th>Descripción</th>
-                  <th>Precio</th>
-                  <th>Duración</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                {servicios.length > 0 ? (
-                  servicios.map(servicio => (
-                    <tr key={servicio.id}>
-                      <td>{servicio.nombre}</td>
-                      <td>{servicio.descripcion}</td>
-                      <td>${servicio.precio}</td>
-                      <td>{servicio.duracion_estimada} min</td>
-                      <td className="actions-cell">
-                        <button className="btn-editar" title="Editar">
-                          <Edit size={16} />
-                        </button>
-                        <button 
-                          className="btn-eliminar" 
-                          title="Eliminar" 
-                          onClick={() => handleEliminar(servicio.id)} // Llamada a la función eliminar
-                        >
-                          <Trash2 size={16} />
-                        </button>
+          {isLoading ? (
+            <div className="loading-message">Cargando servicios...</div>
+          ) : (
+            <div className="servicios-table-container">
+              <table className="servicios-table">
+                <thead>
+                  <tr>
+                    <th>Nombre</th>
+                    <th>Descripción</th>
+                    <th>Precio</th>
+                    <th>Duración</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredServicios.length > 0 ? (
+                    filteredServicios.map(servicio => (
+                      <tr key={servicio.id}>
+                        <td>{servicio.nombre}</td>
+                        <td>{servicio.descripcion}</td>
+                        <td>${servicio.precio}</td>
+                        <td>{servicio.duracion_estimada} min</td>
+                        <td className="actions-cell">
+                          <button className="btn-editar" title="Editar">
+                            <Edit size={16} />
+                          </button>
+                          <button 
+                            className="btn-eliminar" 
+                            title="Eliminar" 
+                            onClick={() => handleEliminar(servicio.id)}
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="5" className="no-results">
+                        {searchTerm ? "No se encontraron resultados" : "No hay servicios registrados"}
                       </td>
                     </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="5" className="no-results">No hay servicios registrados</td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       </div>
     </AdminLayout>

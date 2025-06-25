@@ -6,28 +6,6 @@ import { useState } from "react"
 function RegistroClientes() {
   // Datos quemados de clientes
   const [clientes, setClientes] = useState([
-    {
-      id: 1,
-      tipoDocumento: "CC",
-      documento: "123456789",
-      nombreCompleto: "Juan Pérez Gómez",
-      fechaNacimiento: "1985-05-15",
-      telefono: "3001234567",
-      email: "juan.perez@example.com",
-      direccion: "Calle 123 #45-67, Bogotá",
-      activo: true
-    },
-    {
-      id: 2,
-      tipoDocumento: "CE",
-      documento: "AB123456",
-      nombreCompleto: "María García López",
-      fechaNacimiento: "1990-08-22",
-      telefono: "3109876543",
-      email: "maria.garcia@example.com",
-      direccion: "Carrera 8 #12-34, Medellín",
-      activo: false
-    }
   ])
 
   const [searchTerm, setSearchTerm] = useState("")
