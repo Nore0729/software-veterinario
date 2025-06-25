@@ -39,14 +39,20 @@ const adminRoutes = require('./api/administrador');       // Ruta para administr
 const authRoutes = require('./api/auth');                 // Ruta de autenticación (login/registro)
 const mascotaRoutes = require('./api/mascotas');          // Ruta para mascotas
 const propietarioRoutes = require('./api/propietario');   // Ruta para propietarios
-const servicioRoutes = require('./api/servicios');        // Ruta para servicios (nueva)
+const servicioRoutes = require('./api/servicios'); 
+const consultasVetRoutes = require('./api/consultasvet');       // Ruta para servicios (nueva)
+const veterinarioRoutes = require('./api/veterinario');       // Ruta para servicios (nueva)
+const citasvetRoutes = require('./api/citasvet');      
 
 // Montamos los routers en la aplicación principal
 app.use('/api/admin', adminRoutes(db));
 app.use('/api/auth', authRoutes(db));
 app.use('/api/mascotas', mascotaRoutes(db));
 app.use('/api/propietarios', propietarioRoutes(db));
-app.use('/api/servicios', servicioRoutes(db));            // Ruta de servicios activada
+app.use('/api/servicios', servicioRoutes(db)); 
+app.use('/api/consultas', consultasVetRoutes(db));            // Ruta de servicios activada
+app.use('/api/veterinarios', veterinarioRoutes(db));            // Ruta de servicios activada
+app.use('/api/citasvet', citasvetRoutes(db));            // Ruta de servicios activada
 
 console.log("✅ Todas las rutas han sido cargadas.");
 
