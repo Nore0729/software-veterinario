@@ -79,21 +79,20 @@ CREATE TABLE servicios (
 );
 
 CREATE TABLE citas (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    mascota_id INT NOT NULL,
-    vet_id INT NOT NULL,
-    servicio_id INT,
-    fecha_hora DATETIME NOT NULL,
-    motivo VARCHAR(255) NOT NULL,
-    estado ENUM('Programada', 'Confirmada', 'Completada', 'Cancelada') DEFAULT 'Programada',
-    notas TEXT,
-    fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (mascota_id) REFERENCES mascotas(id) ON DELETE CASCADE,
-    FOREIGN KEY (vet_id) REFERENCES veterinarios(vet_id) ON DELETE CASCADE,
-    FOREIGN KEY (servicio_id) REFERENCES servicios(id) ON DELETE SET NULL,
-    INDEX idx_fecha_hora (fecha_hora),
-    INDEX idx_estado (estado)
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  propietario_doc VARCHAR(50) NOT NULL,          
+  mascota_id INT NOT NULL,                        
+  mascota_nombre VARCHAR(100) NOT NULL,         
+  servicio VARCHAR(100) NOT NULL,                
+  veterinario_id INT NOT NULL,                    
+  veterinario_nombre VARCHAR(100) NOT NULL,      
+  fecha DATE NOT NULL,                            
+  hora TIME NOT NULL,                             
+  notas TEXT,                                    
+  estado ENUM('programada', 'confirmada', 'cancelada', 'completada') DEFAULT 'programada',
+  fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
 
 CREATE TABLE servicios_realizados (
     id INT AUTO_INCREMENT PRIMARY KEY,

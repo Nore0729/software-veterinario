@@ -65,7 +65,7 @@ const UserWelcome = ({ userName }) => {
           <ul className="appointment-list">
            
           </ul>
-          <Link to="/citas" className="view-all">Ver calendario →</Link>
+          <Link to="/AgendarCita" className="view-all">Ver calendario →</Link>
         </div>
       </div>
     </div>

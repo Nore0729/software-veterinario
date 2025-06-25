@@ -90,12 +90,27 @@ module.exports = function(db) {
     });
   });
 
+  router.put('Actualizar-paswword', (req, res) => {
+    const propietarioDoc = req.params.doc;
+    console.log(`📢 [GET /api/propietarios/${propietarioDoc}/mascotas] Petición de mascotas por propietario.`);
+
+    const sql = "SELECT id, nombre, especie FROM mascotas WHERE doc_pro = ? ORDER BY nombre ASC";
+    
+    db.query(sql, [propietarioDoc], (err, results) => {
+      if (err) {
+        console.error(`❌ Error al consultar las mascotas del propietario ${propietarioDoc}:`, err);
+        return res.status(500).json({ error: 'Error interno del servidor.' });
+      }
+      console.log(`✅ Se encontraron ${results.length} mascotas para el propietario ${propietarioDoc}.`);
+      res.status(200).json(results);
+    });
+  });
 
   router.post('/verificar-password', (req, res) => {
     const { email, password } = req.body;
     
     const sql = 'SELECT password FROM usuarios WHERE email = ?';
-    db.query(sql, [email], (err, result) => {
+    db.query(sql, [email], async (err, result) => {
       if (err) {
         return res.status(500).json({ error: 'Error al consultar la base de datos' });
       }
@@ -105,10 +120,11 @@ module.exports = function(db) {
       }
     
       const hashedPassword = result[0].password;
+      console.log(hashedPassword)
       console.log('🔑 Password recibido:', password);
       console.log('🔐 Hash almacenado en la BD:', hashedPassword);
-    
-      bcrypt.compare(password, hashedPassword, (errCompare, isMatch) => {
+          
+      const passValid = await bcrypt.compare(password, hashedPassword, (errCompare, isMatch) => {
         if (errCompare) {
           return res.status(500).json({ error: 'Error al comparar contraseñas' });
         }
@@ -119,6 +135,8 @@ module.exports = function(db) {
           res.status(401).json({ error: 'Contraseña incorrecta' });
         }
       });
+
+      if (passValid) res.status(200).json({ message: "Contraseña correcta", success: 1 })
     });
   });
 

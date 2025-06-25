@@ -3,8 +3,6 @@ import { PlusCircle, Edit, Trash2, Search, X } from "lucide-react";
 import "../../styles/Administrador/ServiciosAdmin.css";
 import AdminLayout from "../../layout/AdminLayout";
 
-const API_BASE_URL = "http://localhost:3000";
-
 function ServiciosAdmin() {
   const [formData, setFormData] = useState({
     nombre: "",
@@ -18,11 +16,11 @@ function ServiciosAdmin() {
   const [isLoading, setIsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Cargar los servicios desde la API
+  // Cargar servicios desde la API
   const cargarServicios = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/api/servicios`);
+      const response = await fetch(`/api/servicios`);
       if (!response.ok) throw new Error("Error al obtener los servicios");
       const data = await response.json();
       setServicios(data);
@@ -38,13 +36,13 @@ function ServiciosAdmin() {
     cargarServicios();
   }, []);
 
-  // Función para eliminar un servicio
+  // Eliminar un servicio
   const handleEliminar = async (id) => {
     const confirmacion = window.confirm("¿Estás seguro de que quieres eliminar este servicio?");
     if (!confirmacion) return;
 
     try {
-      const res = await fetch(`${API_BASE_URL}/api/servicios/${id}`, {
+      const res = await fetch(`/api/servicios/${id}`, {
         method: "DELETE",
       });
 
@@ -55,13 +53,14 @@ function ServiciosAdmin() {
 
       const data = await res.json();
       alert(data.message);
-      cargarServicios(); // Recargar la lista actualizada
+      cargarServicios();
     } catch (error) {
       console.error("Error al eliminar el servicio:", error);
       alert(error.message);
     }
   };
 
+  // Manejar cambios en el formulario
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -70,17 +69,18 @@ function ServiciosAdmin() {
     }));
   };
 
+  // Enviar el formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
     const { nombre, descripcion, precio, duracion } = formData;
-    
+
     if (!nombre || !descripcion || !precio || !duracion) {
       alert("Todos los campos son obligatorios");
       return;
     }
 
     try {
-      const res = await fetch(`${API_BASE_URL}/servicios`, {
+      const res = await fetch(`/api/servicios`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -89,7 +89,7 @@ function ServiciosAdmin() {
           nombre,
           descripcion,
           precio: parseFloat(precio),
-          duracion_estimada: duracion
+          duracion_estimada: parseInt(duracion)
         }),
       });
 
@@ -109,7 +109,6 @@ function ServiciosAdmin() {
     }
   };
 
-  // Función para limpiar el formulario
   const handleCancelar = () => {
     setFormData({ nombre: "", descripcion: "", precio: "", duracion: "" });
     setIsFormVisible(false);
@@ -123,7 +122,7 @@ function ServiciosAdmin() {
     setSearchTerm("");
   };
 
-  // Filtrar servicios según el término de búsqueda
+  // Filtro por búsqueda
   const filteredServicios = servicios.filter(servicio =>
     servicio.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
     servicio.descripcion.toLowerCase().includes(searchTerm.toLowerCase())
@@ -134,11 +133,10 @@ function ServiciosAdmin() {
       <div className="servicios-admin-container">
         <h1 className="servicios-titulo">Administración de Servicios Veterinarios</h1>
 
-        {/* Botón para mostrar el formulario de agregar servicio */}
         {!isFormVisible && (
           <button 
             className="btn-primary btn-corto" 
-            onClick={handleAgregarServicio} 
+            onClick={handleAgregarServicio}
             style={{ width: '160px', height: '68px', display: 'block', marginLeft: 'auto', padding: '20px', marginBottom: '20px' }} 
           >
             <PlusCircle size={18} /> Agregar Servicio
@@ -207,7 +205,6 @@ function ServiciosAdmin() {
           </div>
         )}
 
-        {/* Búsqueda y lista de servicios */}
         <div className="servicios-list-container">
           <div className="search-container">
             <Search className="search-icon" />
