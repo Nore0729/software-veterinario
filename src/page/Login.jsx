@@ -56,40 +56,8 @@ export const Login = () => {
       return;
     }
 
-    const usuariosMock = [
-      {
-        id: 1,
-        nombre: 'Juan Pérez',
-        email: 'juan.perez@gmail.com',
-        password: 'Cliente2025@',
-        rol: 'propietario',
-        documento: '12345678',
-        telefono: '1234567890',
-        direccion: 'Calle Falsa 123'
-      },
-      {
-        id: 2,
-        nombre: 'Ana Martínez',
-        email: 'veterinario@gmail.com',
-        password: 'Vet2025@',
-        rol: 'veterinario',
-        documento: '87654321',
-        telefono: '0987654321',
-        especialidad: 'Cirugía'
-      },
-      {
-        id: 3,
-        nombre: 'Yenifer Garcia',
-        email: 'yenifergb07@gmail.com',
-        password: 'YENIfer2021@',
-        rol: 'administrador',
-        documento: '11122333',
-        telefono: '5554443322',
-        nivel_acceso: 'alto'
-      }
-    ];
-
     try {
+      // ✅ Primer intento con tu API antigua
       const response = await axios.post('/api/auth/login', {
         email,
         password,
@@ -115,12 +83,33 @@ export const Login = () => {
       else navigate('/UserWelcome');
 
     } catch (err) {
-      console.error('Error en login backend:', err);
-      const user = usuariosMock.find(
-        (usuario) => usuario.email === email && usuario.password === password
-      );
+      console.error('Error en login backend viejo:', err);
 
-      if (!user) {
+      // ✅ Segundo intento con la API que verifica el rol directamente
+      try {
+        const response = await axios.post('http://localhost:3000/login_rol', {
+          email,
+          password,
+        });
+
+        const { nombre, email: userEmail, rol, doc } = response.data.usuario;
+
+        localStorage.setItem('nombre', nombre);
+        localStorage.setItem('email', userEmail);
+        localStorage.setItem('doc_pro', doc);
+        localStorage.setItem('rol', rol);
+
+        setErrorGeneral('');
+        setFailedAttempts(0);
+
+        if (rol === 'propietario') navigate('/UserWelcome');
+        else if (rol === 'veterinario') navigate('/VeterinarioPer');
+        else if (rol === 'administrador') navigate('/InicioAdmin');
+        else navigate('/UserWelcome');
+
+      } catch (error) {
+        console.error('Error en login_rol:', error);
+
         const attempts = failedAttempts + 1;
         setFailedAttempts(attempts);
         if (attempts >= 3) {
@@ -129,29 +118,6 @@ export const Login = () => {
         } else {
           setErrorGeneral(`Credenciales incorrectas. Intentos restantes: ${3 - attempts}`);
         }
-        return;
-      }
-
-      localStorage.setItem('userData', JSON.stringify(user));
-      localStorage.setItem('nombre', user.nombre);
-      localStorage.setItem('email', user.email);
-      localStorage.setItem('rol', user.rol);
-
-      setErrorGeneral('');
-      setFailedAttempts(0);
-
-      switch (user.rol) {
-        case 'propietario':
-          navigate('/UserWelcome');
-          break;
-        case 'veterinario':
-          navigate('/VeterinarioPer');
-          break;
-        case 'administrador':
-          navigate('/InicioAdmin');
-          break;
-        default:
-          navigate('/UserWelcome');
       }
     }
   };
@@ -216,8 +182,8 @@ export const Login = () => {
 
           {errorGeneral && <p className="error-message">{errorGeneral}</p>}
 
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             disabled={isBlocked}
             className={isBlocked ? 'blocked-button' : ''}
           >
@@ -230,7 +196,7 @@ export const Login = () => {
           <Link to="/Propietarios">Registrar</Link>
         </div>
       </div>
-    </div>  
+    </div>
   );
 };
 

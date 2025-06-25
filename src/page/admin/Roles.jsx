@@ -146,7 +146,7 @@ function Roles() {
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/admin/asignar_roles/${usuarioSeleccionado.id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/admin/asignar_roles/${usuarioSeleccionado.doc}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"

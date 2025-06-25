@@ -195,67 +195,175 @@ module.exports = function (db) {
     const { rolesSeleccionados, asignado_por } = req.body;
     const usuarioId = req.params.usuarioId;
 
-    if (!rolesSeleccionados || rolesSeleccionados.length === 0) {
-        return res.status(400).json({ error: 'Debe seleccionar al menos un rol' });
-    }
-
-    try {
-        // Verificar si el usuario existe
-        const [usuario] = await db.promise().query('SELECT * FROM usuarios WHERE id = ?', [usuarioId]);
-        if (!usuario.length) {
-            return res.status(404).json({ error: 'Usuario no encontrado' });
-        }
-
-        // Asignar roles y registrar en tablas específicas
-        for (const rol_id of rolesSeleccionados) {
-            // 1. Insertar en asignacion_rol (evitando duplicados)
-            await db.promise().query(
-                `INSERT IGNORE INTO asignacion_rol (usu_id, rol_id, asignado_por) VALUES (?, ?, ?)`,
-                [usuarioId, rol_id, asignado_por]
-            );
-
-            // 2. Obtener nombre del rol
-            const [rol] = await db.promise().query('SELECT nom_rol FROM roles WHERE id = ?', [rol_id]);
-            const rolNombre = rol[0].nom_rol.toLowerCase();
-
-            // 3. Registrar en tabla específica según el rol
-            switch (rolNombre) {
-                case 'propietario':
-                    await db.promise().query(
-                        'INSERT INTO propietarios (id_prop) VALUES (?)',
-                        [usuarioId]
-                    );
-                    break;
-
-                case 'veterinario':
-                    const { especialidad } = req.body;
-                    await db.promise().query(
-                        'INSERT IGNORE INTO veterinarios (vet_id, especialidad) VALUES (?, ?)',
-                        [usuarioId, especialidad || 'General']
-                    );
-                    break;
-
-                case 'administrador':
-                    const { nivel_acceso } = req.body;
-                    await db.promise().query(
-                        'INSERT IGNORE INTO administradores (admin_id, nivel_acceso) VALUES (?, ?)',
-                        [usuarioId, nivel_acceso || 'medio']
-                    );
-                    break;
+            if (!rolesSeleccionados || rolesSeleccionados.length === 0) {
+                return res.status(400).json({ error: 'Debe seleccionar al menos un rol' });
             }
-        }
-
-        res.status(200).json({ message: 'Roles asignados y registros actualizados correctamente' });
-    } catch (error) {
-        console.error('Error:', error);
-        res.status(500).json({ error: 'Error en el servidor al asignar roles' });
-    }
-});
+            try {
+                // Verificar si el usuario existe
+                const [usuario] = await db.promise().query('SELECT * FROM usuarios WHERE doc = ?', [usuarioId]);
+                if (!usuario.length) {
+                    return res.status(404).json({ error: 'Usuario no encontrado' });
+                }
+                // Asignar roles y registrar en tablas específicas
+                for (const rol_id of rolesSeleccionados) {
+                    // 1. Insertar en asignacion_rol (evitando duplicados)
+                    await db.promise().query(
+                        `INSERT IGNORE INTO asignacion_rol (doc_usu, rol_id, asignado_por) VALUES (?, ?, ?)`,
+                        [usuarioId, rol_id, asignado_por]
+                    );
+                    // 2. Obtener nombre del rol
+                    const [rol] = await db.promise().query('SELECT nom_rol FROM roles WHERE id = ?', [rol_id]);
+                    const rolNombre = rol[0].nom_rol.toLowerCase();
+                
+                    // 3. Registrar en tabla específica según el rol
+                    switch (rolNombre) {
+                        case 'cliente':
+                            await db.promise().query(
+                                'INSERT INTO propietarios (id_prop) VALUES (?)',
+                                [usuarioId]
+                            );
+                            break;
+                        case 'veterinario':
+                            const { especialidad } = req.body;
+                            await db.promise().query(
+                                'INSERT IGNORE INTO veterinarios (vet_id, especialidad) VALUES (?, ?)',
+                                [usuarioId, especialidad || 'General']
+                            );
+                            break;
+                        case 'administrador':
+                            const { nivel_acceso } = req.body;
+                            await db.promise().query(
+                                'INSERT IGNORE INTO administradores (admin_id, nivel_acceso) VALUES (?, ?)',
+                                [usuarioId, nivel_acceso || 'alto']
+                            );
+                            break;
+                    }
+                }
+                res.status(200).json({ message: 'Roles asignados y registros actualizados correctamente' });
+            } catch (error) {
+                console.error('Error:', error);
+                res.status(500).json({ error: 'Error en el servidor al asignar roles' });
+            }
+    });
 
 
       //**************************************************************************/
-     //**************************TRAER A SOLO LOS USUARIO CLIENTES***************/
+     //********************TRAER A SOLO LOS USUARIO CLIENTES*********************/
     //**************************************************************************/
+
+    router.get('/odtener_clientes', async (req, res) => {
+        try {
+            const [clientes] = await db.promise().query(`
+                SELECT u.*
+                FROM usuarios u
+                JOIN propietarios p ON u.doc = p.id_prop
+            `);0
+            res.status(200).json(clientes);
+        } catch (error) {
+            console.error('Error al obtener clientes:', error);
+            res.status(500).json({ error: 'Error en el servidor al obtener los clientes' });
+        }
+    });
+
+    //**************************************************************************/
+     //*****************TRAER A SOLO LOS USUARIO veterinarios*******************/
+    //**************************************************************************/
+    
+    router.get('/obtener_veterinarios', async (req, res) => {
+        try {
+            const [veterinarios] = await db.promise().query(`
+                SELECT u.*, v.especialidad
+                FROM usuarios u
+                JOIN veterinarios v ON u.doc = v.vet_id
+            `);
+    
+            res.status(200).json(veterinarios);
+        } catch (error) {
+            console.error('Error al obtener veterinarios:', error);
+            res.status(500).json({ error: 'Error en el servidor al obtener los veterinarios' });
+        }
+    });
+
+    //**************************************************************************/
+     //******************Odtener a todos los administradores********************/
+    //**************************************************************************/
+
+
+    router.get('/obtener_administradores', async (req, res) => {
+        try {
+            const [administradores] = await db.promise().query(`
+                SELECT u.*, a.nivel_acceso 
+                FROM usuarios u
+                JOIN administradores a ON u.doc = a.admin_id
+            `)
+
+            res.status(200).json(administradores)
+        } catch (error) {
+            console.error('❌ Error al obtener administradores:', error)
+            res.status(500).json({ error: 'Error en el servidor al obtener los administradores' })
+        }
+    })
+
+    //**************************************************************************/
+    //*******************para que verifique login segun el rol *****************/
+    //**************************************************************************/
+
+    router.post("/login_rol", async (req, res) => {
+        const { email, password } = req.body;
+        try {
+          // Buscar usuario por correo
+          const [usuarios] = await db.promise().query(
+            "SELECT * FROM usuarios WHERE email = ?",
+            [email]
+          );
+          if (usuarios.length === 0) {
+            return res.status(404).json({ mensaje: "Usuario no encontrado" });
+          }
+          const usuario = usuarios[0];
+          // Validar la contraseña
+          const passwordValida = await bcrypt.compare(password, usuario.password);
+          if (!passwordValida) {
+            return res.status(401).json({ mensaje: "Contraseña incorrecta" });
+          }
+          // Verificar a qué rol pertenece
+          const [admin] = await db.promise().query(
+            "SELECT * FROM administradores WHERE admin_id = ?",
+            [usuario.doc]
+          );
+          const [veterinario] = await db.promise().query(
+            "SELECT * FROM veterinarios WHERE vet_id = ?",
+            [usuario.doc]
+          );
+          const [propietario] = await db.promise().query(
+            "SELECT * FROM propietarios WHERE id_prop = ?",
+            [usuario.doc]
+          );
+          let rol = null;
+          if (admin.length > 0) {
+            rol = "administrador";
+          } else if (veterinario.length > 0) {
+            rol = "veterinario";
+          } else if (propietario.length > 0) {
+            rol = "propietario";
+          } else {
+            return res.status(403).json({ mensaje: "El usuario no tiene un rol asignado" });
+          }
+          res.json({
+            mensaje: "Inicio de sesión exitoso",
+            usuario: {
+              nombre: usuario.nombre,
+              email: usuario.email,
+              doc: usuario.doc,
+              rol: rol,
+            },
+          });
+        } catch (error) {
+          console.error("Error en login:", error);
+          res.status(500).json({ mensaje: "Error en el servidor" });
+        }
+      });
+    
+    
 
     
 

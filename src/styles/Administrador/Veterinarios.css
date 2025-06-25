@@ -477,3 +477,40 @@ select:focus {
 .tabla-container::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(135deg, var(--primary-hover) 0%, var(--primary-color) 100%);
 }
+
+.controles-superiores {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+}
+
+.controles-superiores input {
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  width: 260px;
+  transition: border-color 0.3s;
+}
+
+.controles-superiores input:focus {
+  outline: none;
+  border-color: #007bff;
+}
+.controles-superiores {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+}
+
+.controles-superiores input {
+  padding: 8px 15px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  width: 250px;
+  transition: border-color 0.3s;
+}
+
+.controles-superiores input:focus {
+  outline: none;
+  border-color: #007bff;
+}
