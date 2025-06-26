@@ -63,15 +63,13 @@ const Actualizarpro = () => {
         password: datos.contraseñaActual,
       });
 
-      console.log(response.data.success)
       if (response.data.success) {
-        // Contraseña correcta, actualizamos solo los datos (sin cambiar password)
         const datosActualizar = {
           tel: datos.telefono,
           email: datos.email,
           direccion: datos.direccion,
         };
-        await modifyData(emailOriginal,datosActualizar)
+        await modifyData(emailOriginal, datosActualizar);
       }
     } catch (error) {
       Swal.fire({
@@ -85,25 +83,29 @@ const Actualizarpro = () => {
       });
     }
   };
+
   const modifyData = async (email, data = {}) => {
     try {
-      const response = await axios.put(`/api/propietario/email/${email}`, data);
-      if (response) Swal.fire('Éxito', 'Datos actualizados correctamente', 'success')
-        .then(() => {
-          if (email !== datos.email) {
-            localStorage.setItem('email', datos.email);
-          }
-          navigate('/Datospro');
-        });
+      const response = await axios.put(`/api/propietarios/email/${email}`, data);
+      if (response) {
+        Swal.fire('Éxito', 'Datos actualizados correctamente', 'success')
+          .then(() => {
+            if (email !== datos.email) {
+              localStorage.setItem('email', datos.email);
+            }
+            navigate('/Datospro');
+          });
+      }
     } catch (err) {
       Swal.fire({
         icon: 'error',
         title: 'Error',
         text: 'Datos no se modificaron',
         confirmButtonText: 'Aceptar',
-      })
+      });
     }
-  }
+  };
+
   return (
     <div className="datospro-container">
       <h2>Actualizar datos</h2>

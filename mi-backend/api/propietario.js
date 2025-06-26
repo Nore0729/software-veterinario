@@ -1,11 +1,10 @@
-// routes/propietarios.js
 const express = require('express');
 const bcrypt = require('bcrypt');
-const router = express.Router();
-
 
 module.exports = function(db) {
-  // RUTA: POST /api/propietarios/registro (Tu código original - sin cambios)
+  const router = express.Router();
+
+  // ✅ Registro de propietario
   router.post('/registro', (req, res) => {
     const { tipo_Doc, doc, nombre, fecha_Nac, tel, email, direccion, password } = req.body;
     if (!tipo_Doc || !doc || !nombre || !fecha_Nac || !tel || !email || !direccion || !password) {
@@ -19,13 +18,15 @@ module.exports = function(db) {
 
       try {
         const hashedPassword = await bcrypt.hash(password, 10);
-        const insertUsuarioQuery = `INSERT INTO usuarios (tipo_Doc, doc, nombre, fecha_Nac, tel, email, direccion, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+        const insertUsuarioQuery = `
+          INSERT INTO usuarios (tipo_Doc, doc, nombre, fecha_Nac, tel, email, direccion, password)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
         db.query(insertUsuarioQuery, [tipo_Doc, doc, nombre, fecha_Nac, tel, email, direccion, hashedPassword], (err2, results2) => {
-          if (err2) return res.status(500).json({ message: 'Hubo un problema al registrar el usuario' });
-          
+          if (err2) return res.status(500).json({ message: 'Error al registrar el usuario' });
+
           const usuarioId = results2.insertId;
           db.query('INSERT INTO propietarios (id_prop) VALUES (?)', [usuarioId], (err3) => {
-            if (err3) return res.status(500).json({ message: 'Usuario creado pero hubo un problema al asignar como propietario' });
+            if (err3) return res.status(500).json({ message: 'Usuario creado, pero error al asignar como propietario' });
             return res.status(201).json({ message: 'Propietario registrado exitosamente' });
           });
         });
@@ -35,7 +36,7 @@ module.exports = function(db) {
     });
   });
 
-  // RUTA: GET /api/propietarios/email/:email (Tu código original - sin cambios)
+  // ✅ Obtener datos del propietario por email
   router.get('/email/:email', (req, res) => {
     const { email } = req.params;
     const sql = 'SELECT * FROM usuarios WHERE email = ? AND id IN (SELECT id_prop FROM propietarios)';
@@ -46,97 +47,78 @@ module.exports = function(db) {
     });
   });
 
-  // *******************************************************************
-  // ** RUTAS NUEVAS AÑADIDAS                    **
-  // *******************************************************************
-
-  // RUTA NUEVA: GET /api/propietarios (para listar todos en el desplegable)
+  // ✅ Listar todos los propietarios (para desplegable)
   router.get('/', (req, res) => {
-    console.log("📢 [GET /api/propietarios] Petición de lista de propietarios.");
-    
     const sql = `
-      SELECT 
-        u.id, 
-        u.nombre, 
-        u.doc 
+      SELECT u.id, u.nombre, u.doc
       FROM propietarios p
       JOIN usuarios u ON p.id_prop = u.id
-      ORDER BY u.nombre ASC;
+      ORDER BY u.nombre ASC
     `;
-    
     db.query(sql, (err, results) => {
-      if (err) {
-        console.error('❌ Error al consultar la lista de propietarios:', err);
-        return res.status(500).json({ error: 'Error interno del servidor.' });
-      }
+      if (err) return res.status(500).json({ error: 'Error interno del servidor.' });
       res.status(200).json(results);
     });
   });
 
-  // RUTA NUEVA: GET /api/propietarios/:doc/mascotas (para filtrar mascotas)
+  // ✅ Obtener mascotas por documento del propietario
   router.get('/:doc/mascotas', (req, res) => {
     const propietarioDoc = req.params.doc;
-    console.log(`📢 [GET /api/propietarios/${propietarioDoc}/mascotas] Petición de mascotas por propietario.`);
-
-    const sql = "SELECT id, nombre, especie FROM mascotas WHERE doc_pro = ? ORDER BY nombre ASC";
-    
+    const sql = 'SELECT id, nombre, especie FROM mascotas WHERE doc_pro = ? ORDER BY nombre ASC';
     db.query(sql, [propietarioDoc], (err, results) => {
-      if (err) {
-        console.error(`❌ Error al consultar las mascotas del propietario ${propietarioDoc}:`, err);
-        return res.status(500).json({ error: 'Error interno del servidor.' });
-      }
-      console.log(`✅ Se encontraron ${results.length} mascotas para el propietario ${propietarioDoc}.`);
+      if (err) return res.status(500).json({ error: 'Error al consultar mascotas' });
       res.status(200).json(results);
     });
   });
 
-  router.put('Actualizar-paswword', (req, res) => {
-    const propietarioDoc = req.params.doc;
-    console.log(`📢 [GET /api/propietarios/${propietarioDoc}/mascotas] Petición de mascotas por propietario.`);
-
-    const sql = "SELECT id, nombre, especie FROM mascotas WHERE doc_pro = ? ORDER BY nombre ASC";
-    
-    db.query(sql, [propietarioDoc], (err, results) => {
-      if (err) {
-        console.error(`❌ Error al consultar las mascotas del propietario ${propietarioDoc}:`, err);
-        return res.status(500).json({ error: 'Error interno del servidor.' });
-      }
-      console.log(`✅ Se encontraron ${results.length} mascotas para el propietario ${propietarioDoc}.`);
-      res.status(200).json(results);
-    });
-  });
-
-  router.post('/verificar-password', (req, res) => {
+  // ✅ Verificar contraseña del propietario
+  router.post('/verificar-password', async (req, res) => {
     const { email, password } = req.body;
-    
     const sql = 'SELECT password FROM usuarios WHERE email = ?';
-    db.query(sql, [email], async (err, result) => {
-      if (err) {
-        return res.status(500).json({ error: 'Error al consultar la base de datos' });
-      }
-    
-      if (result.length === 0) {
-        return res.status(404).json({ error: 'Usuario no encontrado' });
-      }
-    
-      const hashedPassword = result[0].password;
-      console.log(hashedPassword)
-      console.log('🔑 Password recibido:', password);
-      console.log('🔐 Hash almacenado en la BD:', hashedPassword);
-          
-      const passValid = await bcrypt.compare(password, hashedPassword, (errCompare, isMatch) => {
-        if (errCompare) {
-          return res.status(500).json({ error: 'Error al comparar contraseñas' });
-        }
-    
-        if (isMatch) {
-          res.json({ success: true });
-        } else {
-          res.status(401).json({ error: 'Contraseña incorrecta' });
-        }
-      });
 
-      if (passValid) res.status(200).json({ message: "Contraseña correcta", success: 1 })
+    db.query(sql, [email], async (err, result) => {
+      if (err) return res.status(500).json({ error: 'Error al consultar la base de datos' });
+      if (result.length === 0) return res.status(404).json({ error: 'Usuario no encontrado' });
+
+      const hashedPassword = result[0].password;
+      try {
+        const isMatch = await bcrypt.compare(password, hashedPassword);
+        if (isMatch) {
+          return res.json({ success: true });
+        } else {
+          return res.status(401).json({ success: false, message: 'Contraseña incorrecta' });
+        }
+      } catch (errCompare) {
+        return res.status(500).json({ error: 'Error al comparar contraseñas' });
+      }
+    });
+  });
+
+  // ✅ ACTUALIZAR datos del propietario por email (RUTA CORREGIDA)
+  router.put('/email/:email', (req, res) => {
+    const emailOriginal = req.params.email;
+    const { tel, email, direccion } = req.body;
+
+    if (!tel || !email || !direccion) {
+      return res.status(400).json({ error: 'Todos los campos son obligatorios' });
+    }
+
+    const sql = `
+      UPDATE usuarios 
+      SET tel = ?, email = ?, direccion = ?
+      WHERE email = ?`;
+
+    db.query(sql, [tel, email, direccion, emailOriginal], (err, result) => {
+      if (err) {
+        console.error('❌ Error al actualizar:', err);
+        return res.status(500).json({ error: 'Error al actualizar datos' });
+      }
+
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ error: 'Usuario no encontrado o sin cambios' });
+      }
+
+      return res.json({ success: true });
     });
   });
 

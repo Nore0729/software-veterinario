@@ -10,6 +10,7 @@ const port = 3000;
 app.use(express.json());
 app.use(cors());
 
+// Conexión a la base de datos
 const db = mysql.createPool({
   host: 'localhost',
   user: 'root',
@@ -36,7 +37,7 @@ console.log("Cargando rutas...");
 const adminRoutes = require('./api/administrador');
 const authRoutes = require('./api/auth');
 const mascotaRoutes = require('./api/mascotas');
-const propietarioRoutes = require('./api/propietario');
+const propietarioRoutes = require('./api/propietario'); // archivo correcto
 const servicioRoutes = require('./api/servicios');
 const consultasvetRoutes = require('./api/consultasvet');
 const veterinarioRoutes = require('./api/veterinario'); 
@@ -46,7 +47,7 @@ const citasvetRoutes = require('./api/citasvet');
 app.use('/api/admin', adminRoutes(db));
 app.use('/api/auth', authRoutes(db));
 app.use('/api/mascotas', mascotaRoutes(db));
-app.use('/api/propietarios', propietarioRoutes(db));
+app.use('/api/propietarios', propietarioRoutes(db)); // ✅ usamos /propietarios (plural)
 app.use('/api/servicios', servicioRoutes(db));
 app.use('/api/consultas', consultasvetRoutes(db));
 app.use('/api/veterinarios', veterinarioRoutes(db));

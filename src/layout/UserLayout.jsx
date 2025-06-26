@@ -14,6 +14,7 @@ import {
   FaCalendarPlus,
 } from "react-icons/fa"
 import { Link } from "react-router-dom"
+import Swal from "sweetalert2"
 import "../styles/User.css"
 
 const UserLayout = () => {
@@ -28,26 +29,38 @@ const UserLayout = () => {
   const [mascotas, setMascotas] = useState([])
 
   useEffect(() => {
-    const nombre = localStorage.getItem("nombre") || "Usuario";
-    const email = localStorage.getItem("email") || "usuario@email.com";
-    const doc = localStorage.getItem("doc_pro");
-  
-    setUserData({ nombre, email });
-  
+    const nombre = localStorage.getItem("nombre") || "Usuario"
+    const email = localStorage.getItem("email") || "usuario@email.com"
+    const doc = localStorage.getItem("doc_pro")
+
+    setUserData({ nombre, email })
+
     if (doc) {
-      fetch(`/api/mascotas/propietario/${doc}`)  // ← CORREGIDA AQUÍ
+      fetch(`/api/mascotas/propietario/${doc}`)
         .then((res) => res.json())
         .then((data) => {
-          setMascotas(data);
+          setMascotas(data)
         })
-        .catch((err) => console.error("Error cargando mascotas:", err));
+        .catch((err) => console.error("Error cargando mascotas:", err))
     }
-  }, []);
-  
+  }, [])
 
   const handleLogout = () => {
-    localStorage.clear()
-    navigate("/login")
+    Swal.fire({
+      title: "¿Cerrar sesión?",
+      text: "¿Estás segur@ de que deseas salir?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Sí, salir",
+      cancelButtonText: "Cancelar",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        localStorage.clear()
+        navigate("/login")
+      }
+    })
   }
 
   const menuItems = [
@@ -68,10 +81,10 @@ const UserLayout = () => {
     {
       title: "Mis Mascotas",
       icon: <FaPaw />,
-      subItems: mascotas.map(m => ({
-       label: m.nombre,
-       path: `/mascota/${m.nombre.toLowerCase()}`
-       }))
+      subItems: mascotas.map((m) => ({
+        label: m.nombre,
+        path: `/mascota/${m.nombre.toLowerCase()}`,
+      })),
     },
     {
       title: "Configuración",
