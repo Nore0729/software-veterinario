@@ -1,71 +1,101 @@
 import "../../styles/Administrador/ClienteAdmin.css"
 import AdminLayout from "../../layout/AdminLayout"
-import { User, AtSign, Phone, Calendar, MapPin, FileText, Edit, Trash2, ToggleLeft, ToggleRight, Search, Plus } from "lucide-react"
-import { useEffect,useState } from "react"
+import { Phone, AtSign, MapPin, Edit, Trash2, ToggleLeft, ToggleRight, Search, X } from "lucide-react"
+import { useEffect, useState } from "react"
 
-// ✅ URL base de tu API
 const API_BASE_URL = "http://localhost:3000";
 
 function RegistroClientes() {
   const [clientes, setClientes] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [modalVisible, setModalVisible] = useState(false);
+  const [clienteActual, setClienteActual] = useState(null);
 
-  
-  // 🚀 Función para cargar los clientes desde la API
+  const [formEdit, setFormEdit] = useState({
+    nombre: "",
+    fechaNacimiento: "",
+    telefono: "",
+    email: "",
+    direccion: ""
+  });
+
   const cargarClientes = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/admin/odtener_clientes`);
-      if (!response.ok) throw new Error("Error al obtener clientes");
-      const data = await response.json();
-
-      // 🔄 Transformar datos para que encajen con el formato del frontend
-      const clientesFormateados = data.map(cliente => ({
-        id: cliente.id,
-        tipoDocumento: cliente.tipo_Doc,
-        documento: cliente.doc,
-        nombreCompleto: cliente.nombre,
-        fechaNacimiento: cliente.fecha_Nac,
-        telefono: cliente.tel,
-        email: cliente.email,
-        direccion: cliente.direccion,
-        activo: true, // ✅ Puedes manejar el estado activo/inactivo desde aquí si es necesario
+      const res = await fetch(`${API_BASE_URL}/api/admin/odtener_clientes`);
+      const data = await res.json();
+      const formateados = data.map(c => ({
+        id: c.id,
+        tipoDocumento: c.tipo_Doc,
+        documento: c.doc,
+        nombreCompleto: c.nombre,
+        fechaNacimiento: c.fecha_Nac,
+        telefono: c.tel,
+        email: c.email,
+        direccion: c.direccion,
+        activo: true,
       }));
-
-      setClientes(clientesFormateados);
+      setClientes(formateados);
     } catch (error) {
-      console.error("Error cargando clientes:", error);
+      console.error("Error:", error);
     }
   };
 
-  // ✅ useEffect para cargar al iniciar el componente
   useEffect(() => {
     cargarClientes();
   }, []);
 
-  // 🔍 Filtrar clientes por búsqueda
-  const filteredClientes = clientes.filter(cliente =>
-    cliente.nombreCompleto.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    cliente.documento.includes(searchTerm)
-  );
-  // ✅ Cambiar estado (activo/inactivo)
-  const toggleEstado = (id) => {
-    setClientes(clientes.map(cliente =>
-      cliente.id === id ? { ...cliente, activo: !cliente.activo } : cliente
-    ));
+  const abrirModalEdicion = (cliente) => {
+    setClienteActual(cliente);
+    setFormEdit({
+      nombre: cliente.nombreCompleto,
+      fechaNacimiento: cliente.fechaNacimiento,
+      telefono: cliente.telefono,
+      email: cliente.email,
+      direccion: cliente.direccion
+    });
+    setModalVisible(true);
   };
-  
+
+  const guardarCambios = async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/admin/actualizar_cliente/${clienteActual.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          nombre: formEdit.nombre,
+          fecha_Nac: formEdit.fechaNacimiento,
+          tel: formEdit.telefono,
+          email: formEdit.email,
+          direccion: formEdit.direccion,
+        })
+      });
+
+      if (!res.ok) throw new Error("Error al actualizar cliente");
+      alert("Cliente actualizado con éxito");
+      setModalVisible(false);
+      cargarClientes();
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Error al guardar cambios");
+    }
+  };
+
+  const filteredClientes = clientes.filter(c =>
+    c.nombreCompleto.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    c.documento.includes(searchTerm)
+  );
 
   return (
     <AdminLayout>
-      <div className="clientes-container">
-        <div className="clientes-header">
-          <h1>panel para la gestion de Clientes</h1>
-          <div className="clientes-actions">
+      <div className="clientes">
+        <div className="clientes_prin">
+          <h1>Gestión de Clientes</h1>
+          <div className="clientes-acciones">
             <div className="search-bar">
               <Search size={18} />
-              <input 
-                type="text" 
-                placeholder="Buscar cliente..." 
+              <input
+                type="text"
+                placeholder="Buscar cliente..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -73,70 +103,40 @@ function RegistroClientes() {
           </div>
         </div>
 
-        <div className="clientes-table-container">
-          <table className="clientes-table">
-           <thead>
+        <div className="clientes-tabla">
+          <table className="clientes-tabla1">
+            <thead>
               <tr>
-                <th style={{ color: 'white' }}>ID</th>
-                <th style={{ color: 'white' }}>Documento</th>
-                <th style={{ color: 'white' }}>Nombre Completo</th>
-                <th style={{ color: 'white' }}>Fecha Nacimiento</th>
-                <th style={{ color: 'white' }}>Teléfono</th>
-                <th style={{ color: 'white' }}>Email</th>
-                <th style={{ color: 'white' }}>Dirección</th>
-                <th style={{ color: 'white' }}>Estado</th>
-                <th style={{ color: 'white' }}>Acciones</th>
+                <th>ID</th>
+                <th>Documento</th>
+                <th>Nombre</th>
+                <th>Nacimiento</th>
+                <th>Teléfono</th>
+                <th>Email</th>
+                <th>Dirección</th>
+                <th>Estado</th>
+                <th>Acciones</th>
               </tr>
             </thead>
             <tbody>
               {filteredClientes.map(cliente => (
                 <tr key={cliente.id}>
                   <td>{cliente.id}</td>
-                  <td>
-                    <div className="documento-cell">
-                      <span className="tipo-doc">{cliente.tipoDocumento}</span>
-                      {cliente.documento}
-                    </div>
-                  </td>
+                  <td>{cliente.tipoDocumento} {cliente.documento}</td>
                   <td>{cliente.nombreCompleto}</td>
                   <td>{new Date(cliente.fechaNacimiento).toLocaleDateString()}</td>
+                  <td><Phone size={16} /> {cliente.telefono}</td>
+                  <td><AtSign size={16} /> {cliente.email}</td>
+                  <td><MapPin size={16} /> {cliente.direccion}</td>
                   <td>
-                    <div className="telefono-cell">
-                      <Phone size={16} />
-                      {cliente.telefono}
-                    </div>
-                  </td>
-                  <td>
-                    <div className="email-cell">
-                      <AtSign size={16} />
-                      {cliente.email}
-                    </div>
-                  </td>
-                  <td>
-                    <div className="direccion-cell">
-                      <MapPin size={16} />
-                      {cliente.direccion}
-                    </div>
-                  </td>
-                  <td>
-                    <button 
-                      onClick={() => toggleEstado(cliente.id)}
-                      className={`status-btn ${cliente.activo ? 'active' : 'inactive'}`}
-                    >
-                      {cliente.activo ? (
-                        <ToggleRight size={20} />
-                      ) : (
-                        <ToggleLeft size={20} />
-                      )}
+                    <button className={`status-btn ${cliente.activo ? 'active' : 'inactive'}`}>
+                      {cliente.activo ? <ToggleRight size={20} /> : <ToggleLeft size={20} />}
                       {cliente.activo ? 'Activo' : 'Inactivo'}
                     </button>
                   </td>
-                  <td className="actions-cell">
-                    <button className="btn-edit">
+                  <td>
+                    <button className="btn-editar" onClick={() => abrirModalEdicion(cliente)}>
                       <Edit size={18} />
-                    </button>
-                    <button className="btn-delete">
-                      <Trash2 size={18} />
                     </button>
                   </td>
                 </tr>
@@ -144,11 +144,56 @@ function RegistroClientes() {
             </tbody>
           </table>
         </div>
+
+        {/* MODAL EDICIÓN */}
+        {modalVisible && (
+            <div className="actualizar">
+              <div className="form_actualizar">
+                <button className="botons-close" onClick={() => setModalVisible(false)}>
+                  <X size={20} />
+                </button>
+
+                {/* Columna izquierda: Logo y nombre */}
+                <div className="menu">
+                  <img src="https://raw.githubusercontent.com/Nore0729/Img-soft-veterinario/refs/heads/main/GuzPet.png" alt="Logo Veterinaria" />
+                  <h3>Pet Lovers</h3>
+                </div>
+
+                {/* Columna derecha: Formulario */}
+                <div className="formulario">
+                  <h2>Editar Cliente</h2>
+                  <div className="campo1">
+                    <label>Nombre completo:</label>
+                    <input value={formEdit.nombre} onChange={e => setFormEdit({ ...formEdit, nombre: e.target.value })} />
+                  </div>
+                  <div className="campo2">
+                    <label>Fecha de nacimiento:</label>
+                    <input type="date" value={formEdit.fechaNacimiento} onChange={e => setFormEdit({ ...formEdit, fechaNacimiento: e.target.value })} />
+                  </div>
+                  <div className="campo3">
+                    <label>Teléfono:</label>
+                    <input value={formEdit.telefono} onChange={e => setFormEdit({ ...formEdit, telefono: e.target.value })} />
+                  </div>
+                  <div className="campo4">
+                    <label>Email:</label>
+                    <input type="email" value={formEdit.email} onChange={e => setFormEdit({ ...formEdit, email: e.target.value })} />
+                  </div>
+                  <div className="campo5">
+                    <label>Dirección:</label>
+                    <input value={formEdit.direccion} onChange={e => setFormEdit({ ...formEdit, direccion: e.target.value })} />
+                  </div>
+                  <button className="guardra_cambios" onClick={guardarCambios}>
+                    Guardar cambios
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
       </div>
     </AdminLayout>
-  )
+  );
 }
 
-export default RegistroClientes; 
-
+export default RegistroClientes;
 

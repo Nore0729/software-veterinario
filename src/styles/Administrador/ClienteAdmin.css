@@ -429,27 +429,453 @@
 .clientes-table tbody tr:hover .status-btn {
   transform: scale(1.02);
 }
-
-/* Transiciones suaves para todos los elementos interactivos */
-* {
-  transition: var(--transition);
+/* Modal Overlay - Actualizar */
+.actualizar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeInModal 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Scrollbar personalizado para la tabla */
-.clientes-table-container::-webkit-scrollbar {
-  height: 8px;
+@keyframes fadeInModal {
+  from {
+    opacity: 0;
+    backdrop-filter: blur(0px);
+  }
+  to {
+    opacity: 1;
+    backdrop-filter: blur(8px);
+  }
 }
 
-.clientes-table-container::-webkit-scrollbar-track {
-  background: var(--background-color);
-  border-radius: var(--border-radius-sm);
+/* Modal Container */
+.form_actualizar {
+  background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+  border-radius: 28px;
+  box-shadow: 
+    0 32px 64px -12px rgba(0, 0, 0, 0.25),
+    0 0 0 1px rgba(255, 255, 255, 0.9),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  width: 90%;
+  max-width: 520px;
+  max-height: 90vh;
+  overflow: hidden;
+  position: relative;
+  animation: modalSlideIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.clientes-table-container::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
-  border-radius: var(--border-radius-sm);
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(60px) scale(0.9) rotateX(10deg);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1) rotateX(0deg);
+  }
 }
 
-.clientes-table-container::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(135deg, var(--primary-hover) 0%, var(--primary-color) 100%);
+/* Close Button */
+.botons-close {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  background: rgba(255, 255, 255, 0.95);
+  border: none;
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 15;
+  box-shadow: 
+    0 4px 16px rgba(0, 0, 0, 0.12),
+    0 2px 4px rgba(0, 0, 0, 0.08);
+  color: #64748b;
+}
+
+.botons-close:hover {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+  transform: rotate(90deg) scale(1.1);
+  box-shadow: 
+    0 8px 25px rgba(239, 68, 68, 0.4),
+    0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.botons-close:active {
+  transform: rotate(90deg) scale(0.95);
+}
+
+/* Header Section with Logo - Menu */
+.menu {
+  background: linear-gradient(135deg, #abbaff 0%, #64a2dd 50%, #295ce9 100%);
+  padding: 48px 30px 36px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.menu::before {
+  content: '';
+  position: absolute;
+  top: -60%;
+  left: -60%;
+  width: 220%;
+  height: 220%;
+  background: 
+    radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 70% 70%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+  animation: floatBackground 25s ease-in-out infinite;
+}
+
+@keyframes floatBackground {
+  0%, 100% {
+    transform: rotate(0deg) scale(1);
+  }
+  50% {
+    transform: rotate(180deg) scale(1.1);
+  }
+}
+
+.menu img {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  border: 5px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.15);
+  padding: 10px;
+  margin-bottom: 20px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  z-index: 3;
+  box-shadow: 
+    0 12px 40px rgba(0, 0, 0, 0.2),
+    0 4px 16px rgba(0, 0, 0, 0.1),
+    inset 0 2px 4px rgba(255, 255, 255, 0.2);
+}
+
+.menu img:hover {
+  transform: scale(1.08) rotate(-3deg);
+  box-shadow: 
+    0 20px 60px rgba(0, 0, 0, 0.3),
+    0 8px 24px rgba(0, 0, 0, 0.15),
+    inset 0 2px 4px rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.menu h3 {
+  color: white;
+  font-size: 28px;
+  font-weight: 800;
+  margin: 0;
+  text-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.3),
+    0 4px 16px rgba(0, 0, 0, 0.2);
+  position: relative;
+  z-index: 3;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* Form Section - Formulario */
+.formulario {
+  padding: 44px 32px 36px;
+  background: white;
+  position: relative;
+}
+
+.formulario::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #abbaff,#64a2dd,#295ce9);
+}
+
+.formulario h2 {
+  color: #1e293b;
+  font-size: 32px;
+  font-weight: 800;
+  margin: 0 0 36px 0;
+  text-align: center;
+  background: linear-gradient(135deg,#abbaff, #295ce9);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  position: relative;
+}
+
+.formulario h2::after {
+  content: '';
+  position: absolute;
+  bottom: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, #66baea, #6f93f5);
+  border-radius: 2px;
+}
+
+/* Form Fields */
+.campo1, .campo2, .campo3, .campo4, .campo5 {
+  margin-bottom: 28px;
+  position: relative;
+}
+
+.campo1 label, .campo2 label, .campo3 label, .campo4 label, .campo5 label {
+  display: block;
+  color: #334155;
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  position: relative;
+}
+
+.campo1 label::before, .campo2 label::before, .campo3 label::before, 
+.campo4 label::before, .campo5 label::before {
+  content: '';
+  position: absolute;
+  left: -8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 16px;
+  background: linear-gradient(135deg, #66baea,  #6f93f5);
+  border-radius: 2px;
+}
+
+.campo1 input, .campo2 input, .campo3 input, .campo4 input, .campo5 input {
+  width: 100%;
+  padding: 18px 24px;
+  background: linear-gradient(145deg, #f8fafc 0%, #f1f5f9 100%);
+  border: 2px solid #e2e8f0;
+  border-radius: 20px;
+  font-size: 16px;
+  color: #1e293b;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-sizing: border-box;
+  font-weight: 500;
+}
+
+.campo1 input:focus, .campo2 input:focus, .campo3 input:focus, 
+.campo4 input:focus, .campo5 input:focus {
+  outline: none;
+  border-color: #667eea;
+  background: white;
+  box-shadow: 
+    0 0 0 6px rgba(102, 126, 234, 0.1),
+    0 12px 32px -8px rgba(102, 126, 234, 0.25),
+    inset 0 2px 4px rgba(255, 255, 255, 0.8);
+  transform: translateY(-3px) scale(1.02);
+}
+
+.campo1 input:hover:not(:focus), .campo2 input:hover:not(:focus), 
+.campo3 input:hover:not(:focus), .campo4 input:hover:not(:focus), 
+.campo5 input:hover:not(:focus) {
+  border-color: #cbd5e1;
+  background: white;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+/* Save Button */
+.guardra_cambios {
+  width: 100%;
+  padding: 20px;
+  background: linear-gradient(135deg,  #66baea 0%, #6f93f5 50%, #4d5bdd 100%);
+  color: white;
+  border: none;
+  border-radius: 20px;
+  font-size: 17px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-top: 24px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 
+    0 12px 32px -8px rgba(102, 126, 234, 0.4),
+    0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.guardra_cambios::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.6s ease;
+}
+
+.guardra_cambios:hover::before {
+  left: 100%;
+}
+
+.guardra_cambios:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 
+    0 20px 48px -8px rgba(102, 126, 234, 0.6),
+    0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.guardra_cambios:active {
+  transform: translateY(-2px) scale(0.98);
+  box-shadow: 
+    0 8px 24px -8px rgba(102, 126, 234, 0.5),
+    0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .form_actualizar {
+    width: 95%;
+    margin: 10px;
+    max-height: 95vh;
+    border-radius: 24px;
+  }
+  
+  .botons-close {
+    top: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+  }
+  
+  .menu {
+    padding: 40px 24px 28px;
+  }
+  
+  .menu img {
+    width: 70px;
+    height: 70px;
+    padding: 8px;
+  }
+  
+  .menu h3 {
+    font-size: 24px;
+  }
+  
+  .formulario {
+    padding: 36px 24px 28px;
+  }
+  
+  .formulario h2 {
+    font-size: 28px;
+    margin-bottom: 28px;
+  }
+  
+  .campo1, .campo2, .campo3, .campo4, .campo5 {
+    margin-bottom: 24px;
+  }
+  
+  .campo1 input, .campo2 input, .campo3 input, .campo4 input, .campo5 input {
+    padding: 16px 20px;
+    font-size: 15px;
+  }
+  
+  .guardra_cambios {
+    padding: 18px;
+    font-size: 16px;
+    margin-top: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .form_actualizar {
+    width: 98%;
+    margin: 5px;
+    border-radius: 20px;
+  }
+  
+  .menu {
+    padding: 32px 20px 24px;
+  }
+  
+  .menu img {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .menu h3 {
+    font-size: 22px;
+  }
+  
+  .formulario {
+    padding: 28px 20px 24px;
+  }
+  
+  .formulario h2 {
+    font-size: 24px;
+  }
+}
+
+/* Smooth scrolling for overflow content */
+.form_actualizar {
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f1f5f9;
+}
+
+.form_actualizar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.form_actualizar::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.form_actualizar::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #cbd5e1, #94a3b8);
+  border-radius: 3px;
+}
+
+.form_actualizar::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #94a3b8, #64748b);
+}
+
+/* Loading animation for button */
+.guardra_cambios.loading {
+  pointer-events: none;
+  opacity: 0.8;
+}
+
+.guardra_cambios.loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
 }

@@ -85,8 +85,8 @@ export default function RegistroUsu() {
     }
     if (!formData.doc) {
       newErrors.doc = "El número de documento es obligatorio";
-    } else if (formData.doc.length < 6) {
-      newErrors.doc = "El documento debe tener al menos 6 dígitos";
+    } else if (formData.doc.length < 8) {
+      newErrors.doc = "El documento debe tener al menos 8 dígitos";
     }
     if (!formData.nombre) {
       newErrors.nombre = "El nombre es obligatorio";

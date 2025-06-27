@@ -266,6 +266,66 @@ module.exports = function (db) {
     });
 
     //**************************************************************************/
+     //********************ACTUALIZAR A SOLO LOS USUARIO CLIENTES***************/
+    //**************************************************************************/
+
+    
+    router.put('/actualizar_cliente/:id', async (req, res) => {
+        const { id } = req.params;
+        const { nombre, fecha_Nac, tel, email, direccion } = req.body;
+        try {
+            // Validación básica
+            if (!nombre || !email) {
+                return res.status(400).json({ error: 'Nombre y correo electrónico son obligatorios' });
+            }
+            const [result] = await db.promise().query(
+                `UPDATE usuarios 
+                 SET nombre = ?, fecha_Nac = ?, tel = ?, email = ?, direccion = ?
+                 WHERE id = ?`,
+                [nombre, fecha_Nac, tel, email, direccion, id]
+            );
+            if (result.affectedRows === 0) {
+                return res.status(404).json({ error: 'Cliente no encontrado' });
+            }
+            res.status(200).json({ mensaje: 'Datos del cliente actualizados correctamente' });
+        } catch (error) {
+            console.error('Error al actualizar cliente:', error);
+            res.status(500).json({ error: 'Error en el servidor al actualizar el cliente' });
+        }
+    });
+
+
+    //**************************************************************************/
+    //******************ACTUALIZAR A SOLO LOS USUARIO VETERINARIOS**************/
+    //**************************************************************************/
+    
+    router.put('/actualizar_vet/:id', async (req, res) => {
+        const { id } = req.params;
+        const { nombre, fecha_Nac, tel, email, direccion } = req.body;
+        try {
+            // Validación básica
+            if (!nombre || !email) {
+                return res.status(400).json({ error: 'Nombre y correo electrónico son obligatorios' });
+            }
+            const [result] = await db.promise().query(
+                `UPDATE usuarios 
+                 SET nombre = ?, fecha_Nac = ?, tel = ?, email = ?, direccion = ?
+                 WHERE id = ?`,
+                [nombre, fecha_Nac, tel, email, direccion, id]
+            );
+            if (result.affectedRows === 0) {
+                return res.status(404).json({ error: 'Cliente no encontrado' });
+            }
+            res.status(200).json({ mensaje: 'Datos del cliente actualizados correctamente' });
+        } catch (error) {
+            console.error('Error al actualizar cliente:', error);
+            res.status(500).json({ error: 'Error en el servidor al actualizar el cliente' });
+        }
+    });
+
+
+
+    //**************************************************************************/
      //*****************TRAER A SOLO LOS USUARIO veterinarios*******************/
     //**************************************************************************/
     
