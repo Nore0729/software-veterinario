@@ -1,3 +1,4 @@
+-- Active: 1750450606850@@127.0.0.1@3306@veterinaria
 DROP DATABASE IF EXISTS veterinaria;
 CREATE DATABASE veterinaria;
 USE veterinaria;
@@ -13,13 +14,7 @@ CREATE TABLE usuarios (
     email VARCHAR(100) NOT NULL UNIQUE,
     direccion VARCHAR(255),
     password VARCHAR(255) NOT NULL,
-    fecha_Regis TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE propietarios (
-    id_prop INT PRIMARY KEY,
-    FOREIGN KEY (id_prop) REFERENCES usuarios(id) ON DELETE CASCADE
-);
+    fecha_Regis TIMESTAMP DEFAULT 
 
 CREATE TABLE veterinarios (
     vet_id INT PRIMARY KEY,
@@ -82,10 +77,8 @@ CREATE TABLE citas (
   id INT AUTO_INCREMENT PRIMARY KEY,
   propietario_doc VARCHAR(50) NOT NULL,          
   mascota_id INT NOT NULL,                        
-  mascota_nombre VARCHAR(100) NOT NULL,         
   servicio VARCHAR(100) NOT NULL,                
   veterinario_id INT NOT NULL,                    
-  veterinario_nombre VARCHAR(100) NOT NULL,      
   fecha DATE NOT NULL,                            
   hora TIME NOT NULL,                             
   notas TEXT,                                    

@@ -257,7 +257,7 @@ module.exports = function (db) {
                 SELECT u.*
                 FROM usuarios u
                 JOIN propietarios p ON u.doc = p.id_prop
-            `);0
+            `);
             res.status(200).json(clientes);
         } catch (error) {
             console.error('Error al obtener clientes:', error);
