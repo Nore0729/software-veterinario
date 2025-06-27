@@ -367,3 +367,40 @@ input[type="email"]:focus:valid {
 .password-input-container:focus-within + .password-strength {
   transform: scaleX(1);
 }
+
+/* Mensaje de éxito */
+.success-message-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80vh;
+  background-color: #f8f9fa;
+}
+
+.success-message-box {
+  text-align: center;
+  padding: 2rem;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  max-width: 500px;
+  width: 100%;
+  border: 2px solid #28a745;
+}
+
+.success-icon {
+  font-size: 4rem;
+  color: #28a745;
+  margin-bottom: 1rem;
+}
+
+.success-message-box h2 {
+  color: #28a745;
+  margin-bottom: 1rem;
+  font-size: 1.8rem;
+}
+
+.success-message-box p {
+  font-size: 1.1rem;
+  margin: 0.5rem 0;
+}

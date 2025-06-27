@@ -43,7 +43,82 @@ module.exports = function(db) {
     });
   });
 
-  // RESET PASSWORD
+   //**************************************************************************/
+    //*******************para que verifique login segun el rol *****************/
+    //**************************************************************************/
+
+  router.post('/login_con_roles', (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).json({ message: 'Email y contraseña son requeridos' });
+  }
+
+  // Primero buscar al usuario en la tabla usuarios
+  const userQuery = 'SELECT * FROM usuarios WHERE email = ?';
+  
+  db.query(userQuery, [email], async (err, userResults) => {
+    if (err) {
+      console.error('Error en la consulta:', err);
+      return res.status(500).json({ message: 'Error del servidor' });
+    }
+
+    if (userResults.length === 0) {
+      return res.status(401).json({ message: 'Usuario no encontrado' });
+    }
+
+    const user = userResults[0];
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    
+    if (!passwordMatch) {
+      return res.status(401).json({ message: 'Contraseña incorrecta' });
+    }
+
+    // Verificar en qué tablas de roles existe el usuario
+    const docUsuario = user.doc;
+    let rol = '';
+
+    // Consultar todas las tablas de roles en paralelo
+    try {
+      const [propietarioResult, veterinarioResult, adminResult] = await Promise.all([
+        db.promise().query('SELECT 1 FROM propietarios WHERE id_prop = ?', [docUsuario]),
+        db.promise().query('SELECT 1 FROM veterinarios WHERE vet_id = ?', [docUsuario]),
+        db.promise().query('SELECT 1 FROM administradores WHERE admin_id = ?', [docUsuario])
+      ]);
+
+      // Determinar el rol (prioridad: admin > veterinario > propietario)
+      if (adminResult[0].length > 0) {
+        rol = 'administrador';
+      } else if (veterinarioResult[0].length > 0) {
+        rol = 'veterinario';
+      } else if (propietarioResult[0].length > 0) {
+        rol = 'cliente';
+      } else {
+        return res.status(401).json({ message: 'Usuario no tiene un rol asignado' });
+      }
+
+      return res.status(200).json({
+        message: 'Login exitoso',
+        usuario: {
+          id: user.id,
+          doc: user.doc,
+          nombre: user.nombre,
+          email: user.email,
+          rol: rol
+        }
+      });
+
+    } catch (error) {
+      console.error('Error al verificar roles:', error);
+      return res.status(500).json({ message: 'Error al verificar roles del usuario' });
+    }
+  });
+});
+
+  //*********************************************** */
+  // ***************RESET PASSWORD*****************
+  //*********************************************** */
+
   router.post('/reset-password', async (req, res) => {
     const { email, newPassword } = req.body;
 

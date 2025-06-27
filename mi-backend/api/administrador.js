@@ -305,73 +305,34 @@ module.exports = function (db) {
     })
 
     //**************************************************************************/
-    //*******************para que verifique login segun el rol *****************/
+     //******************Odtener cuantos administradores hay********************/
     //**************************************************************************/
+        router.get("/admin_registrados", (req, res) => {
+            const query = "SELECT COUNT(*) AS total_administradores FROM administradores;";
 
-    router.post("/login_rol", async (req, res) => {
-        const { email, password } = req.body;
-        try {
-          // Buscar usuario por correo
-          const [usuarios] = await db.promise().query(
-            "SELECT * FROM usuarios WHERE email = ?",
-            [email]
-          );
-          if (usuarios.length === 0) {
-            return res.status(404).json({ mensaje: "Usuario no encontrado" });
-          }
-          const usuario = usuarios[0];
-          // Validar la contraseña
-          const passwordValida = await bcrypt.compare(password, usuario.password);
-          if (!passwordValida) {
-            return res.status(401).json({ mensaje: "Contraseña incorrecta" });
-          }
-          // Verificar a qué rol pertenece
-          const [admin] = await db.promise().query(
-            "SELECT * FROM administradores WHERE admin_id = ?",
-            [usuario.doc]
-          );
-          const [veterinario] = await db.promise().query(
-            "SELECT * FROM veterinarios WHERE vet_id = ?",
-            [usuario.doc]
-          );
-          const [propietario] = await db.promise().query(
-            "SELECT * FROM propietarios WHERE id_prop = ?",
-            [usuario.doc]
-          );
-          let rol = null;
-          if (admin.length > 0) {
-            rol = "administrador";
-          } else if (veterinario.length > 0) {
-            rol = "veterinario";
-          } else if (propietario.length > 0) {
-            rol = "propietario";
-          } else {
-            return res.status(403).json({ mensaje: "El usuario no tiene un rol asignado" });
-          }
-          res.json({
-            mensaje: "Inicio de sesión exitoso",
-            usuario: {
-              nombre: usuario.nombre,
-              email: usuario.email,
-              doc: usuario.doc,
-              rol: rol,
-            },
-          });
-        } catch (error) {
-          console.error("Error en login:", error);
-          res.status(500).json({ mensaje: "Error en el servidor" });
-        }
-      });
-    
-    
+            db.query(query, (err, results) => {
+                if (err) {
+                  console.error("Error al obtener la cantidad de administradores:", err);
+                  return res.status(500).json({ message: "Hubo un problema al obtener los administradores" });
+                }
+                res.status(200).json(results);
+            });
+        });
 
-    
-
-
-
-
-
-
+    //**************************************************************************/
+     //******************Odtener cuantos veterinarios  hay*********************/
+    //**************************************************************************/
+        router.get("/vet_registrados", (req, res) => {
+            const query = "SELECT COUNT(*) AS total_veterinarios FROM veterinarios;";
+        
+            db.query(query, (err, results) => {
+                if (err) {
+                    console.error("Error al obtener la cantidad de veterinarios:", err);
+                    return res.status(500).json({ message: "Hubo un problema al obtener los veterinarios" });
+                }
+                res.status(200).json(results);
+            });
+        });
 
     return router;
 }

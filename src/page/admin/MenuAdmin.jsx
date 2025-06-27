@@ -64,7 +64,7 @@ function MenuAdmin({ children }) {
                 <ChevronDown className="admin-dashboard-profile-chevron" size={16} />
               </div>
               <div className={`admin-dashboard-profile-dropdown ${profileDropdownOpen ? "admin-dashboard-dropdown-show" : ""}`}>
-                <a href="/perfil" className="admin-dashboard-dropdown-item">
+                <a href="/Miperfil" className="admin-dashboard-dropdown-item">
                   <User size={16} />
                   <span>Mi Perfil</span>
                 </a>

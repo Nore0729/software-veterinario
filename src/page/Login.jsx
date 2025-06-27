@@ -4,6 +4,8 @@ import axios from 'axios';
 import '../styles/Login.css';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
+ const API_BASE_URL = "http://localhost:3000";
+
 export const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -13,6 +15,7 @@ export const Login = () => {
   const [failedAttempts, setFailedAttempts] = useState(0);
   const [isBlocked, setIsBlocked] = useState(false);
   const [countdown, setCountdown] = useState(60);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -43,6 +46,39 @@ export const Login = () => {
     }
   };
 
+  const handleLoginSuccess = (userData, fromNewAPI = false) => {
+    // Maneja respuesta de ambas APIs
+    const user = fromNewAPI ? userData.usuario : userData;
+    const { nombre, email: userEmail, rol, doc } = user;
+    
+    if (nombre && userEmail) {
+      localStorage.setItem('nombre', nombre);
+      localStorage.setItem('email', userEmail);
+      if (doc) localStorage.setItem('doc_pro', doc);
+      if (rol) localStorage.setItem('rol', rol);
+    } else {
+      throw new Error('Datos de usuario incompletos');
+    }
+
+    setErrorGeneral('');
+    setFailedAttempts(0);
+
+    // Redirección basada en rol
+    switch(rol) {
+      case 'propietario':
+        navigate('/UserWelcome');
+        break;
+      case 'veterinario':
+        navigate('/VeterinarioPer');
+        break;
+      case 'administrador':
+        navigate('/InicioAdmin');
+        break;
+      default:
+        navigate('/UserWelcome');
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -56,69 +92,48 @@ export const Login = () => {
       return;
     }
 
+    setIsLoading(true);
+    setErrorGeneral('');
+
     try {
-      // ✅ Primer intento con tu API antigua
-      const response = await axios.post('/api/auth/login', {
-        email,
-        password,
-      });
-
-      const { nombre, email: userEmail, rol, doc } = response.data;
-
-      if (!nombre || !userEmail) {
-        throw new Error('Datos de usuario incompletos desde backend');
-      }
-
-      localStorage.setItem('nombre', nombre);
-      localStorage.setItem('email', userEmail);
-      localStorage.setItem('doc_pro', doc);
-      localStorage.setItem('rol', rol || '');
-
-      setErrorGeneral('');
-      setFailedAttempts(0);
-
-      if (rol === 'propietario') navigate('/UserWelcome');
-      else if (rol === 'veterinario') navigate('/VeterinarioPer');
-      else if (rol === 'administrador') navigate('/InicioAdmin');
-      else navigate('/UserWelcome');
-
-    } catch (err) {
-      console.error('Error en login backend viejo:', err);
-
-      // ✅ Segundo intento con la API que verifica el rol directamente
+      // 1. Primero intentamos con la API original
       try {
-        const response = await axios.post('http://localhost:3000/login_rol', {
+        const response = await axios.post('/api/auth/login', {
           email,
           password,
         });
-
-        const { nombre, email: userEmail, rol, doc } = response.data.usuario;
-
-        localStorage.setItem('nombre', nombre);
-        localStorage.setItem('email', userEmail);
-        localStorage.setItem('doc_pro', doc);
-        localStorage.setItem('rol', rol);
-
-        setErrorGeneral('');
-        setFailedAttempts(0);
-
-        if (rol === 'propietario') navigate('/UserWelcome');
-        else if (rol === 'veterinario') navigate('/VeterinarioPer');
-        else if (rol === 'administrador') navigate('/InicioAdmin');
-        else navigate('/UserWelcome');
-
-      } catch (error) {
-        console.error('Error en login_rol:', error);
-
-        const attempts = failedAttempts + 1;
-        setFailedAttempts(attempts);
-        if (attempts >= 3) {
-          setIsBlocked(true);
-          setCountdown(60);
-        } else {
-          setErrorGeneral(`Credenciales incorrectas. Intentos restantes: ${3 - attempts}`);
-        }
+        handleLoginSuccess(response.data);
+        return;
+      } catch (oldApiError) {
+        console.warn('Error en API antigua:', oldApiError);
+        // Si falla, continuamos con la nueva API
       }
+
+       // ✅ 2. Intento con la nueva API que sí valida el rol
+        const response = await axios.post(`${API_BASE_URL}/api/auth/login_con_roles`, {
+          email,
+          password,
+        });
+      handleLoginSuccess(response.data, true);
+      
+    } catch (error) {
+      console.error('Error en login:', error);
+      
+      const attempts = failedAttempts + 1;
+      setFailedAttempts(attempts);
+      
+      if (attempts >= 3) {
+        setIsBlocked(true);
+        setCountdown(60);
+        setErrorGeneral('Demasiados intentos fallidos. Cuenta bloqueada temporalmente.');
+      } else {
+        const errorMessage = error.response?.data?.mensaje || 
+                           error.message || 
+                           'Credenciales incorrectas';
+        setErrorGeneral(`${errorMessage}. Intentos restantes: ${3 - attempts}`);
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -154,7 +169,7 @@ export const Login = () => {
               onChange={handleEmailChange}
               placeholder="ejemplo@vet.com"
               autoComplete="username"
-              disabled={isBlocked}
+              disabled={isBlocked || isLoading}
             />
             {emailError && <p className="error-message">{emailError}</p>}
           </div>
@@ -168,12 +183,12 @@ export const Login = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 autoComplete="current-password"
-                disabled={isBlocked}
+                disabled={isBlocked || isLoading}
               />
               <span
                 className="password-toggle-icon"
-                onClick={() => !isBlocked && setShowPassword(!showPassword)}
-                style={{ cursor: isBlocked ? 'not-allowed' : 'pointer' }}
+                onClick={() => !isBlocked && !isLoading && setShowPassword(!showPassword)}
+                style={{ cursor: isBlocked || isLoading ? 'not-allowed' : 'pointer' }}
               >
                 {showPassword ? <FaEyeSlash /> : <FaEye />}
               </span>
@@ -184,10 +199,16 @@ export const Login = () => {
 
           <button
             type="submit"
-            disabled={isBlocked}
-            className={isBlocked ? 'blocked-button' : ''}
+            disabled={isBlocked || isLoading}
+            className={`login-button ${isBlocked ? 'blocked-button' : ''} ${isLoading ? 'loading-button' : ''}`}
           >
-            {isBlocked ? 'CUENTA BLOQUEADA' : 'Iniciar Sesión'}
+            {isLoading ? (
+              <span className="loading-spinner"></span>
+            ) : isBlocked ? (
+              'CUENTA BLOQUEADA'
+            ) : (
+              'Iniciar Sesión'
+            )}
           </button>
         </form>
 

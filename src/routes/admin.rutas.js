@@ -10,6 +10,8 @@ import Clientes from '../page/admin/Clientes';
 import Roles from '../page/admin/Roles';
 import Veterinarios from '../page/admin/Veterinarios';
 import ServiciosAdmin from '../page/admin/ServiciosAdmin';
+import Miperfil from '../page/admin/Miperfil';
+
 
 const AdminRoutes = () => (
   <>
@@ -21,6 +23,7 @@ const AdminRoutes = () => (
     <Route path="/Roles" element={<Roles />} />
     <Route path="/Veterinarios" element={<Veterinarios />} />
     <Route path="/ServiciosAdmin" element={<ServiciosAdmin />} />
+    <Route path="/Miperfil" element={<Miperfil />} />
   </>
 );
 

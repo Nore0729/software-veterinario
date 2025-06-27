@@ -1,9 +1,9 @@
-import AdminLayout from "../../layout/AdminLayout";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSave, faTimes, faCalendarAlt, faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
-import "../../styles/Administrador//FormUsu.css";
+import { faSave, faTimes, faCalendarAlt, faEye, faEyeSlash, faCheckCircle } from "@fortawesome/free-solid-svg-icons";
+import AdminLayout from "../../layout/AdminLayout";
+import "../../styles/Administrador/FormUsu.css";
 
 export default function RegistroUsu() {
   const navigate = useNavigate();
@@ -21,6 +21,11 @@ export default function RegistroUsu() {
 
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [registrationSuccess, setRegistrationSuccess] = useState({
+    show: false,
+    message: "",
+    userName: ""
+  });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -132,13 +137,11 @@ export default function RegistroUsu() {
     return Object.keys(newErrors).length === 0;
   };
 
-  // --- FUNCIÓN handleSubmit CORREGIDA Y MEJORADA ---
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
   
     setIsSubmitting(true);
-    // Limpia errores de envíos anteriores para no confundir al usuario
     setErrors((prev) => ({ ...prev, submit: null }));
   
     try {
@@ -164,32 +167,35 @@ export default function RegistroUsu() {
       const result = await res.json();
   
       if (!res.ok) {
-        // Lanza un error con el mensaje del backend si la respuesta no es exitosa
         throw new Error(result.message || "Error al registrar el usuario");
       }
   
-      // Si todo sale bien
-      alert(result.message || "Usuario registrado exitosamente");
-  
-      // Limpia el formulario
-      setFormData({
-        tipo_Doc: "CC",
-        doc: "",
-        nombre: "",
-        fecha_Nac: "",
-        tel: "",
-        email: "",
-        direccion: "",
-        password: "",
-        showPassword: false,
+      // Mostrar mensaje de éxito
+      setRegistrationSuccess({
+        show: true,
+        message: "¡REGISTRO EXITOSO!",
+        userName: formData.nombre
       });
   
-      // Redirige al usuario
-      navigate("/InicioAdmin");
+      // Limpiar formulario después de 3 segundos
+      setTimeout(() => {
+        setFormData({
+          tipo_Doc: "CC",
+          doc: "",
+          nombre: "",
+          fecha_Nac: "",
+          tel: "",
+          email: "",
+          direccion: "",
+          password: "",
+          showPassword: false,
+        });
+        setRegistrationSuccess({ show: false, message: "", userName: "" });
+        navigate("/InicioAdmin");
+      }, 3000);
   
     } catch (error) {
       console.error("Error en handleSubmit:", error);
-      // Muestra el error específico del backend en el formulario
       setErrors((prev) => ({
         ...prev,
         submit: error.message || "No se pudo conectar con el servidor",
@@ -199,13 +205,27 @@ export default function RegistroUsu() {
     }
   };
 
+  if (registrationSuccess.show) {
+    return (
+      <AdminLayout>
+        <div className="success-message-container">
+          <div className="success-message-box">
+            <FontAwesomeIcon icon={faCheckCircle} className="success-icon" />
+            <h2>{registrationSuccess.message}</h2>
+            <p>El usuario <strong>{registrationSuccess.userName}</strong> se ha registrado correctamente.</p>
+            <p>Serás redirigido automáticamente...</p>
+          </div>
+        </div>
+      </AdminLayout>
+    );
+  }
+
   return (
     <AdminLayout>
       <div className="registro-container">
         <h2 className="titulo-formulario">Registro de usuarios</h2>
 
         <form onSubmit={handleSubmit} className="formulario-registro">
-          {/* Muestra el error de envío si existe */}
           {errors.submit && <div className="error-message">{errors.submit}</div>}
 
           <div className="form-row">
