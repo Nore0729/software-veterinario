@@ -34,26 +34,30 @@ const AgendarCita = () => {
     "17:30", "18:00"
   ];
 
+  
   useEffect(() => {
     const cargarDatos = async () => {
       const doc = localStorage.getItem("doc_pro");
       if (!doc) return;
-
+  
       try {
-        const [mascotasRes, serviciosRes, veterinariosRes, citasRes] = await Promise.all([
-          axios.get(`http://localhost:3000/api/mascotas/propietario/${doc}`),
-          axios.get('http://localhost:3000/api/servicios'),
-          // axios.get('http://localhost:3000/api/veterinarios'),
-          // axios.get(`http://localhost:3000/api/citas-existentes/${doc}`),
-        ]);
+        const mascotasRes = await axios.get(`http://localhost:3000/api/mascotas/propietario/${doc}`);
         setMascotas(mascotasRes.data);
+  
+        const serviciosRes = await axios.get('http://localhost:3000/api/servicios');
         setServicios(serviciosRes.data);
+  
+        const veterinariosRes = await axios.get('http://localhost:3000/api/veterinarios');
         setVeterinarios(veterinariosRes.data);
+  
+        const citasRes = await axios.get(`http://localhost:3000/api/citas`);
         setCitasExistentes(citasRes.data);
+  
       } catch (error) {
         console.error("Error al cargar datos:", error);
       }
     };
+  
     cargarDatos();
   }, []);
 
@@ -106,24 +110,22 @@ const AgendarCita = () => {
 
     try {
       const doc = localStorage.getItem("doc_pro");
-      const mascotaSeleccionada = mascotas.find((m) => m.id === parseInt(formData.mascota));
       const servicioSeleccionado = servicios.find((s) => s.id === parseInt(formData.servicio));
-      const veterinarioSeleccionado = veterinarios.find((v) => v.id === parseInt(formData.veterinario));
 
       const citaData = {
-        propietario_doc: doc,
-        mascota_id: formData.mascota,
-        mascota_nombre: mascotaSeleccionada?.nombre,
-        servicio: servicioSeleccionado?.nombre,
-        veterinario_id: formData.veterinario,
-        veterinario_nombre: veterinarioSeleccionado?.nombre,
-        fecha: formData.fecha,
-        hora: formData.hora,
-        notas: formData.notas,
-        estado: "programada",
+          propietario_doc: doc,
+          mascota_id: formData.mascota,
+          servicio: servicioSeleccionado?.nombre,
+          veterinario_id: formData.veterinario,
+          fecha: formData.fecha,
+          hora: formData.hora + ":00", 
+          notas: formData.notas,
+          estado: "programada",  
       };
 
-      const res = await axios.post("/api/agendar-cita", citaData);
+      console.log(citaData)
+
+      const res = await axios.post("http://localhost:3000/api/citas", citaData);
       if (!res.data) throw new Error();
 
       setMostrarConfirmacion(true);
@@ -208,9 +210,11 @@ const AgendarCita = () => {
             <label htmlFor="veterinario"><FaStethoscope /> Elija Veterinario *</label>
             <select name="veterinario" value={formData.veterinario} onChange={handleInputChange} required>
               <option value="">-- Selecciona un veterinario--</option>
-              {veterinarios.map((v) => (
-                <option key={v.id} value={v.id}>{v.nombre}</option>
-              ))}
+              {veterinarios.map((v) => {
+                return (
+                  <option key={v.vet_id} value={String(v.vet_id)}>{v.nombre}</option>
+                );
+              })}
             </select>
           </div>
 
