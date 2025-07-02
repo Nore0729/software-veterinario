@@ -1,4 +1,4 @@
--- Active: 1750450606850@@127.0.0.1@3306@veterinaria
+
 DROP DATABASE IF EXISTS veterinaria;
 CREATE DATABASE veterinaria;
 USE veterinaria;

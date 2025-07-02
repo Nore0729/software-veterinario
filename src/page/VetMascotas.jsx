@@ -200,7 +200,7 @@ const VetMascotas = () => {
           </h1>
           <p>Administra y supervisa todas las mascotas registradas en el sistema</p>
         </div>
-        <Link to="/nueva-mascota">
+        <Link to="/mascotas">
         <motion.button className="btn-nuevo" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
         <Plus size={20} />
         Nueva Mascota
