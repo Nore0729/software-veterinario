@@ -47,6 +47,26 @@ module.exports = (db) => {
     );
   });
 
+  // Obtener citas por documento de propietario (próximas citas)
+router.get('/propietario/:doc', (req, res) => {
+  const { doc } = req.params;
+
+  const sql = `
+    SELECT * FROM citas
+    WHERE propietario_doc = ? AND fecha >= CURDATE()
+    ORDER BY fecha ASC
+  `;
+
+  db.query(sql, [doc], (err, results) => {
+    if (err) {
+      console.error('Error al obtener citas por propietario:', err);
+      return res.status(500).json({ error: 'Error al obtener citas del propietario' });
+    }
+    res.status(200).json(results);
+  });
+});
+
+
   // Obtener todas las citas
   router.get('/', (req, res) => {
     const sql = `SELECT * FROM citas`;

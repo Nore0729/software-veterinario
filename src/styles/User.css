@@ -1,22 +1,17 @@
-/* ===========================
-   0) Estilos nuevos para Topbar
-   =========================== */
-
-/* Contenedor fijo en la parte superior */
 .topbar {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  height: 60px;                         /* Altura de la topbar, ajusta si quieres otro tamaño */
-  background-color: #73acf3;            /* Mismo color base que tu sidebar */
+  height: 60px;
+  background-color: #73acf3;
   color: white;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 20px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  z-index: 200;                         /* Para que quede por encima de sidebar y main-content */
+  z-index: 200;
 }
 
 .topbar-left {
@@ -50,26 +45,18 @@
   font-size: 1.1rem;
 }
 
-/* ===========================
-   1) Tu CSS original, sin cambios exc. los comentados
-   =========================== */
-
-/* Estructura Principal */
 .user-dashboard {
   display: flex;
   min-height: 100vh;
   font-family: 'Arial', sans-serif;
   background-color: #e0e7f1;
   position: relative;
-
-  /* → Sólo agregamos esto para empujar todo hacia abajo 60px */
   padding-top: 60px;
 }
 
-/* Barra lateral */
 .sidebar {
   width: 60px;
-  height: 100vh;          /* ← Cambiamos a: calc(100vh - 60px) para que no quede debajo de la topbar */
+  height: calc(100vh - 60px);
   background: #73acf3;
   color: white;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -77,22 +64,15 @@
   position: fixed;
   z-index: 100;
   border-right: 2px solid rgba(255, 255, 255, 0.1);
-
-  /* ↓ Añadimos esto para que inicie justo debajo de la topbar */
   top: 60px;
-  height: calc(100vh - 60px);
 }
 
 .sidebar.expanded {
   width: 280px;
   box-shadow: 2px 0 15px rgba(0, 0, 0, 0.2);
-
-  /* ↓ También para la versión expandida */
   top: 60px;
-  height: calc(100vh - 60px);
 }
 
-/* Perfil de usuario */
 .user-profile {
   display: flex;
   align-items: center;
@@ -120,7 +100,6 @@
   opacity: 1;
 }
 
-/* Menú */
 .side-menu {
   padding: 15px 0;
   height: calc(100vh - 80px);
@@ -178,7 +157,6 @@
   color: white;
 }
 
-/* Submenú */
 .submenu {
   background: #73acf3;
   max-height: 0;
@@ -211,7 +189,6 @@
   font-size: 14px;
 }
 
-/* Contenido principal */
 .main-content {
   flex: 1;
   padding: 30px 30px 30px 90px;
@@ -223,8 +200,6 @@
   padding-left: 310px;
 }
 
-/* Resto de tus estilos (tarjetas, listas, responsive, etc.) */
-/* Tarjetas de información */
 .dashboard-cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -254,7 +229,6 @@
   gap: 10px;
 }
 
-/* Lista de mascotas */
 .pet-list {
   margin: 15px 0;
 }
@@ -291,7 +265,6 @@
   font-size: 0.9rem;
 }
 
-/* Lista de citas */
 .appointment-list {
   list-style: none;
   padding: 0;
@@ -301,6 +274,15 @@
 .appointment-list li {
   padding: 12px 0;
   border-bottom: 1px solid #eee;
+}
+
+/* Centrado completo cuando se muestra la confirmación de cita */
+.appointment-form-container.confirmation {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 60px); /* Considera la topbar */
+  padding: 2rem;
 }
 
 .appointment-list li:last-child {
@@ -318,7 +300,6 @@
   font-size: 0.9rem;
 }
 
-/* Enlace "Ver todos" */
 .view-all {
   display: inline-block;
   margin-top: 15px;
@@ -333,29 +314,22 @@
   text-decoration: underline;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
   .sidebar {
     width: 50px;
   }
-  
   .sidebar.expanded {
     width: 250px;
   }
-  
   .main-content {
     padding-left: 80px;
   }
-  
   .sidebar.expanded ~ .main-content {
     padding-left: 260px;
   }
-  
   .dashboard-cards {
     grid-template-columns: 1fr;
   }
-
-  /* Ajustamos top y height también en móvil */
   .sidebar {
     top: 60px;
     height: calc(100vh - 60px);
@@ -372,7 +346,6 @@
     top: 60px;
     height: calc(100vh - 60px);
   }
-  
   .sidebar.expanded {
     transform: translateX(0);
     width: 80%;
@@ -380,16 +353,14 @@
     top: 60px;
     height: calc(100vh - 60px);
   }
-  
   .main-content {
     padding-left: 30px;
   }
-  
   .sidebar.expanded ~ .main-content {
     padding-left: 30px;
   }
 }
-/* Estilos específicos para el formulario de citas */
+
 .appointment-form-container {
   max-width: 800px;
   margin: 0 auto;
@@ -510,7 +481,6 @@
   color: white;
 }
 
-/* Mensajes de estado */
 .mensaje {
   padding: 12px 16px;
   border-radius: 8px;
@@ -530,7 +500,6 @@
   border: 1px solid #f5c6cb;
 }
 
-/* Confirmación de cita */
 .confirmation-card {
   text-align: center;
   padding: 40px 30px;
@@ -597,7 +566,6 @@
   height: 48px;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
   .appointment-form-container {
     padding: 0 15px;

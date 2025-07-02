@@ -101,7 +101,7 @@ const UserLayout = () => {
     <>
       <div className="topbar">
         <div className="topbar-left">
-          <span>Bienvenid@, {userData.nombre}</span>
+          <span>{userData.nombre}</span>
         </div>
         <div className="topbar-right">
           <button className="btn-logout-top" onClick={handleLogout}>

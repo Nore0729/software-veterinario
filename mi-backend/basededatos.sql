@@ -1,4 +1,3 @@
-
 DROP DATABASE IF EXISTS veterinaria;
 CREATE DATABASE veterinaria;
 USE veterinaria;
@@ -14,8 +13,11 @@ CREATE TABLE usuarios (
     email VARCHAR(100) NOT NULL UNIQUE,
     direccion VARCHAR(255),
     password VARCHAR(255) NOT NULL,
-    fecha_Regis TIMESTAMP DEFAULT 
+    fecha_Regis TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
+
+ select  * from usuarios; 
 CREATE TABLE veterinarios (
     vet_id INT PRIMARY KEY,
     especialidad VARCHAR(50) NOT NULL,
@@ -72,7 +74,7 @@ CREATE TABLE servicios (
     duracion_estimada INT COMMENT 'Duración en minutos',
     estado ENUM('Activo', 'Inactivo') DEFAULT 'Activo'
 );
-
+DROP table citas;
 CREATE TABLE citas (
   id INT AUTO_INCREMENT PRIMARY KEY,
   propietario_doc VARCHAR(50) NOT NULL,          
@@ -86,6 +88,7 @@ CREATE TABLE citas (
   fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+SELECT * FROM citas;
 
 CREATE TABLE servicios_realizados (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -125,7 +128,7 @@ CREATE TABLE historias_clinicas (
 );
 
 
-
+DROP table historias_clinicas;
 DELIMITER $$
 CREATE PROCEDURE insertar_servicio(
     IN p_nombre VARCHAR(100), IN p_descripcion TEXT, IN p_precio DECIMAL(10,2),
@@ -190,7 +193,7 @@ INSERT INTO `usuarios` (`id`, `tipo_Doc`, `doc`, `nombre`, `fecha_Nac`, `tel`, `
 
 -- Asignación de roles
 INSERT INTO `propietarios` (`id_prop`) VALUES (1), (2);
-INSERT INTO `veterinarios` (`vet_id`, `especialidad`) VALUES (3, 'Cirugía General'), (4, 'Medicina Interna');
+INSERT INTO `veterinarios` (`vet_id`, `especialidad`) VALUES (13, 'Cirugía General'), (10, 'Medicina Interna');
 
 -- Inserción de mascotas
 INSERT INTO `mascotas` (`doc_pro`, `nombre`, `especie`, `raza`, `genero`, `color`, `fecha_nac`, `peso`, `tamano`, `estado_reproductivo`, `vacunado`) VALUES

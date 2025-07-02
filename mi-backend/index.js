@@ -44,6 +44,7 @@ const veterinarioRoutes = require('./api/veterinario');
 const citasvetRoutes = require('./api/citasvet');
 const citasRoutes =require('./api/citas');
 
+
 // Montaje de todos los routers en la aplicación
 app.use('/api/admin', adminRoutes(db));
 app.use('/api/auth', authRoutes(db));
