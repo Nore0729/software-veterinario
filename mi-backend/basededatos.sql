@@ -36,16 +36,15 @@ CREATE TABLE roles (
     descripcion VARCHAR(255)
 );
 
-CREATE TABLE asignacion_roles (
+CREATE TABLE asignacion_rol (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    usu_id INT NOT NULL,
+    doc_usu VARCHAR(15) NOT NULL UNIQUE,
     rol_id INT NOT NULL,
     asignado_por INT COMMENT 'ID del admin que asignó el rol',
     fecha_asignacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (usu_id) REFERENCES usuarios(id),
-    FOREIGN KEY (rol_id) REFERENCES roles(id),
-    FOREIGN KEY (asignado_por) REFERENCES usuarios(id),
-    UNIQUE (usu_id, rol_id)
+    FOREIGN KEY (doc_usu) REFERENCES usuarios(doc) ON DELETE CASCADE,
+    FOREIGN KEY (rol_id) REFERENCES roles(id) ON DELETE CASCADE,
+    FOREIGN KEY (asignado_por) REFERENCES administradores(admin_id) ON DELETE SET NULL
 );
 
 CREATE TABLE mascotas (

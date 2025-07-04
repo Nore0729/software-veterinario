@@ -660,3 +660,113 @@ button, input, textarea, select {
 .btn-volver .fa-icon {
   margin-right: 5px;
 }
+
+/* Estilos para la asignación múltiple de roles */
+.roles-lista {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.rol-item {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-radius: 5px;
+  background-color: #f8f9fa;
+  transition: all 0.3s ease;
+}
+
+.rol-item:hover {
+  background-color: #e9ecef;
+}
+
+.rol-item.asignado-actualmente {
+  background-color: #e6f7ff;
+  border-left: 3px solid #1890ff;
+}
+
+.rol-item input[type="checkbox"] {
+  margin-right: 10px;
+}
+
+.rol-item label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  width: 100%;
+}
+
+.icono-rol {
+  margin-right: 8px;
+  color: #555;
+}
+
+.badge-asignado {
+  margin-left: auto;
+  background-color: #28a745;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.75rem;
+}
+
+.fila-seleccionada {
+  background-color: #f0f7ff;
+}
+
+.btn-asignar.activo {
+  background-color: #1890ff;
+  color: white;
+}
+
+.botones-accion {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.btn-asignar-roles {
+  background-color: #28a745;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.btn-asignar-roles:hover {
+  background-color: #218838;
+}
+
+.btn-cancelar-asignacion {
+  background-color: #dc3545;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.btn-cancelar-asignacion:hover {
+  background-color: #c82333;
+}
+
+/* Estilos responsivos */
+@media (max-width: 768px) {
+  .roles-lista {
+    grid-template-columns: 1fr;
+  }
+  
+  .botones-accion {
+    flex-direction: column;
+  }
+  
+  .btn-asignar-roles, 
+  .btn-cancelar-asignacion {
+    width: 100%;
+  }
+}
