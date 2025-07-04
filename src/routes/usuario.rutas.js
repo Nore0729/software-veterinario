@@ -9,16 +9,20 @@ import Ayudapro from '../page/ayudapro';
 import Actualizarpro from '../page/Actualizarpro';
 import MisMascotas from '../page/MisMascotas';
 import AgendarCita from "../page/AgendarCita";
-
+import CitasProximas from '../page/CitasProximas';
+import HistorialMedico from '../page/HistorialMedico'; 
 const UserSpecificRoutes = () => (
   <>
     <Route path="/UserWelcome" element={<UserWelcome />} />
     <Route path="/Datospro" element={<DatosPro />} />
     <Route path="/Ayudapro" element={<Ayudapro />} />
     <Route path="/Actualizarpro" element={<Actualizarpro />} />
-    <Route path= "/MisMascotas" element={<MisMascotas/>}/>
+    <Route path="/MisMascotas" element={<MisMascotas />} />
     <Route path="/AgendarCita" element={<AgendarCita />} />
+    <Route path="/CitasProximas" element={<CitasProximas />} /> 
+    <Route path="/HistorialMedico" element={<HistorialMedico />} />
   </>
 );
 
 export default UserSpecificRoutes;
+

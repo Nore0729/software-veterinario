@@ -23,7 +23,7 @@ const AgendarCita = () => {
   const [mascotas, setMascotas] = useState([]);
   const [servicios, setServicios] = useState([]);
   const [veterinarios, setVeterinarios] = useState([]);
-  const [citasExistentes, setCitasExistentes] = useState([]);
+  const [horasOcupadas, setHorasOcupadas] = useState([]);
   const [loading, setLoading] = useState(false);
   const [mensaje, setMensaje] = useState({ tipo: "", texto: "" });
   const [mostrarConfirmacion, setMostrarConfirmacion] = useState(false);
@@ -32,9 +32,8 @@ const AgendarCita = () => {
 
   const horariosDisponibles = [
     "08:00", "08:30", "09:00", "09:30", "10:00",
-    "10:30", "11:00", "11:30", "14:00", "14:30",
-    "15:00", "15:30", "16:00", "16:30", "17:00",
-    "17:30", "18:00"
+    "10:30", "11:00", "11:30", "12:00", "14:00",
+    "14:30", "15:00", "15:30", "16:00", "16:30", "17:00"
   ];
 
   useEffect(() => {
@@ -51,10 +50,6 @@ const AgendarCita = () => {
 
         const veterinariosRes = await axios.get('http://localhost:3000/api/veterinarios');
         setVeterinarios(veterinariosRes.data);
-
-        const citasRes = await axios.get(`http://localhost:3000/api/citas`);
-        setCitasExistentes(citasRes.data);
-
       } catch (error) {
         console.error("Error al cargar datos:", error);
       }
@@ -63,15 +58,22 @@ const AgendarCita = () => {
     cargarDatos();
   }, []);
 
-  const verificarDisponibilidad = (fecha, hora) => {
-    if (!formData.veterinario) return true;
-    return !citasExistentes.some(
-      (cita) =>
-        cita.fecha === fecha &&
-        cita.hora === hora &&
-        cita.veterinario_id === parseInt(formData.veterinario)
-    );
-  };
+  useEffect(() => {
+    const cargarHorasOcupadas = async () => {
+      const { fecha, veterinario } = formData;
+      if (!fecha || !veterinario) return;
+
+      try {
+        const res = await axios.get(`http://localhost:3000/api/citas/ocupadas`, {
+          params: { fecha, vet_id: veterinario }
+        });
+        setHorasOcupadas(res.data);
+      } catch (error) {
+        console.error("Error al consultar horarios ocupados:", error);
+      }
+    };
+    cargarHorasOcupadas();
+  }, [formData.fecha, formData.veterinario]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -95,8 +97,8 @@ const AgendarCita = () => {
       return false;
     }
 
-    if (!verificarDisponibilidad(fecha, hora)) {
-      setMensaje({ tipo: "error", texto: "Esta fecha y hora ya están ocupadas para el veterinario seleccionado." });
+    if (horasOcupadas.includes(hora)) {
+      setMensaje({ tipo: "error", texto: "La hora seleccionada ya está ocupada." });
       return false;
     }
 
@@ -188,7 +190,7 @@ const AgendarCita = () => {
             <select name="servicio" value={formData.servicio} onChange={handleInputChange} required>
               <option value="">-- Selecciona un servicio --</option>
               {servicios.map((s) => (
-                <option key={s.id} value={s.id}>{s.nombre} ({s.duracion} min)</option>
+                <option key={s.id} value={s.id}>{s.nombre} ({s.duracion_estimada} min)</option>
               ))}
             </select>
           </div>
@@ -209,14 +211,11 @@ const AgendarCita = () => {
             <label><FaClock /> Hora *</label>
             <select name="hora" value={formData.hora} onChange={handleInputChange} required>
               <option value="">-- Selecciona una hora --</option>
-              {horariosDisponibles.map((hora) => {
-                const disponible = formData.fecha ? verificarDisponibilidad(formData.fecha, hora) : true;
-                return (
-                  <option key={hora} value={hora} disabled={!disponible}>
-                    {hora} {!disponible ? "(Ocupado)" : ""}
-                  </option>
-                );
-              })}
+              {horariosDisponibles.map((hora) => (
+                <option key={hora} value={hora} disabled={horasOcupadas.includes(hora)}>
+                  {hora} {horasOcupadas.includes(hora) ? "(Ocupado)" : ""}
+                </option>
+              ))}
             </select>
           </div>
           <div className="form-group">
@@ -235,4 +234,4 @@ const AgendarCita = () => {
 };
 
 export default AgendarCita;
-
+  

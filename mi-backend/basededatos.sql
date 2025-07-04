@@ -2,7 +2,7 @@ DROP DATABASE IF EXISTS veterinaria;
 CREATE DATABASE veterinaria;
 USE veterinaria;
 
-
+-- Tabla de usuarios
 CREATE TABLE usuarios (
     id INT AUTO_INCREMENT PRIMARY KEY,
     tipo_Doc VARCHAR(10) NOT NULL,
@@ -16,14 +16,20 @@ CREATE TABLE usuarios (
     fecha_Regis TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Tabla de propietarios
+CREATE TABLE propietarios (
+    id_prop INT PRIMARY KEY,
+    FOREIGN KEY (id_prop) REFERENCES usuarios(id) ON DELETE CASCADE
+);
 
- select  * from usuarios; 
+-- Tabla de veterinarios
 CREATE TABLE veterinarios (
     vet_id INT PRIMARY KEY,
     especialidad VARCHAR(50) NOT NULL,
     FOREIGN KEY (vet_id) REFERENCES usuarios(id) ON DELETE CASCADE
 );
 
+-- Tabla de administradores
 CREATE TABLE administradores (
     admin_id INT PRIMARY KEY,
     nivel_acceso ENUM('basico', 'medio', 'alto') DEFAULT 'medio',
@@ -37,7 +43,12 @@ CREATE TABLE roles (
     descripcion VARCHAR(255)
 );
 
+<<<<<<< HEAD
 CREATE TABLE asignacion_rol (
+=======
+-- Asignación de roles
+CREATE TABLE asignacion_roles (
+>>>>>>> 31ff07d (malooo)
     id INT AUTO_INCREMENT PRIMARY KEY,
     doc_usu VARCHAR(15) NOT NULL UNIQUE,
     rol_id INT NOT NULL,
@@ -76,22 +87,22 @@ CREATE TABLE servicios (
     duracion_estimada INT,
     estado ENUM('Activo', 'Inactivo') DEFAULT 'Activo'
 );
-DROP table citas;
+
+-- Tabla de citas
 CREATE TABLE citas (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  propietario_doc VARCHAR(50) NOT NULL,          
-  mascota_id INT NOT NULL,                        
-  servicio VARCHAR(100) NOT NULL,                
-  veterinario_id INT NOT NULL,                    
-  fecha DATE NOT NULL,                            
-  hora TIME NOT NULL,                             
-  notas TEXT,                                    
-  estado ENUM('programada', 'confirmada', 'cancelada', 'completada') DEFAULT 'programada',
-  fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    propietario_doc VARCHAR(50) NOT NULL,
+    mascota_id INT NOT NULL,
+    servicio VARCHAR(100) NOT NULL,
+    veterinario_id INT NOT NULL,
+    fecha DATE NOT NULL,
+    hora TIME NOT NULL,
+    notas TEXT,
+    estado ENUM('programada', 'confirmada', 'cancelada', 'completada') DEFAULT 'programada',
+    fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-SELECT * FROM citas;
-
+-- Tabla de servicios realizados
 CREATE TABLE servicios_realizados (
     id INT AUTO_INCREMENT PRIMARY KEY,
     mascota_id INT NOT NULL,
@@ -130,9 +141,9 @@ CREATE TABLE historias_clinicas (
     INDEX idx_fecha_consulta (fecha_consulta)
 );
 
-
-DROP table historias_clinicas;
+-- Procedimientos almacenados
 DELIMITER $$
+
 CREATE PROCEDURE insertar_servicio(
     IN p_nombre VARCHAR(100), IN p_descripcion TEXT, IN p_precio DECIMAL(10,2),
     IN p_duracion_estimada INT, IN p_estado ENUM('Activo', 'Inactivo')
@@ -168,47 +179,63 @@ BEGIN
         UPDATE usuarios SET password = p_password WHERE id = user_id;
     END IF;
 END$$
+
 DELIMITER ;
 
-SET FOREIGN_KEY_CHECKS = 0;
-TRUNCATE TABLE historias_clinicas;
-TRUNCATE TABLE citas;
-TRUNCATE TABLE mascotas;
-TRUNCATE TABLE veterinarios;
-TRUNCATE TABLE propietarios;
-TRUNCATE TABLE usuarios;
-TRUNCATE TABLE servicios;
-SET FOREIGN_KEY_CHECKS = 1;
-
--- Inserción de servicios
+-- Insertar servicios
 INSERT INTO servicios (nombre, descripcion, precio, duracion_estimada, estado) VALUES
 ('Consulta General', 'Revisión completa de la mascota, diagnóstico y plan de tratamiento inicial.', 50000, 30, 'Activo'),
 ('Vacunación Anual', 'Aplicación de vacunas correspondientes al plan anual de la mascota.', 80000, 20, 'Activo'),
 ('Limpieza Dental', 'Profilaxis dental bajo sedación para eliminar sarro y placa.', 150000, 60, 'Activo'),
 ('Corte de Pelo y Baño', 'Servicio completo de grooming, incluye corte de uñas y limpieza de oídos.', 70000, 90, 'Activo');
 
--- Inserción de usuarios
-INSERT INTO `usuarios` (`id`, `tipo_Doc`, `doc`, `nombre`, `fecha_Nac`, `tel`, `email`, `direccion`, `password`) VALUES
+-- Insertar usuarios
+INSERT INTO usuarios (id, tipo_Doc, doc, nombre, fecha_Nac, tel, email, direccion, password) VALUES
 (1, 'CC', '10101010', 'Ana García', '1990-05-15', '3001112233', 'ana.garcia@email.com', 'Calle Falsa 123', 'pass123'),
 (2, 'CC', '20202020', 'Carlos Martinez', '1985-11-20', '3104445566', 'carlos.martinez@email.com', 'Avenida Siempre Viva 742', 'pass123'),
 (3, 'CC', '30303030', 'Dr. Ricardo Sanchez', '1988-02-10', '3207778899', 'ricardo.sanchez.vet@email.com', 'Consultorio 101', 'passVet1'),
 (4, 'CC', '40404040', 'Dra. Laura Torres', '1992-09-01', '3019998877', 'laura.torres.vet@email.com', 'Consultorio 102', 'passVet1');
 
--- Asignación de roles
-INSERT INTO `propietarios` (`id_prop`) VALUES (1), (2);
-INSERT INTO `veterinarios` (`vet_id`, `especialidad`) VALUES (13, 'Cirugía General'), (10, 'Medicina Interna');
+-- Insertar propietarios y veterinarios
+INSERT INTO propietarios (id_prop) VALUES (1), (2);
+INSERT INTO veterinarios (vet_id, especialidad) VALUES (3, 'Cirugía General'), (4, 'Medicina Interna');
 
--- Inserción de mascotas
-INSERT INTO `mascotas` (`doc_pro`, `nombre`, `especie`, `raza`, `genero`, `color`, `fecha_nac`, `peso`, `tamano`, `estado_reproductivo`, `vacunado`) VALUES
+-- Insertar mascotas
+INSERT INTO mascotas (doc_pro, nombre, especie, raza, genero, color, fecha_nac, peso, tamano, estado_reproductivo, vacunado) VALUES
 ('10101010', 'Max', 'Perro', 'Golden Retriever', 'Macho', 'Dorado', '2021-03-10', 28.5, 'Grande', 'Intacto', 1),
 ('10101010', 'Luna', 'Gato', 'Siamés', 'Hembra', 'Crema', '2022-01-20', 4.2, 'Pequeño', 'Esterilizado', 1),
 ('20202020', 'Rocky', 'Perro', 'Bulldog Francés', 'Macho', 'Negro', '2020-07-30', 12.0, 'Mediano', 'Intacto', 1);
 
-INSERT INTO `citas` (`mascota_id`, `vet_id`, `servicio_id`, `fecha_hora`, `motivo`, `estado`) VALUES
-(1, 3, 1, DATE_ADD(NOW(), INTERVAL 5 DAY), 'Revisión general anual', 'Programada')
-(3, 4, 2, DATE_ADD(NOW(), INTERVAL 2 DAY), 'Vacuna de refuerzo', 'Confirmada');
+-- Insertar citas
+INSERT INTO citas (propietario_doc, mascota_id, servicio, veterinario_id, fecha, hora, notas, estado) VALUES
+('10101010', 1, 'Consulta General', 3, DATE_ADD(CURDATE(), INTERVAL 5 DAY), '10:00:00', 'Revisión general anual', 'programada'),
+('20202020', 3, 'Vacunación Anual', 4, DATE_ADD(CURDATE(), INTERVAL 2 DAY), '14:30:00', 'Vacuna de refuerzo', 'confirmada');
 
+-- Insertar historia clínica
+INSERT INTO historias_clinicas 
+(mascota_id, vet_id, fecha_consulta, motivo_consulta, signos_vitales, diagnostico, tratamiento, medicamentos, observaciones, proxima_cita) VALUES
+(1, 3, '2024-05-20 10:30:00', 'Control anual y revisión de piel.', 
+ '{"peso": "28.5 kg", "temperatura": "38.5°C"}', 
+ 'Dermatitis alérgica leve por pulgas.', 
+ 'Aplicar pipeta antipulgas mensual.', 
+ '[{"nombre": "Bravecto", "dosis": "1 pipeta"}]', 
+ 'El paciente se muestra alerta y con buen apetito.', 
+ '2025-05-20');
+ 
+ -- Consultas básicas
+SELECT * FROM usuarios;
+SELECT * FROM propietarios;
+SELECT * FROM veterinarios;
+SELECT * FROM administradores;
+SELECT * FROM roles;
+SELECT * FROM asignacion_roles;
+SELECT * FROM mascotas;
+SELECT * FROM servicios;
+SELECT * FROM citas;
+SELECT * FROM servicios_realizados;
+SELECT * FROM historias_clinicas;
 
+<<<<<<< HEAD
 INSERT INTO `historias_clinicas` (`mascota_id`, `vet_id`, `fecha_consulta`, `motivo_consulta`, `signos_vitales`, `diagnostico`, `tratamiento`, `medicamentos`, `observaciones`, `proxima_cita`) VALUES
 (1, 3, '2024-05-20 10:30:00', 'Control anual y revisión de piel.', '{"peso": "28.5 kg", "temperatura": "38.5°C"}', 'Dermatitis alérgica leve por pulgas.', 'Aplicar pipeta antipulgas mensual.', '[{"nombre": "Bravecto", "dosis": "1 pipeta"}]', 'El paciente se muestra alerta y con buen apetito.', '2025-05-20');
 
@@ -318,3 +345,5 @@ SELECT * FROM servicios;
 SELECT * FROM citas;
 SELECT * FROM servicios_realizados;
 SELECT * FROM historias_clinicas;
+=======
+>>>>>>> 31ff07d (malooo)

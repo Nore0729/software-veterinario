@@ -57,12 +57,7 @@ const Header = () => {
             <li>
               <Link to="/AyudaU" className="nav-link" onClick={() => !isDesktop && setIsMobileMenuOpen(false)}>Ayuda</Link>
             </li>
-            {/* <li>
-              <Link to="/mascotas" className="nav-link" onClick={() => !isDesktop && setIsMobileMenuOpen(false)}>Mascotas</Link>
-            </li>
-            <li>
-              <Link to="/contacto" className="nav-link" onClick={() => !isDesktop && setIsMobileMenuOpen(false)}>Contacto</Link>
-            </li> */}
+            
           </ul>
         </nav>
 

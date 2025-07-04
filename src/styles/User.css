@@ -314,6 +314,67 @@
   text-decoration: underline;
 }
 
+.citas-tarjetas-container {
+  padding: 20px;
+}
+
+.tarjetas-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.tarjeta-cita {
+  background: #e6f4fb;
+  border-radius: 15px;
+  padding: 15px;
+  width: 250px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease;
+}
+
+.tarjeta-cita:hover {
+  transform: translateY(-5px);
+}
+
+.tarjeta-header {
+  font-size: 18px;
+  margin-bottom: 10px;
+  color: #0077cc;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.tarjeta-body p {
+  margin: 5px 0;
+  font-size: 14px;
+}
+
+.btn-cancelar {
+  margin-top: 10px;
+  background-color: #ff4d4d;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.btn-cancelar:hover {
+  background-color: #e60000;
+}
+
+.mensaje {
+  margin-bottom: 10px;
+  color: #006600;
+  background: #d4edda;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+
 @media (max-width: 768px) {
   .sidebar {
     width: 50px;
