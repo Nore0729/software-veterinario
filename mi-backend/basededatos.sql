@@ -2,6 +2,9 @@ DROP DATABASE IF EXISTS veterinaria;
 CREATE DATABASE veterinaria;
 USE veterinaria;
 
+-- -----------------------------------------------------
+-- Tablas
+-- -----------------------------------------------------
 
 CREATE TABLE usuarios (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -17,36 +20,32 @@ CREATE TABLE usuarios (
 );
 
 
- select  * from usuarios; 
-CREATE TABLE veterinarios (
-    vet_id INT PRIMARY KEY,
-    especialidad VARCHAR(50) NOT NULL,
-    FOREIGN KEY (vet_id) REFERENCES usuarios(id) ON DELETE CASCADE
-);
-
-CREATE TABLE administradores (
-    admin_id INT PRIMARY KEY,
-    nivel_acceso ENUM('basico', 'medio', 'alto') DEFAULT 'medio',
-    FOREIGN KEY (admin_id) REFERENCES usuarios(id) ON DELETE CASCADE
-);
-
 CREATE TABLE roles (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nom_rol VARCHAR(50) NOT NULL UNIQUE,
     descripcion VARCHAR(255)
 );
 
+
 CREATE TABLE asignacion_roles (
     id INT AUTO_INCREMENT PRIMARY KEY,
     usu_id INT NOT NULL,
     rol_id INT NOT NULL,
-    asignado_por INT COMMENT 'ID del admin que asignó el rol',
+    asignado_por INT,
     fecha_asignacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (usu_id) REFERENCES usuarios(id),
-    FOREIGN KEY (rol_id) REFERENCES roles(id),
-    FOREIGN KEY (asignado_por) REFERENCES usuarios(id),
+    FOREIGN KEY (usu_id) REFERENCES usuarios(id) ON DELETE CASCADE,
+    FOREIGN KEY (rol_id) REFERENCES roles(id) ON DELETE CASCADE,
+    FOREIGN KEY (asignado_por) REFERENCES usuarios(id) ON DELETE SET NULL,
     UNIQUE (usu_id, rol_id)
 );
+
+
+CREATE TABLE veterinarios (
+    vet_id INT PRIMARY KEY,
+    especialidad VARCHAR(50) NOT NULL,
+    FOREIGN KEY (vet_id) REFERENCES usuarios(id) ON DELETE CASCADE
+);
+
 
 CREATE TABLE mascotas (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -57,51 +56,43 @@ CREATE TABLE mascotas (
     genero ENUM('Macho', 'Hembra') NOT NULL,
     color VARCHAR(30),
     fecha_nac DATE NOT NULL,
-    peso DECIMAL(5,2) COMMENT 'Peso en kg',
+    peso DECIMAL(5,2),
     tamano ENUM('Pequeño', 'Mediano', 'Grande') NOT NULL,
     estado_reproductivo ENUM('Intacto', 'Esterilizado', 'Castrado') NOT NULL,
     vacunado BOOLEAN DEFAULT FALSE,
     observaciones TEXT,
+    estado ENUM('Activo', 'Inactivo') NOT NULL DEFAULT 'Activo',
     fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (doc_pro) REFERENCES usuarios(doc) ON DELETE CASCADE
 );
+
 
 CREATE TABLE servicios (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
     descripcion TEXT,
     precio DECIMAL(10,2) NOT NULL,
-    duracion_estimada INT COMMENT 'Duración en minutos',
+    duracion_estimada INT,
     estado ENUM('Activo', 'Inactivo') DEFAULT 'Activo'
 );
-DROP table citas;
+
+
 CREATE TABLE citas (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  propietario_doc VARCHAR(50) NOT NULL,          
-  mascota_id INT NOT NULL,                        
-  servicio VARCHAR(100) NOT NULL,                
-  veterinario_id INT NOT NULL,                    
-  fecha DATE NOT NULL,                            
-  hora TIME NOT NULL,                             
-  notas TEXT,                                    
-  estado ENUM('programada', 'confirmada', 'cancelada', 'completada') DEFAULT 'programada',
-  fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-SELECT * FROM citas;
-
-CREATE TABLE servicios_realizados (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    mascota_id INT NOT NULL,
-    servicio_id INT NOT NULL,
-    vet_id INT NOT NULL,
-    fecha_hora DATETIME NOT NULL,
-    notas TEXT,
+    propietario_doc VARCHAR(50) NOT NULL,          
+    mascota_id INT NOT NULL,                        
+    servicio VARCHAR(100) NOT NULL,                
+    veterinario_id INT NOT NULL,                    
+    fecha DATE NOT NULL,                            
+    hora TIME NOT NULL,                             
+    notas TEXT,                                    
+    estado ENUM('programada', 'confirmada', 'cancelada', 'completada') DEFAULT 'programada',
+    fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (propietario_doc) REFERENCES usuarios(doc) ON DELETE CASCADE,
     FOREIGN KEY (mascota_id) REFERENCES mascotas(id) ON DELETE CASCADE,
-    FOREIGN KEY (servicio_id) REFERENCES servicios(id) ON DELETE CASCADE,
-    FOREIGN KEY (vet_id) REFERENCES veterinarios(vet_id) ON DELETE CASCADE,
-    INDEX idx_fecha_hora (fecha_hora)
+    FOREIGN KEY (veterinario_id) REFERENCES veterinarios(vet_id) ON DELETE CASCADE
 );
+
 
 CREATE TABLE historias_clinicas (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -122,96 +113,56 @@ CREATE TABLE historias_clinicas (
     fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (mascota_id) REFERENCES mascotas(id) ON DELETE CASCADE,
     FOREIGN KEY (cita_id) REFERENCES citas(id) ON DELETE SET NULL,
-    FOREIGN KEY (vet_id) REFERENCES veterinarios(vet_id) ON DELETE CASCADE,
-    INDEX idx_mascota (mascota_id),
-    INDEX idx_fecha_consulta (fecha_consulta)
+    FOREIGN KEY (vet_id) REFERENCES veterinarios(vet_id) ON DELETE CASCADE
 );
 
 
-DROP table historias_clinicas;
-DELIMITER $$
-CREATE PROCEDURE insertar_servicio(
-    IN p_nombre VARCHAR(100), IN p_descripcion TEXT, IN p_precio DECIMAL(10,2),
-    IN p_duracion_estimada INT, IN p_estado ENUM('Activo', 'Inactivo')
-)
-BEGIN
-    INSERT INTO servicios (nombre, descripcion, precio, duracion_estimada, estado)
-    VALUES (p_nombre, p_descripcion, p_precio, p_duracion_estimada, p_estado);
-END$$
+-- -----------------------------------------------------
+-- Datos de Ejemplo
+-- -----------------------------------------------------
 
-CREATE PROCEDURE ActualizarServicio(
-    IN p_id INT, IN p_nombre VARCHAR(100), IN p_descripcion TEXT,
-    IN p_precio DECIMAL(10,2), IN p_duracion_estimada INT, IN p_estado ENUM('Activo', 'Inactivo')
-)
-BEGIN
-    UPDATE servicios SET nombre = p_nombre, descripcion = p_descripcion, precio = p_precio,
-    duracion_estimada = p_duracion_estimada, estado = p_estado WHERE id = p_id;
-END$$
+INSERT INTO roles (id, nom_rol, descripcion) VALUES (1, 'propietario', 'Dueño de mascota'), (2, 'veterinario', 'Médico veterinario'), (3, 'administrador', 'Admin del sistema');
 
-CREATE PROCEDURE borrar_servicio(IN servicio_id INT)
-BEGIN
-    DELETE FROM servicios WHERE id = servicio_id;
-END$$
+INSERT INTO servicios (id, nombre, descripcion, precio, duracion_estimada, estado) VALUES 
+(1, 'Consulta General', 'Revisión completa', 50000, 30, 'Activo'),
+(2, 'Vacunación Anual', 'Plan anual de vacunas', 80000, 20, 'Activo'), 
+(3, 'Limpieza Dental', 'Profilaxis dental', 150000, 60, 'Activo'), 
+(4, 'Corte de Pelo y Baño', 'Servicio de grooming', 70000, 90, 'Activo');
 
-CREATE PROCEDURE ModifyPassword(IN user_email VARCHAR(255), IN p_password VARCHAR(255))
-BEGIN
-    DECLARE user_exists INT;
-    DECLARE user_id INT;
-    SELECT COUNT(*), u.id INTO user_exists, user_id FROM usuarios u
-    INNER JOIN propietarios p ON u.id = p.id_prop WHERE u.email = user_email;
-    IF user_exists = 0 THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Usuario no encontrado o no es propietario';
-    ELSE
-        UPDATE usuarios SET password = p_password WHERE id = user_id;
-    END IF;
-END$$
-DELIMITER ;
+INSERT INTO usuarios (id, tipo_Doc, doc, nombre, fecha_Nac, tel, email, direccion, password) VALUES 
+(1, 'CC', '10101010', 'Ana García', '1990-05-15', '3001112233', 'ana.garcia@email.com', 'Calle Falsa 123', 'pass_hashed'), 
+(2, 'CC', '20202020', 'Carlos Martinez', '1985-11-20', '3104445566', 'carlos.martinez@email.com', 'Avenida Siempre Viva 742', 'pass_hashed'), 
+(3, 'CC', '30303030', 'Dr. Ricardo Sanchez', '1988-02-10', '3207778899', 'ricardo.sanchez.vet@email.com', 'Consultorio 101', 'pass_hashed'), 
+(4, 'CC', '40404040', 'Dra. Laura Torres', '1992-09-01', '3019998877', 'laura.torres.vet@email.com', 'Consultorio 102', 'pass_hashed');
 
-SET FOREIGN_KEY_CHECKS = 0;
-TRUNCATE TABLE historias_clinicas;
-TRUNCATE TABLE citas;
-TRUNCATE TABLE mascotas;
-TRUNCATE TABLE veterinarios;
-TRUNCATE TABLE propietarios;
-TRUNCATE TABLE usuarios;
-TRUNCATE TABLE servicios;
-SET FOREIGN_KEY_CHECKS = 1;
+INSERT INTO asignacion_roles (usu_id, rol_id) VALUES 
+(1, 1), 
+(2, 1), 
+(3, 2), 
+(4, 2);
 
--- Inserción de servicios
-INSERT INTO servicios (nombre, descripcion, precio, duracion_estimada, estado) VALUES
-('Consulta General', 'Revisión completa de la mascota, diagnóstico y plan de tratamiento inicial.', 50000, 30, 'Activo'),
-('Vacunación Anual', 'Aplicación de vacunas correspondientes al plan anual de la mascota.', 80000, 20, 'Activo'),
-('Limpieza Dental', 'Profilaxis dental bajo sedación para eliminar sarro y placa.', 150000, 60, 'Activo'),
-('Corte de Pelo y Baño', 'Servicio completo de grooming, incluye corte de uñas y limpieza de oídos.', 70000, 90, 'Activo');
+INSERT INTO veterinarios (vet_id, especialidad) VALUES 
+(3, 'Cirugía General'), 
+(4, 'Medicina Interna');
 
--- Inserción de usuarios
-INSERT INTO `usuarios` (`id`, `tipo_Doc`, `doc`, `nombre`, `fecha_Nac`, `tel`, `email`, `direccion`, `password`) VALUES
-(1, 'CC', '10101010', 'Ana García', '1990-05-15', '3001112233', 'ana.garcia@email.com', 'Calle Falsa 123', 'pass123'),
-(2, 'CC', '20202020', 'Carlos Martinez', '1985-11-20', '3104445566', 'carlos.martinez@email.com', 'Avenida Siempre Viva 742', 'pass123'),
-(3, 'CC', '30303030', 'Dr. Ricardo Sanchez', '1988-02-10', '3207778899', 'ricardo.sanchez.vet@email.com', 'Consultorio 101', 'passVet1'),
-(4, 'CC', '40404040', 'Dra. Laura Torres', '1992-09-01', '3019998877', 'laura.torres.vet@email.com', 'Consultorio 102', 'passVet1');
+INSERT INTO mascotas (id, doc_pro, nombre, especie, raza, genero, color, fecha_nac, peso, tamano, estado_reproductivo, vacunado) VALUES 
+(1, '10101010', 'Max', 'Perro', 'Golden Retriever', 'Macho', 'Dorado', '2021-03-10', 28.5, 'Grande', 'Intacto', 1), 
+(2, '10101010', 'Luna', 'Gato', 'Siamés', 'Hembra', 'Crema', '2022-01-20', 4.2, 'Pequeño', 'Esterilizado', 1), 
+(3, '20202020', 'Rocky', 'Perro', 'Bulldog Francés', 'Macho', 'Negro', '2020-07-30', 12.0, 'Mediano', 'Intacto', 1);
 
--- Asignación de roles
-INSERT INTO `propietarios` (`id_prop`) VALUES (1), (2);
-INSERT INTO `veterinarios` (`vet_id`, `especialidad`) VALUES (13, 'Cirugía General'), (10, 'Medicina Interna');
+INSERT INTO citas (id, propietario_doc, mascota_id, servicio, veterinario_id, fecha, hora, notas, estado) VALUES 
+(1, '10101010', 1, 'Consulta General', 3, DATE_ADD(CURDATE(), INTERVAL 5 DAY), '10:00:00', 'Revisión anual', 'programada'), 
+(2, '20202020', 3, 'Vacunación Anual', 4, DATE_ADD(CURDATE(), INTERVAL 2 DAY), '14:00:00', 'Refuerzo', 'confirmada');
 
--- Inserción de mascotas
-INSERT INTO `mascotas` (`doc_pro`, `nombre`, `especie`, `raza`, `genero`, `color`, `fecha_nac`, `peso`, `tamano`, `estado_reproductivo`, `vacunado`) VALUES
-('10101010', 'Max', 'Perro', 'Golden Retriever', 'Macho', 'Dorado', '2021-03-10', 28.5, 'Grande', 'Intacto', 1),
-('10101010', 'Luna', 'Gato', 'Siamés', 'Hembra', 'Crema', '2022-01-20', 4.2, 'Pequeño', 'Esterilizado', 1),
-('20202020', 'Rocky', 'Perro', 'Bulldog Francés', 'Macho', 'Negro', '2020-07-30', 12.0, 'Mediano', 'Intacto', 1);
-
-INSERT INTO `citas` (`mascota_id`, `vet_id`, `servicio_id`, `fecha_hora`, `motivo`, `estado`) VALUES
-(1, 3, 1, DATE_ADD(NOW(), INTERVAL 5 DAY), 'Revisión general anual', 'Programada')
-(3, 4, 2, DATE_ADD(NOW(), INTERVAL 2 DAY), 'Vacuna de refuerzo', 'Confirmada');
+INSERT INTO historias_clinicas (mascota_id, cita_id, vet_id, fecha_consulta, motivo_consulta, diagnostico) VALUES 
+(1, 1, 3, '2024-05-20 10:30:00', 'Control anual', 'Dermatitis alérgica');
 
 
-INSERT INTO `historias_clinicas` (`mascota_id`, `vet_id`, `fecha_consulta`, `motivo_consulta`, `signos_vitales`, `diagnostico`, `tratamiento`, `medicamentos`, `observaciones`, `proxima_cita`) VALUES
-(1, 3, '2024-05-20 10:30:00', 'Control anual y revisión de piel.', '{"peso": "28.5 kg", "temperatura": "38.5°C"}', 'Dermatitis alérgica leve por pulgas.', 'Aplicar pipeta antipulgas mensual.', '[{"nombre": "Bravecto", "dosis": "1 pipeta"}]', 'El paciente se muestra alerta y con buen apetito.', '2025-05-20');
-
+-- -----------------------------------------------------
+-- Procedimientos Almacenados
+-- -----------------------------------------------------
 
 DELIMITER $$
-
 CREATE PROCEDURE `GetOwnersWithDetails`(IN p_doc VARCHAR(15))
 BEGIN
     SELECT
@@ -221,48 +172,49 @@ BEGIN
         u.email,
         u.direccion AS address,
         u.fecha_Regis AS registrationDate,
-        MIN(citas.fecha_hora) as nextAppointmentDate,
-        -- Usamos JSON_ARRAYAGG para agrupar todas las mascotas de un propietario en un solo campo JSON
-        JSON_ARRAYAGG(
-            -- Usamos IF para evitar errores si un propietario no tiene mascotas
-            IF(m.id IS NULL, NULL,
-                -- JSON_OBJECT crea un objeto JSON para cada mascota
-                JSON_OBJECT(
-                    'id', m.id,
-                    'name', m.nombre,
-                    'species', m.especie,
-                    'breed', m.raza,
-                    'age', CONCAT(TIMESTAMPDIFF(YEAR, m.fecha_nac, CURDATE()), ' años'),
-                    'weight', m.peso,
-                    'gender', m.genero,
-                    'photo', '/placeholder.svg?height=80&width=80',
-                    'pendingAppointments', (SELECT COUNT(*) FROM citas c WHERE c.mascota_id = m.id AND c.estado IN ('Programada', 'Confirmada') AND c.fecha_hora >= NOW()),
-                    'lastVisit', (SELECT MAX(fecha_consulta) FROM historias_clinicas hc WHERE hc.mascota_id = m.id),
-                    'nextAppointment', ( -- Subconsulta para obtener la próxima cita específica de esta mascota
-                        SELECT JSON_OBJECT('date', DATE_FORMAT(c.fecha_hora, '%Y-%m-%d'), 'time', DATE_FORMAT(c.fecha_hora, '%H:%i'), 'service', s.nombre, 'status', LOWER(c.estado))
-                        FROM citas c JOIN servicios s ON c.servicio_id = s.id
-                        WHERE c.mascota_id = m.id AND c.estado IN ('Programada', 'Confirmada') AND c.fecha_hora >= NOW()
-                        ORDER BY c.fecha_hora ASC LIMIT 1
+        MIN(CONCAT(c.fecha, ' ', c.hora)) as nextAppointmentDate,
+        IFNULL(
+            CONCAT('[',
+                GROUP_CONCAT(
+                    DISTINCT
+                    IF(m.id IS NULL, NULL,
+                        JSON_OBJECT(
+                            'id', m.id,
+                            'name', m.nombre,
+                            'species', m.especie,
+                            'breed', m.raza,
+                            'age', CONCAT(TIMESTAMPDIFF(YEAR, m.fecha_nac, CURDATE()), ' años'),
+                            'weight', m.peso,
+                            'gender', m.genero,
+                            'photo', '/placeholder.svg?height=80&width=80',
+                            'pendingAppointments', (SELECT COUNT(*) FROM citas c_sub WHERE c_sub.mascota_id = m.id AND c_sub.estado IN ('programada', 'confirmada') AND CONCAT(c_sub.fecha, ' ', c_sub.hora) >= NOW()),
+                            'lastVisit', (SELECT MAX(hc.fecha_consulta) FROM historias_clinicas hc WHERE hc.mascota_id = m.id),
+                            'nextAppointment', (
+                                SELECT JSON_OBJECT('date', c_sub.fecha, 'time', c_sub.hora, 'service', c_sub.servicio, 'status', LOWER(c_sub.estado))
+                                FROM citas c_sub
+                                WHERE c_sub.mascota_id = m.id AND c_sub.estado IN ('programada', 'confirmada') AND CONCAT(c_sub.fecha, ' ', c_sub.hora) >= NOW()
+                                ORDER BY CONCAT(c_sub.fecha, ' ', c_sub.hora) ASC LIMIT 1
+                            )
+                        )
                     )
-                )
-            )
-        ) as pets
+                ),
+            ']'),
+        '[]') as pets
     FROM
         usuarios u
     JOIN
-        propietarios p ON u.id = p.id_prop
+        asignacion_roles ar ON u.id = ar.usu_id
+    JOIN
+        roles r ON ar.rol_id = r.id
     LEFT JOIN
         mascotas m ON u.doc = m.doc_pro
     LEFT JOIN
-        citas ON m.id = citas.mascota_id AND citas.estado IN ('Programada', 'Confirmada') AND citas.fecha_hora >= NOW()
-    -- El WHERE maneja la búsqueda: si p_doc es NULL o vacío, los trae a todos. Si no, busca por el documento.
+        citas c ON m.id = c.mascota_id AND c.estado IN ('programada', 'confirmada') AND CONCAT(c.fecha, ' ', c.hora) >= NOW()
     WHERE
-        (p_doc IS NULL OR p_doc = '' OR u.doc LIKE CONCAT('%', p_doc, '%'))
+        r.nom_rol = 'propietario' AND (p_doc IS NULL OR p_doc = '' OR u.doc LIKE CONCAT('%', p_doc, '%'))
     GROUP BY
         u.id
-    -- Ordena por la fecha de la cita más próxima. Los que no tienen cita van al final.
     ORDER BY
-        nextAppointmentDate IS NULL, nextAppointmentDate ASC;
+        MIN(CONCAT(c.fecha, ' ', c.hora)) IS NULL, MIN(CONCAT(c.fecha, ' ', c.hora)) ASC;
 END$$
-
 DELIMITER ;

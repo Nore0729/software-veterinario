@@ -14,12 +14,7 @@ import {
   Filter,
   AlertCircle,
   CheckCircle,
-  XCircle,
-  Heart,
-  Activity,
-  Edit,
-  Eye,
-  Loader, // Icono de carga
+  Loader,
 } from "lucide-react"
 import "../styles/UsuarioVet.css" // Asegúrate de que la ruta a tu CSS es correcta
 
@@ -31,86 +26,85 @@ const OwnersList = () => {
   const [filterStatus, setFilterStatus] = useState("all")
   const [expandedOwners, setExpandedOwners] = useState(new Set())
 
-  // --- FUNCIÓN PARA OBTENER DATOS DEL BACKEND ---
-  // useCallback evita que la función se recree en cada render, optimizando el rendimiento.
+  // --- FUNCIÓN PARA OBTENER DATOS DEL BACKEND (CORREGIDA) ---
   const fetchOwners = useCallback(async (doc) => {
-    setIsLoading(true)
-    // Usamos el procedimiento almacenado que creamos en el backend
-    const url = new URL("http://localhost:3001/api/owners")
+    setIsLoading(true);
+    
+    // Usamos una ruta relativa que funcionará correctamente
+    let url = '/api/propietarios'; 
+    
+    // Si hay un término de búsqueda, lo añadimos como un parámetro de query
     if (doc) {
-      url.searchParams.append("doc", doc)
+      url += `?doc=${doc}`;
     }
-
+  
     try {
-      const response = await fetch(url)
+      const response = await fetch(url); // La URL ahora es correcta
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-      const data = await response.json()
-      setOwnersData(data)
+      const data = await response.json();
+      setOwnersData(data);
     } catch (error) {
-      console.error("No se pudieron obtener los datos de los propietarios:", error)
-      setOwnersData([]) // En caso de error, dejamos la lista vacía
+      console.error("No se pudieron obtener los datos de los propietarios:", error);
+      setOwnersData([]); // En caso de error, dejamos la lista vacía
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }, [])
+  }, []); // El array de dependencias vacío asegura que la función no se recree innecesariamente
 
   // --- useEffect PARA BÚSQUEDA Y CARGA INICIAL ---
   useEffect(() => {
-    // Este "debounce" espera 500ms después de que el usuario deja de escribir para lanzar la búsqueda.
-    // Esto evita hacer una llamada a la API por cada letra tecleada.
+    // Debounce para no sobrecargar la API con cada letra tecleada
     const debounceHandler = setTimeout(() => {
-      fetchOwners(searchTerm)
-    }, 500)
+      fetchOwners(searchTerm);
+    }, 500);
 
-    // La función de limpieza se ejecuta si el componente se desmonta o antes de volver a ejecutar el efecto.
     return () => {
-      clearTimeout(debounceHandler)
-    }
-  }, [searchTerm, fetchOwners])
+      clearTimeout(debounceHandler);
+    };
+  }, [searchTerm, fetchOwners]);
 
 
   // --- FUNCIONES AUXILIARES Y DE MANEJO DE UI ---
-
   const toggleOwnerExpansion = (ownerId) => {
-    const newExpanded = new Set(expandedOwners)
+    const newExpanded = new Set(expandedOwners);
     if (newExpanded.has(ownerId)) {
-      newExpanded.delete(ownerId)
+      newExpanded.delete(ownerId);
     } else {
-      newExpanded.add(ownerId)
+      newExpanded.add(ownerId);
     }
-    setExpandedOwners(newExpanded)
+    setExpandedOwners(newExpanded);
   }
 
   const getStatusClass = (status) => {
     switch (status) {
-      case "confirmada": return "status-confirmed"
-      case "programada": return "status-pending"
-      case "completada": return "status-completed"
-      case "cancelada": return "status-cancelled"
-      default: return "status-default"
+      case "confirmada": return "status-confirmed";
+      case "programada": return "status-pending";
+      case "completada": return "status-completed";
+      case "cancelada": return "status-cancelled";
+      default: return "status-default";
     }
   }
 
   const getStatusIcon = (status) => {
     switch (status) {
-      case "confirmada": return <CheckCircle className="status-icon" />
-      case "programada": return <AlertCircle className="status-icon" />
-      default: return <Calendar className="status-icon" />
+      case "confirmada": return <CheckCircle className="status-icon" />;
+      case "programada": return <AlertCircle className="status-icon" />;
+      default: return <Calendar className="status-icon" />;
     }
   }
 
-  // El filtrado por "con/sin citas" se hace en el frontend sobre los datos ya cargados.
   const filteredOwners = ownersData.filter((owner) => {
+    if (!owner.pets) return true; // Si por alguna razón no hay mascotas, no lo filtramos
     const hasPendingAppointments = owner.pets.some(
       (pet) => pet && pet.pendingAppointments > 0
-    )
-    if (filterStatus === "all") return true
-    if (filterStatus === "with-appointments") return hasPendingAppointments
-    if (filterStatus === "no-appointments") return !hasPendingAppointments
-    return true
-  })
+    );
+    if (filterStatus === "all") return true;
+    if (filterStatus === "with-appointments") return hasPendingAppointments;
+    if (filterStatus === "no-appointments") return !hasPendingAppointments;
+    return true;
+  });
 
   // --- RENDERIZADO DEL COMPONENTE ---
 
@@ -120,10 +114,8 @@ const OwnersList = () => {
         <Loader className="loading-icon" />
         <p>Cargando propietarios...</p>
       </div>
-    )
+    );
   }
-  
-  // (Variantes de animación como `containerVariants`, `cardVariants`, etc., se mantienen igual que en tu archivo original)
 
   return (
     <motion.div className="owners-container">
@@ -156,7 +148,7 @@ const OwnersList = () => {
       <AnimatePresence>
         {filteredOwners.length > 0 ? (
           filteredOwners.map((owner) => (
-            <motion.div key={owner.id} className="owner-card-container" >
+            <motion.div key={owner.id} className="owner-card-container">
               <div className="owner-card">
                 <div className="owner-header" onClick={() => toggleOwnerExpansion(owner.id)}>
                     <div className="owner-info">
@@ -201,7 +193,7 @@ const OwnersList = () => {
                                       {pet.nextAppointment.service}
                                     </span>
                                     <span className="appointment-time">
-                                      {new Date(pet.nextAppointment.date).toLocaleDateString('es-ES', {day: '2-digit', month: 'long'})}, {pet.nextAppointment.time}
+                                      {new Date(pet.nextAppointment.date + 'T00:00:00').toLocaleDateString('es-ES', {day: '2-digit', month: 'long'})}, {pet.nextAppointment.time}
                                     </span>
                                   </div>
                                 </div>
@@ -232,4 +224,4 @@ const OwnersList = () => {
   )
 }
 
-export default OwnersList
+export default OwnersList;
