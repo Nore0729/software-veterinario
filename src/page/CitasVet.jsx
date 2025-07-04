@@ -27,9 +27,9 @@ const VeterinaryAppointments = () => {
   const fetchAllData = async () => {
     try {
       const [appRes, servRes, vetRes] = await Promise.all([
-        fetch('/api/citasvet'),
-        fetch('/api/servicios'),
-        fetch('/api/veterinarios')
+        fetch('http://localhost:3000/api/citasvet'),
+        fetch('http://localhost:3000/api/servicios'),
+        fetch('http://localhost:3000/api/veterinarios')
       ]);
       
       if (!appRes.ok || !servRes.ok || !vetRes.ok) throw new Error("Error al cargar datos iniciales");
@@ -55,10 +55,11 @@ const VeterinaryAppointments = () => {
   // --- Manejadores para el MODAL DE EDICIÓN ---
   const handleOpenEditModal = (appointment) => {
     setCurrentAppointment(appointment);
-    const vetIdEncontrado = veterinarios.find(v => v.nombre === appointment.veterinario)?.vet_id || '';
+    // *** AJUSTE REALIZADO AQUÍ ***
+    // Se usan los campos correctos que vienen de la API modificada
     setEditFormData({
-        servicio_id: servicios.find(s => s.nombre === appointment.service)?.id || '',
-        vet_id: vetIdEncontrado,
+        servicio_nombre: appointment.service || '', 
+        vet_id: appointment.veterinario_id, 
         fecha_hora: appointment.date,
         time: appointment.time,
         motivo: appointment.notes || ''
@@ -77,7 +78,7 @@ const VeterinaryAppointments = () => {
     e.preventDefault();
     if (!currentAppointment) return;
     try {
-        const response = await fetch(`/api/citasvet/${currentAppointment.id}`, {
+        const response = await fetch(`http://localhost:3000/api/citasvet/${currentAppointment.id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(editFormData),
@@ -91,7 +92,7 @@ const VeterinaryAppointments = () => {
             timer: 1500,
             showConfirmButton: false
         });
-        fetchAllData();
+        fetchAllData(); // Recargar datos para ver los cambios
     } catch (error) {
         console.error("Error al actualizar la cita:", error);
         Swal.fire('Error', 'No se pudo actualizar la cita.', 'error');
@@ -112,7 +113,7 @@ const VeterinaryAppointments = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const response = await fetch(`/api/citasvet/${appointmentId}`, { method: 'DELETE' });
+          const response = await fetch(`http://localhost:3000/api/citasvet/${appointmentId}`, { method: 'DELETE' });
           if (!response.ok) throw new Error('No se pudo eliminar la cita.');
           setAppointments(prev => prev.filter(app => app.id !== appointmentId));
           Swal.fire('¡Eliminado!', 'La cita ha sido eliminada.', 'success');
@@ -128,7 +129,7 @@ const VeterinaryAppointments = () => {
     const originalAppointments = [...appointments];
     setAppointments(prev => prev.map(app => app.id === appointmentId ? { ...app, status: newStatus } : app));
     try {
-      const response = await fetch(`/api/citasvet/${appointmentId}/status`, {
+      const response = await fetch(`http://localhost:3000/api/citasvet/${appointmentId}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus }),
@@ -148,7 +149,7 @@ const VeterinaryAppointments = () => {
   const getStatusClass = (status) => {
     switch (status?.toLowerCase()) {
       case "confirmada": return "status-confirmed";
-      case "pendiente": return "status-pending";
+      case "programada": return "status-pending"; // 'programada' es el nuevo 'pendiente'
       case "completada": return "status-completed";
       case "cancelada": return "status-cancelled";
       default: return "status-default";
@@ -158,7 +159,7 @@ const VeterinaryAppointments = () => {
   const getStatusIcon = (status) => {
     switch (status?.toLowerCase()) {
       case "confirmada": return <CheckCircle className="status-icon" />;
-      case "pendiente": return <AlertCircle className="status-icon" />;
+      case "programada": return <AlertCircle className="status-icon" />;
       case "completada": return <CheckCircle className="status-icon" />;
       case "cancelada": return <XCircle className="status-icon" />;
       default: return <AlertCircle className="status-icon" />;
@@ -197,7 +198,17 @@ const VeterinaryAppointments = () => {
 
       <motion.div className="appointments-filters">
         <div className="search-container"><Search className="search-icon" /><input type="text" placeholder="Buscar por mascota o propietario..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="search-input"/></div>
-        <div className="filter-container"><Filter className="filter-icon" /><select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="filter-select"><option value="all">Todos los estados</option><option value="pendiente">Pendiente</option><option value="confirmada">Confirmada</option><option value="completada">Completada</option><option value="cancelada">Cancelada</option></select></div>
+        <div className="filter-container">
+          <Filter className="filter-icon" />
+          <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="filter-select">
+            <option value="all">Todos los estados</option>
+            {/* *** AJUSTE REALIZADO AQUÍ *** */}
+            <option value="programada">Programada</option>
+            <option value="confirmada">Confirmada</option>
+            <option value="completada">Completada</option>
+            <option value="cancelada">Cancelada</option>
+          </select>
+        </div>
       </motion.div>
       
       <motion.div className="appointments-list">
@@ -209,7 +220,7 @@ const VeterinaryAppointments = () => {
                   <div className="appointment-info">
                     <div className="appointment-pet-info"><div className="pet-avatar"><Dog className="pet-icon" /></div><div className="pet-details"><h3 className="pet-name">{appointment.petName}</h3><p className="owner-name"><User className="owner-icon" />{appointment.ownerName}</p></div></div>
                     <div className="appointment-details">
-                      <div className="appointment-detail"><Calendar className="detail-icon" /><span>{new Date(appointment.date).toLocaleDateString("es-ES")}</span></div>
+                      <div className="appointment-detail"><Calendar className="detail-icon" /><span>{new Date(appointment.date).toLocaleDateString("es-ES", { timeZone: 'UTC' })}</span></div>
                       <div className="appointment-detail"><Clock className="detail-icon" /><span>{appointment.time}</span></div>
                       <div className="appointment-detail"><Phone className="detail-icon" /><span>{appointment.phone}</span></div>
                       <div className="appointment-detail"><Mail className="detail-icon" /><span>{appointment.email}</span></div>
@@ -217,8 +228,12 @@ const VeterinaryAppointments = () => {
                     <div className="appointment-badges">
                       <div className={`status-badge-container ${getStatusClass(appointment.status)}`}>
                         {getStatusIcon(appointment.status)}
+                        {/* *** AJUSTE REALIZADO AQUÍ *** */}
                         <select value={appointment.status} className="status-select" onChange={(e) => handleStatusChange(appointment.id, e.target.value)}>
-                          <option value="Pendiente">Pendiente</option><option value="Confirmada">Confirmada</option><option value="Completada">Completada</option><option value="Cancelada">Cancelada</option>
+                          <option value="programada">Programada</option>
+                          <option value="confirmada">Confirmada</option>
+                          <option value="completada">Completada</option>
+                          <option value="cancelada">Cancelada</option>
                         </select>
                       </div>
                       <span className="service-badge">{appointment.service}</span>
@@ -240,7 +255,7 @@ const VeterinaryAppointments = () => {
         <motion.div className="empty-state" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
           <div className="empty-icon-container"><Calendar className="empty-icon" /></div>
           <h3 className="empty-title">No hay citas</h3>
-          <p className="empty-message">No se encontraron citas. ¡Intenta crear una nueva!</p>
+          <p className="empty-message">No se encontraron citas que coincidan con los filtros. ¡Intenta crear una nueva!</p>
         </motion.div>
       )}
 
@@ -255,12 +270,39 @@ const VeterinaryAppointments = () => {
               <div className="modal-body">
                 {currentAppointment && 
                   <form onSubmit={handleEditFormSubmit} className="edit-form">
-                    <div className="form-group"><label>Servicio</label><select name="servicio_id" value={editFormData.servicio_id} onChange={handleEditFormChange} required>{servicios.map(s => <option key={s.id} value={s.id}>{s.nombre}</option>)}</select></div>
-                    <div className="form-group"><label>Veterinario</label><select name="vet_id" value={editFormData.vet_id} onChange={handleEditFormChange} required>{veterinarios.map(v => <option key={v.vet_id} value={v.vet_id}>Dr. {v.nombre}</option>)}</select></div>
-                    <div className="form-group"><label>Fecha</label><input type="date" name="fecha_hora" value={editFormData.fecha_hora} onChange={handleEditFormChange} required /></div>
-                    <div className="form-group"><label>Hora</label><input type="time" name="time" value={editFormData.time} onChange={handleEditFormChange} required /></div>
-                    <div className="form-group"><label>Notas</label><textarea name="motivo" value={editFormData.motivo} onChange={handleEditFormChange}></textarea></div>
-                    <div className="modal-footer"><button type="button" className="btn-secundario" onClick={handleCloseEditModal}>Cancelar</button><button type="submit" className="btn-primario">Guardar Cambios</button></div>
+                    {/* *** AJUSTE REALIZADO AQUÍ *** */}
+                    <div className="form-group">
+                        <label>Servicio</label>
+                        <input 
+                            type="text"
+                            name="servicio_nombre" 
+                            value={editFormData.servicio_nombre || ''}
+                            onChange={handleEditFormChange} 
+                            required 
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Veterinario</label>
+                        <select name="vet_id" value={editFormData.vet_id || ''} onChange={handleEditFormChange} required>
+                            {veterinarios.map(v => <option key={v.vet_id} value={v.vet_id}>Dr. {v.nombre}</option>)}
+                        </select>
+                    </div>
+                    <div className="form-group">
+                        <label>Fecha</label>
+                        <input type="date" name="fecha_hora" value={editFormData.fecha_hora || ''} onChange={handleEditFormChange} required />
+                    </div>
+                    <div className="form-group">
+                        <label>Hora</label>
+                        <input type="time" name="time" value={editFormData.time || ''} onChange={handleEditFormChange} required />
+                    </div>
+                    <div className="form-group">
+                        <label>Notas</label>
+                        <textarea name="motivo" value={editFormData.motivo || ''} onChange={handleEditFormChange}></textarea>
+                    </div>
+                    <div className="modal-footer">
+                        <button type="button" className="btn-secundario" onClick={handleCloseEditModal}>Cancelar</button>
+                        <button type="submit" className="btn-primario">Guardar Cambios</button>
+                    </div>
                   </form>
                 }
               </div>

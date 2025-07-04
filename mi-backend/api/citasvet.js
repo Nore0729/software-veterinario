@@ -7,50 +7,77 @@ module.exports = function(db) {
 
   // GET: Obtener TODAS las citas para la lista
   router.get('/', (req, res) => {
-    const sql = `
-      SELECT
-        c.id, m.nombre AS petName, p.nombre AS ownerName, p.tel AS phone,
-        p.email AS email, c.fecha_hora, s.nombre AS service, c.estado AS status, c.notas AS notes,
-        vet_user.nombre AS veterinario
-      FROM citas c
-      JOIN mascotas m ON c.mascota_id = m.id
-      JOIN usuarios p ON m.doc_pro = p.doc
-      JOIN servicios s ON c.servicio_id = s.id
-      JOIN veterinarios v ON c.vet_id = v.vet_id
-      JOIN usuarios vet_user ON v.vet_id = vet_user.id
-      ORDER BY c.fecha_hora ASC;
-    `;
-    db.query(sql, (err, results) => {
-      if (err) return res.status(500).json({ error: 'Error interno del servidor.' });
-      const citasFormateadas = results.map(cita => {
-        const fechaHora = new Date(cita.fecha_hora);
-        return { ...cita, date: fechaHora.toISOString().split('T')[0], time: fechaHora.toTimeString().split(' ')[0].substring(0, 5) };
-      });
-      res.status(200).json(citasFormateadas);
+  // La consulta ahora se adapta a la estructura de la BD
+  const sql = `
+    SELECT
+      c.id,
+      m.nombre AS petName,
+      p.nombre AS ownerName,
+      p.tel AS phone,
+      p.email AS email,
+      c.fecha,                               -- Obtenemos la fecha
+      c.hora,                                -- Obtenemos la hora
+      c.servicio AS service,                 -- Obtenemos el nombre del servicio directamente
+      c.estado AS status,
+      c.notas AS notes,
+      c.veterinario_id,                      -- Pasamos el ID del veterinario
+      vet_user.nombre AS veterinario
+    FROM citas c
+    JOIN mascotas m ON c.mascota_id = m.id
+    JOIN usuarios p ON m.doc_pro = p.doc
+    JOIN veterinarios v ON c.veterinario_id = v.vet_id -- Unión corregida
+    JOIN usuarios vet_user ON v.vet_id = vet_user.id
+    ORDER BY c.fecha, c.hora ASC;
+  `;
+  db.query(sql, (err, results) => {
+    if (err) {
+      console.error("❌ Error al consultar citas:", err);
+      return res.status(500).json({ error: 'Error interno del servidor.' });
+    }
+    
+    // "Traducimos" los resultados para el frontend
+    const citasFormateadas = results.map(cita => {
+      const fechaJS = new Date(cita.fecha);
+      const [hora, minutos] = cita.hora.split(':');
+      fechaJS.setUTCHours(hora, minutos);
+
+      return {
+        ...cita,
+        // Creamos los campos 'date' y 'time' que el frontend espera
+        date: fechaJS.toISOString().split('T')[0],
+        time: `${hora}:${minutos}`
+      };
     });
+    res.status(200).json(citasFormateadas);
   });
+});
 
   // GET: Obtener UNA SOLA cita por su ID (para rellenar el formulario de edición)
-  router.get('/:id', (req, res) => {
-    const citaId = req.params.id;
-    const sql = `
-      SELECT c.mascota_id, c.vet_id, c.servicio_id, c.fecha_hora, c.notas AS motivo, m.doc_pro AS propietario_doc 
-      FROM citas c
-      JOIN mascotas m ON c.mascota_id = m.id
-      WHERE c.id = ?
-    `;
-    db.query(sql, [citaId], (err, results) => {
-      if (err) return res.status(500).json({ error: "Error interno del servidor." });
-      if (results.length === 0) return res.status(404).json({ error: "No se encontró la cita." });
-      
-      const cita = results[0];
-      const fechaHoraJS = new Date(cita.fecha_hora);
-      cita.fecha_hora = fechaHoraJS.toISOString().split('T')[0];
-      cita.time = fechaHoraJS.toTimeString().split(' ')[0].substring(0, 5);
-      res.json(cita);
-    });
-  });
+  router.put('/:id', (req, res) => {
+  const citaId = req.params.id;
+  // Esperamos los nombres de campo que envía el formulario de edición
+  const { servicio_nombre, vet_id, fecha_hora, time, motivo } = req.body;
 
+  const sql = `
+    UPDATE citas 
+    SET 
+      servicio = ?, 
+      veterinario_id = ?, 
+      fecha = ?, 
+      hora = ?, 
+      notas = ? 
+    WHERE id = ?`;
+  
+  const params = [servicio_nombre, vet_id, fecha_hora, time, motivo, citaId];
+
+  db.query(sql, params, (err, result) => {
+    if (err) {
+      console.error("❌ Error al actualizar la cita:", err);
+      return res.status(500).json({ error: 'Error al actualizar la cita.' });
+    }
+    res.status(200).json({ message: 'Cita actualizada exitosamente' });
+  });
+});
   // PUT: Actualizar una cita existente por su ID
   router.put('/:id', (req, res) => {
     const citaId = req.params.id;

@@ -1,3 +1,5 @@
+// archivo: Citas.jsx (Versión Corregida)
+
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
@@ -5,23 +7,19 @@ import Swal from 'sweetalert2';
 import '../styles/Citas.css'
 
 function Citas() {
-  // Este componente ahora solo se encarga de CREAR citas nuevas
   const { register, handleSubmit, formState: { errors }, watch } = useForm({
     mode: 'onChange',
   });
   const navigate = useNavigate();
 
-  // Estados para datos dinámicos de los menús desplegables
   const [propietarios, setPropietarios] = useState([]);
   const [mascotas, setMascotas] = useState([]);
   const [servicios, setServicios] = useState([]);
   const [veterinarios, setVeterinarios] = useState([]);
   const [loadingMascotas, setLoadingMascotas] = useState(false);
 
-  // Observamos el valor del propietario seleccionado para cargar sus mascotas
   const selectedPropietarioDoc = watch("propietario_doc");
 
-  // useEffect para cargar datos iniciales (propietarios, servicios, etc.)
   useEffect(() => {
     const fetchInitialData = async () => {
         try {
@@ -40,12 +38,11 @@ function Citas() {
     fetchInitialData();
   }, []);
 
-  // useEffect para cargar las mascotas cuando cambia el propietario
   useEffect(() => {
     const fetchMascotas = async () => {
         if (selectedPropietarioDoc) {
             setLoadingMascotas(true);
-            setMascotas([]); // Limpiamos la lista anterior
+            setMascotas([]);
             try {
                 const response = await fetch(`/api/propietarios/${selectedPropietarioDoc}/mascotas`);
                 setMascotas(await response.json());
@@ -61,11 +58,9 @@ function Citas() {
     fetchMascotas();
   }, [selectedPropietarioDoc]);
 
-
-  // Función para enviar el formulario y crear una nueva cita
   const onSubmit = async (data) => {
     try {
-        const response = await fetch('/api/citasvet', {
+        const response = await fetch('/api/citas', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data),
@@ -83,10 +78,7 @@ function Citas() {
             timer: 2000,
             showConfirmButton: false,
         });
-
-        // Redirigimos a la lista de citas para ver el cambio
         navigate('/CitasVet'); 
-
     } catch (error) {
         console.error("Error al enviar el formulario:", error);
         Swal.fire({
@@ -103,7 +95,6 @@ function Citas() {
         <form className="cita-formulario" onSubmit={handleSubmit(onSubmit)}>
           <h1 className="cita-titulo">Agendar Nueva Cita</h1>
           <div className="cita-secciones">
-            
             <div className="cita-seccion">
               <h2 className="cita-subtitulo">Datos del Paciente</h2>
               <label className="cita-label">Propietario *</label>
@@ -136,27 +127,27 @@ function Citas() {
               <h2 className="cita-subtitulo">Detalles de la Cita</h2>
               <label className="cita-label">Servicio *</label>
                 <select
-                className={`cita-input ${errors.servicio_id ? 'input-error' : ''}`}
-                {...register('servicio_id', { required: "Selecciona un servicio" })}
+                className={`cita-input ${errors.servicio ? 'input-error' : ''}`}
+                {...register('servicio', { required: "Selecciona un servicio" })}
               >
                 <option value="">-- Seleccionar Servicio --</option>
                 {servicios.map(s => (
-                    <option key={s.id} value={s.id}>{s.nombre}</option>
+                    <option key={s.id} value={s.nombre}>{s.nombre}</option>
                 ))}
               </select>
-              {errors.servicio_id && <p className="error-text">{errors.servicio_id.message}</p>}
+              {errors.servicio && <p className="error-text">{errors.servicio.message}</p>}
 
               <label className="cita-label">Veterinario *</label>
                 <select
-                className={`cita-input ${errors.vet_id ? 'input-error' : ''}`}
-                {...register('vet_id', { required: "Selecciona un veterinario" })}
+                className={`cita-input ${errors.veterinario_id ? 'input-error' : ''}`}
+                {...register('veterinario_id', { required: "Selecciona un veterinario" })}
               >
                 <option value="">-- Seleccionar Veterinario --</option>
                 {veterinarios.map(v => (
                     <option key={v.vet_id} value={v.vet_id}>Dr. {v.nombre}</option>
                 ))}
               </select>
-              {errors.vet_id && <p className="error-text">{errors.vet_id.message}</p>}
+              {errors.veterinario_id && <p className="error-text">{errors.veterinario_id.message}</p>}
             </div>
             
             <div className="cita-seccion">
@@ -165,23 +156,23 @@ function Citas() {
                 <input
                   type="date"
                   min={new Date().toISOString().split('T')[0]}
-                  className={`cita-input ${errors.fecha_hora ? 'input-error' : ''}`}
-                  {...register('fecha_hora', { required: "La fecha es obligatoria" })}
+                  className={`cita-input ${errors.fecha ? 'input-error' : ''}`}
+                  {...register('fecha', { required: "La fecha es obligatoria" })}
                 />
-                {errors.fecha_hora && <p className="error-text">{errors.fecha_hora.message}</p>}
+                {errors.fecha && <p className="error-text">{errors.fecha.message}</p>}
               </div>
               <div className="cita-seleccion-hora">
                 <label className="cita-label">Hora *</label>
                 <select
-                  className={`cita-input ${errors.time ? 'input-error' : ''}`}
-                  {...register('time', { required: "Selecciona una hora" })}
+                  className={`cita-input ${errors.hora ? 'input-error' : ''}`}
+                  {...register('hora', { required: "Selecciona una hora" })}
                 >
                   <option value="">-- Seleccionar Hora --</option>
-                  {['09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00'].map(time => (
+                  {['09:00:00', '10:00:00', '11:00:00', '13:00:00', '14:00:00', '15:00:00', '16:00:00'].map(time => (
                       <option key={time} value={time}>{time}</option>
                   ))}
                 </select>
-                {errors.time && <p className="error-text">{errors.time.message}</p>}
+                {errors.hora && <p className="error-text">{errors.hora.message}</p>}
               </div>
             </div>
 
@@ -191,9 +182,9 @@ function Citas() {
                 placeholder="Motivo de la cita, síntomas, etc."
                 rows="3"
                 className="cita-textarea"
-                {...register('motivo', { maxLength: { value: 500, message: "Máximo 500 caracteres" } })}
+                {...register('notas', { maxLength: { value: 500, message: "Máximo 500 caracteres" } })}
               ></textarea>
-              {errors.motivo && <p className="error-text">{errors.motivo.message}</p>}
+              {errors.notas && <p className="error-text">{errors.notas.message}</p>}
             </div>
           </div>
 
